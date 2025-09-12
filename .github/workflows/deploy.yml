@@ -40,8 +40,9 @@ jobs:
       - name: Upload to Deno Deploy
         run: |
           deno install -A --global jsr:@deno/deployctl
-          cd dist
           deployctl deploy \
             --project=kumak-blog \
             --token=${{ secrets.DENO_DEPLOY_TOKEN }} \
-            --entrypoint=jsr:@std/http/file-server
+            --include=./dist \
+            --exclude=node_modules \
+            --entrypoint=https://deno.land/std/http/file_server.ts

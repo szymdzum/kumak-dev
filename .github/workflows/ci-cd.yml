@@ -91,7 +91,9 @@ jobs:
           deployctl deploy \
             --project=kumak-blog \
             --token=${{ secrets.DENO_DEPLOY_TOKEN }} \
-            --entrypoint=dist/server/entry.mjs
+            --include=./dist \
+            --exclude=node_modules \
+            --entrypoint=https://deno.land/std/http/file_server.ts
       
       - name: Create deployment status
         if: always()
