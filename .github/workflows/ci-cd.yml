@@ -1,4 +1,4 @@
-name: 🛡️ Quality Gates & Deploy
+name: Quality Gates & Deploy
 
 on:
   push:
@@ -38,19 +38,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
       
-      - name: 🔍 Layer 4a: TypeScript Validation
+      - name: TypeScript Validation
         run: deno run -A npm:astro check
       
-      - name: 📝 Layer 4b: JSR-Native Linting
+      - name: JSR-Native Linting
         run: deno lint
       
-      - name: 🎨 Layer 4c: Code Formatting Check
+      - name: Code Formatting Check
         run: deno fmt --check src/ tests/ astro.config.mjs
       
-      - name: 🧪 Layer 4d: Test Suite Execution
+      - name: Test Suite Execution
         run: deno task test
       
-      - name: 🏠 Layer 4e: Production Build Validation
+      - name: Production Build Validation
         run: deno task build
       
       - name: Upload build artifacts
