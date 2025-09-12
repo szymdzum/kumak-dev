@@ -1,0 +1,59 @@
+---
+export interface Props {
+  as?: 'h1' | 'h2' | 'h3';
+  size?: 'large' | 'xl';
+  class?: string;
+}
+
+const { 
+  as: Element = 'h1',
+  size = 'xl',
+  class: className = '',
+  ...rest 
+} = Astro.props;
+
+const sizeClass = `hero-title-${size}`;
+---
+
+<Element class:list={['hero-title', sizeClass, className]} {...rest}>
+  <slot />
+</Element>
+
+<style>
+  .hero-title {
+    font-weight: 900;
+    margin: 0;
+    color: white;
+    letter-spacing: -0.02em;
+    text-align: center;
+    transition: transform 0.3s ease;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: auto;
+  }
+
+  .hero-title:hover {
+    transform: scale(1.02);
+  }
+
+  .hero-title-large {
+    font-size: clamp(2rem, 6vw, 4rem);
+    line-height: 1.1;
+  }
+
+  .hero-title-xl {
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    line-height: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-title {
+      transition: none;
+    }
+    
+    .hero-title:hover {
+      transform: none;
+    }
+  }
+</style>

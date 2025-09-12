@@ -1,0 +1,47 @@
+name: Deploy to Deno Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    # No need for working-directory - we're at root now
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.x
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: Build project
+        run: deno task build
+
+      - name: Upload to Deno Deploy
+        run: |
+          deno install -A --global jsr:@deno/deployctl
+          cd dist
+          deployctl deploy \
+            --project=kumak-blog \
+            --token=${{ secrets.DENO_DEPLOY_TOKEN }} \
+            --entrypoint=jsr:@std/http/file-server

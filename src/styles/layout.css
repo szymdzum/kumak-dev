@@ -1,0 +1,195 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+
+  /* No body padding - let content go edge to edge */
+  padding-inline: 0;
+}
+
+main {
+  width: 100%;
+  flex: 1;
+
+  /* Add fluid spacing between sections */
+  display: grid;
+  gap: clamp(3rem, 8vw, 6rem);
+}
+
+/* Replace with intrinsic sections */
+section {
+  container-type: inline-size;
+  display: grid;
+  gap: clamp(1rem, 4cqi, 2rem);
+
+  /* Keep padding but make it fluid */
+  padding-block: clamp(2rem, 6vw, 4rem);
+}
+
+/* Special handling for content that needs measure constraint */
+section.constrained {
+  /* Only constrain reading content, not the section itself */
+  > p,
+  > .prose {
+    max-inline-size: var(--measure);
+    margin-inline: auto;
+  }
+}
+
+/* Edge-to-edge sections when needed */
+section.full-bleed {
+  margin-inline: calc(-1 * clamp(0.75rem, 1.5vw, 1rem));
+  padding-inline: clamp(0.75rem, 1.5vw, 1rem);
+}
+
+footer {
+  margin-top: auto;
+  padding: var(--padding-sm);
+}
+
+/* Update .center to be less aggressive */
+.center {
+  margin-inline: auto;
+  box-sizing: content-box;
+  max-inline-size: var(--max-width, var(--measure));
+  /* Remove padding since body now handles it */
+}
+
+/* Enhanced flexbox-row with container awareness */
+.flexbox-row {
+  --min: clamp(18ch, 25cqi, 30ch);
+  --gap: clamp(1rem, 4cqi, 2rem);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  container-type: inline-size;
+
+  > * {
+    flex: 1 1 var(--min);
+  }
+}
+
+@container (min-width: 40rem) {
+  .flexbox-row {
+    --min: clamp(25ch, 30cqi, 40ch);
+    --gap: clamp(1.5rem, 5cqi, 3rem);
+  }
+}
+
+/* Natural grid with container query enhancement */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18.75rem, 100%), 1fr));
+  gap: clamp(1rem, 4cqi, 2rem);
+  container-type: inline-size;
+}
+
+@container (min-width: 30rem) {
+  .auto-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+    gap: clamp(1.25rem, 5cqi, 2.5rem);
+  }
+}
+
+@container (min-width: 60rem) {
+  .auto-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(22.5rem, 100%), 1fr));
+    gap: clamp(1.5rem, 6cqi, 3rem);
+  }
+}
+
+/* Enhanced stack with container-aware fluid spacing */
+.stack {
+  container-type: inline-size;
+}
+
+.stack > * + * {
+  margin-block-start: clamp(var(--s-1), 3cqi, var(--s1));
+}
+
+.stack-sm {
+  container-type: inline-size;
+}
+
+.stack-sm > * + * {
+  margin-block-start: clamp(var(--s-2), 2cqi, var(--s0));
+}
+
+@container (min-width: 30rem) {
+  .stack > * + * {
+    margin-block-start: clamp(var(--s0), 4cqi, var(--s2));
+  }
+
+  .stack-sm > * + * {
+    margin-block-start: clamp(var(--s-1), 3cqi, var(--s1));
+  }
+}
+
+/* Fluid boxes */
+.box {
+  padding: clamp(1rem, 4cqi, 2rem);
+  border-radius: clamp(var(--radius-sm), 1cqi, var(--radius));
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  container-type: inline-size;
+}
+
+/* Container query enhancements for boxes */
+@container (min-width: 25rem) {
+  .box {
+    padding: clamp(1.5rem, 5cqi, 3rem);
+  }
+}
+
+@container (min-width: 40rem) {
+  .box {
+    padding: clamp(2rem, 6cqi, 4rem);
+    border-radius: clamp(var(--radius), 1.5cqi, var(--radius) * 2);
+  }
+}
+
+/* Card component that breathes */
+.card {
+  container-type: inline-size;
+  padding: clamp(1rem, 4cqi, 2rem);
+  border-radius: clamp(var(--radius-sm), 1cqi, var(--radius));
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--box-shadow);
+}
+
+@container (min-width: 25rem) {
+  .card {
+    padding: clamp(1.5rem, 5cqi, 3rem);
+  }
+
+  .card h3 {
+    font-size: clamp(1.5rem, 4cqi, 2.25rem);
+  }
+}
+
+@container (min-width: 40rem) {
+  .card {
+    padding: clamp(2rem, 6cqi, 4rem);
+    border-radius: clamp(var(--radius), 1.5cqi, var(--radius) * 2);
+  }
+
+  .card h3 {
+    font-size: clamp(1.75rem, 5cqi, 2.75rem);
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

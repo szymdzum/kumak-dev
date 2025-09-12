@@ -1,0 +1,320 @@
+/* Typography Variables - Fluid and Container-Aware */
+:root {
+  --text-base-size: clamp(0.875rem, 2.5vw, 1.125rem);
+  --text-scale-ratio: 1.25;
+
+  /* Fluid proportional text sizes with container awareness */
+  --text-sm: calc(var(--text-base-size) / var(--text-scale-ratio));
+  --text-base: var(--text-base-size);
+  --text-lg: calc(var(--text-base-size) * var(--text-scale-ratio));
+  --text-xl: calc(var(--text-base-size) * var(--text-scale-ratio) * var(--text-scale-ratio));
+
+  /* Container-contextual text sizes */
+  --text-contextual-sm: clamp(0.75rem, 3cqi, 1rem);
+  --text-contextual-base: clamp(0.875rem, 4cqi, 1.25rem);
+  --text-contextual-lg: clamp(1rem, 5cqi, 1.5rem);
+  --text-contextual-xl: clamp(1.125rem, 6cqi, 1.875rem);
+
+  /* Font families */
+  --font-family-base:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue', sans-serif;
+  --font-family-heading: var(--font-family-base);
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Fluid line heights that adapt to container context */
+  --line-height-tight: clamp(1.1, 1.2 + 0.1cqi, 1.3);
+  --line-height-base: clamp(1.4, 1.5 + 0.1cqi, 1.6);
+  --line-height-loose: clamp(1.7, 1.8 + 0.1cqi, 1.9);
+
+  /* Standard measure for readable text */
+  --measure: 60ch;
+}
+
+/* Improve text rendering */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-base);
+}
+
+/* Enhanced link styles */
+a:not([class]) {
+  text-decoration-thickness: max(0.08em, 1px);
+  text-underline-offset: 0.15em;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+  text-decoration: none;
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover,
+h5 a:hover,
+h6 a:hover {
+  text-decoration: underline;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-secondary);
+  transition: color var(--theme-transition);
+  line-height: var(--line-height-tight);
+  font-family: var(--font-family-heading);
+}
+
+/* Headings with container query enhancements */
+h1 {
+  font-size: clamp(2.5rem, 6vw + 2cqi, 4rem);
+  margin-bottom: var(--s1);
+  letter-spacing: clamp(-0.03em, -0.02em + 0.01cqi, -0.01em);
+  container-type: inline-size;
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw + 1.5cqi, 3rem);
+  margin-bottom: var(--s0);
+  container-type: inline-size;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 4vw + 1cqi, 2.25rem);
+  margin-bottom: var(--s-1);
+  container-type: inline-size;
+}
+
+h4 {
+  font-size: clamp(1.2rem, 3vw + 0.75cqi, 1.5rem);
+  margin-bottom: var(--s-1);
+  container-type: inline-size;
+}
+
+h5 {
+  font-size: clamp(1rem, 2.5vw + 0.5cqi, 1.2rem);
+  margin-bottom: var(--s-1);
+  font-weight: bold;
+  container-type: inline-size;
+}
+
+h6 {
+  font-size: clamp(0.875rem, 2vw + 0.25cqi, 1rem);
+  margin-bottom: var(--s-1);
+  font-weight: normal;
+  font-style: italic;
+  container-type: inline-size;
+}
+
+/* Container query refinements for headings */
+@container (min-width: 30rem) {
+  h1 {
+    font-size: clamp(3rem, 8cqi, 5rem);
+  }
+  h2 {
+    font-size: clamp(2.5rem, 6cqi, 4rem);
+  }
+  h3 {
+    font-size: clamp(2rem, 5cqi, 3rem);
+  }
+}
+
+@container (min-width: 50rem) {
+  h1 {
+    font-size: clamp(3.5rem, 10cqi, 6rem);
+    letter-spacing: clamp(-0.04em, -0.02em, -0.01em);
+  }
+  h2 {
+    font-size: clamp(3rem, 8cqi, 4.5rem);
+  }
+  h3 {
+    font-size: clamp(2.25rem, 6cqi, 3.5rem);
+  }
+}
+
+p,
+ul,
+ol {
+  max-width: var(--measure);
+  margin-bottom: var(--s0);
+}
+
+ul,
+ol {
+  padding-left: var(--s1);
+}
+
+a {
+  color: var(--color-primary);
+  transition: color var(--theme-transition);
+}
+
+/* Code blocks */
+pre,
+code {
+  font-family: var(--font-family-mono);
+}
+
+code {
+  font-size: clamp(0.8em, 0.9em + 0.1cqi, 1em);
+  padding: clamp(0.125em, 0.2em + 0.05cqi, 0.3em) clamp(0.25em, 0.4em + 0.1cqi, 0.5em);
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-sm);
+}
+
+pre {
+  padding: var(--s0-contextual);
+  overflow-x: auto;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius);
+  container-type: inline-size;
+}
+
+@container (min-width: 30rem) {
+  pre {
+    padding: var(--s1-contextual);
+  }
+}
+
+pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Flow utility for proper content spacing */
+.flow > * + * {
+  margin-top: var(--s1);
+}
+
+/* Rich text content class for styling article/blog content */
+.rich-text h2 {
+  margin-top: var(--s3);
+}
+
+.rich-text h3 {
+  margin-top: var(--s2);
+}
+
+.rich-text blockquote {
+  padding-left: var(--s1);
+  border-left: 4px solid var(--color-border);
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.rich-text img {
+  margin: var(--s1) 0;
+}
+
+/* Typography styles - replaces prose utility */
+.prose {
+  color: var(--color-foreground);
+  max-width: 65ch;
+}
+
+.prose a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.prose p.lead {
+  font-size: var(--text-contextual-lg);
+  color: var(--color-muted-foreground);
+}
+
+.prose h2 {
+  margin-top: var(--s2-contextual);
+  margin-bottom: var(--s0-contextual);
+  font-size: var(--text-contextual-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: clamp(-0.03em, -0.02em + 0.01cqi, -0.01em);
+  line-height: var(--line-height-tight);
+}
+
+.prose h3 {
+  margin-top: var(--s1-contextual);
+  margin-bottom: var(--s0-contextual);
+  font-size: var(--text-contextual-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: clamp(-0.02em, -0.01em + 0.005cqi, 0em);
+  line-height: var(--line-height-tight);
+}
+
+.prose ul {
+  margin: var(--s1-contextual) 0;
+  padding-left: var(--s1-contextual);
+  list-style-type: disc;
+}
+
+.prose ul li {
+  margin-bottom: var(--s-1);
+}
+
+.prose pre {
+  margin: var(--s1-contextual) 0;
+  padding: var(--s0-contextual);
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: var(--border-thin) solid var(--color-border);
+  background-color: black;
+}
+
+.prose pre code {
+  background-color: transparent;
+  color: var(--color-foreground);
+  font-family: 'GeistMono', monospace;
+}
+
+.prose code {
+  padding: clamp(0.0625rem, 0.125rem + 0.05cqi, 0.1875rem) clamp(0.125rem, 0.25rem + 0.1cqi, 0.375rem);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-muted);
+  font-family: 'GeistMono', monospace;
+  font-size: var(--text-contextual-sm);
+}
+
+/* Text size utility classes */
+.text-sm {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.text-base {
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+.text-lg {
+  font-size: var(--text-lg);
+  line-height: 1.4;
+}
+
+.text-xl {
+  font-size: var(--text-xl);
+  line-height: 1.3;
+}

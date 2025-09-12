@@ -1,0 +1,65 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import PostContent from "./PostContent.astro";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+---
+
+<article data-component="post-card">
+  <PostContent post={post} showTitle={true} />
+  <div data-post-image-container>
+    <Image
+      src={post.data.heroImage || "/blog-placeholder-1.jpg"}
+      alt={post.data.title}
+      width={600}
+      height={450}
+      format="webp"
+      quality={80}
+      loading="lazy"
+      data-post-image
+    />
+  </div>
+</article>
+
+<style>
+  [data-component="post-card"] {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--space-lg, 2rem);
+    border-radius: var(--radius, 0.25rem);
+    transition: transform 0.2s ease;
+    margin-bottom: var(--s4);
+    margin-top: var(--s4);
+    align-items: start;
+  }
+
+  [data-post-image-container] {
+    overflow: hidden;
+    border-radius: var(--radius, 0.25rem);
+    aspect-ratio: 4/3;
+  }
+
+  [data-post-image] {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  [data-component="post-card"]:hover [data-post-image] {
+    transform: scale(1.05);
+  }
+
+  /* Responsive layout */
+  @media (max-width: 768px) {
+    [data-component="post-card"] {
+      grid-template-columns: 1fr;
+      gap: var(--space-md, 1rem);
+    }
+  }
+</style>

@@ -1,0 +1,142 @@
+/* Theme Variables */
+:root {
+  /* Light theme variables */
+  --color-bg: #ffffff;
+  --color-text: #111111;
+  --color-primary: #3273dc;
+  --color-primary-dark: #2357b8;
+  --color-secondary: #363636;
+  --color-secondary-dark: #1f1f1f;
+  --color-accent: #ff470f;
+  --color-muted: #666666;
+  --color-border: #dbdbdb;
+  --color-border-hover: #b5b5b5;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  /* Semantic state colors (Style Guide requirement) */
+  --color-surface: hsl(0 0% 100%);
+  --color-error: hsl(0 72% 51%);
+  --color-success: hsl(123 46% 44%);
+  --color-warning: hsl(45 86% 62%);
+  --color-info: hsl(204 86% 53%);
+
+  /* RGB values for rgba() usage */
+  --background-rgb: 255, 255, 255;
+  --foreground-rgb: 17, 17, 17;
+  --border-rgb: 219, 219, 219;
+  --primary-rgb: 50, 115, 220;
+  --secondary-rgb: 54, 54, 54;
+  --accent-rgb: 255, 71, 15;
+
+  /* Border styles - fluid and container-aware */
+  --border-thin: max(0.0625rem, 0.1cqi);
+  --radius-sm: clamp(0.125rem, 0.5cqi, 0.375rem);
+  --radius: clamp(0.25rem, 1cqi, 0.75rem);
+  --blur-amount: clamp(0.5rem, 2cqi, 1.25rem);
+
+  /* Layout variables - intrinsic and container-aware */
+  --container-width: min(90%, 80ch);
+  --header-height: clamp(3rem, 8vh, 6rem);
+  --container-inline-padding: clamp(0.75rem, 2.5vw, 2rem);
+  --container-block-padding: clamp(1rem, 4vh, 3rem);
+
+  /* Fluid modular scale using ratio of 1.5 with container awareness */
+  --ratio: 1.5;
+  --s0: clamp(0.875rem, 2vw + 0.5rem, 1.125rem);
+  --s1: calc(var(--s0) * var(--ratio));
+  --s2: calc(var(--s1) * var(--ratio));
+  --s3: calc(var(--s2) * var(--ratio));
+  --s4: calc(var(--s3) * var(--ratio));
+  --s5: calc(var(--s4) * var(--ratio));
+  --s-1: calc(var(--s0) / var(--ratio));
+  --s-2: calc(var(--s-1) / var(--ratio));
+
+  /* Container-aware spacing variants */
+  --s0-contextual: clamp(0.75rem, 2cqi, 1.25rem);
+  --s1-contextual: calc(var(--s0-contextual) * var(--ratio));
+  --s2-contextual: calc(var(--s1-contextual) * var(--ratio));
+
+  /* Responsive padding using clamp */
+  --padding-xs: clamp(0.5rem, 1.5%, 0.75rem);
+  --padding-sm: clamp(1rem, 3%, 1.5rem);
+  --padding-md: clamp(1.5rem, 6%, 3rem);
+  --padding-lg: clamp(3rem, 12%, 6rem);
+  --padding-xl: clamp(4rem, 16%, 8rem);
+
+  /* Fluid type scale (Style Guide requirement) */
+  --step-0: clamp(1.125rem, 1.0815rem + 0.2174vw, 1.25rem);
+  --step-1: clamp(1.35rem, 1.2761rem + 0.3696vw, 1.5625rem);
+  --step-2: clamp(1.62rem, 1.5076rem + 0.5652vw, 1.9531rem);
+  --step-3: clamp(1.944rem, 1.7869rem + 0.8261vw, 2.4414rem);
+
+  /* Space scale (Style Guide requirement) */
+  --space-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --space-s: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --space-m: clamp(1.5rem, 1.425rem + 0.375vw, 1.6875rem);
+  --space-l: clamp(2rem, 1.8rem + 1vw, 2.5rem);
+  --space-xl: clamp(3rem, 2.7rem + 1.5vw, 4rem);
+
+  /* Standard measure for readable text (Style Guide requirement) */
+  --measure: 65ch;
+
+  /* Typography - fluid base with container awareness */
+  --text-base: clamp(0.875rem, 2.5vw, 1.125rem);
+  --text-contextual: clamp(0.875rem, 4cqi, 1.25rem);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Theme transition */
+  --theme-transition: 0.2s ease-in-out;
+  transition:
+    background-color var(--theme-transition),
+    color var(--theme-transition),
+    border-color var(--theme-transition),
+    box-shadow var(--theme-transition);
+
+  /* Z-index layers */
+  --z-negative: -1;
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal: 40;
+  --z-popover: 50;
+  --z-tooltip: 60;
+}
+
+/* Dark theme variables */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #121212;
+    --color-text: #ffffff;
+    --color-primary: #66b3ff;
+    --color-primary-dark: #4d9ce6;
+    --color-secondary: #b5b5b5;
+    --color-secondary-dark: #8a8a8a;
+    --color-accent: #ff8c66;
+    --color-muted: #999999;
+    --color-border: #404040;
+    --color-border-hover: #606060;
+    --box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+
+    /* Semantic state colors (dark theme) */
+    --color-surface: hsl(0 0% 7%);
+    --color-error: hsl(0 72% 60%);
+    --color-success: hsl(123 46% 54%);
+    --color-warning: hsl(45 86% 72%);
+    --color-info: hsl(204 86% 63%);
+
+    /* RGB values for dark theme */
+    --background-rgb: 18, 18, 18;
+    --foreground-rgb: 255, 255, 255;
+    --border-rgb: 64, 64, 64;
+    --primary-rgb: 102, 179, 255;
+    --secondary-rgb: 181, 181, 181;
+    --accent-rgb: 255, 115, 64;
+  }
+}
+
+/* Remove manual theme toggle for now */
+/* :root[data-theme='dark'] { ... } */

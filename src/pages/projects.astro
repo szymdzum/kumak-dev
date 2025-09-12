@@ -1,0 +1,40 @@
+---
+import Layout from "@layouts/Layout.astro";
+import ProjectCard from "@components/ProjectCard.astro";
+
+import { featuredProjects } from "@/site-config";
+---
+
+<Layout
+  title="Projects - The Null Hypothesis"
+  description="A collection of my coding projects and open-source contributions"
+>
+  <section class="projects-page">
+    <header>
+      <h1>Projects</h1>
+      <p class="subtitle">
+        A collection of my coding projects and open-source contributions
+      </p>
+    </header>
+    <div class="auto-grid">
+      {
+        featuredProjects.map((project) => (
+          <ProjectCard
+            title={project.title}
+            description={project.description}
+            tags={project.tags}
+            githubUrl={project.githubUrl}
+            demoUrl={project.demoUrl}
+          />
+        ))
+      }
+    </div>
+  </section>
+</Layout>
+
+<style>
+
+
+
+
+</style>

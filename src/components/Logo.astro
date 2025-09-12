@@ -1,0 +1,39 @@
+---
+import { siteConfig } from "@/site-config";
+---
+
+<a href="/" class="logo" aria-label={siteConfig.name}>
+  <svg
+    class="logo-icon"
+    width="40"
+    height="40"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+    ></circle>
+    <line x1="6" y1="12" x2="18" y2="12" stroke="currentColor" stroke-width="2"
+    ></line>
+  </svg>
+</a>
+
+<style>
+  .logo {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+  }
+
+  .logo:hover {
+    background-color: rgba(var(--foreground-rgb), 0.05);
+  }
+
+  .logo-icon {
+    color: rgb(var(--foreground-rgb));
+  }
+</style>

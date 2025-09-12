@@ -1,0 +1,22 @@
+---
+import Layout from "@layouts/Layout.astro";
+
+export interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Layout title={title} description={description}>
+  <article class="stack">
+    <header class="center">
+      <h1>{title}</h1>
+      <p data-subtitle>{description}</p>
+    </header>
+    <section class="center stack">
+      <slot />
+    </section>
+  </article>
+</Layout>

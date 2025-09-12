@@ -1,0 +1,100 @@
+---
+import { siteConfig } from "@/site-config";
+import { isPathActive } from "@/utils/path";
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav data-component="navigation" aria-label="Main navigation">
+  <ul data-navigation-list role="menubar">
+    {/* deno-fmt-ignore-start */}
+     {siteConfig.navItems.map(({ href, title }) => (
+        <li data-navigation-item role="none">
+          <a data-navigation-link
+            href={href}
+            role="menuitem"
+            aria-current={isPathActive(currentPath, href) ? "page" : undefined}
+          >
+            {title}
+          </a>
+        </li>
+      ))}
+    {/* deno-fmt-ignore-end */}
+  </ul>
+</nav>
+
+<style>
+  [data-component="navigation"] {
+    display: flex;
+    container-type: inline-size;
+  }
+
+  [data-component="navigation"] [data-navigation-list] {
+    display: flex;
+    /* Container-aware gap that adapts to navigation width */
+    gap: clamp(1rem, 4cqi, 2.5rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  [data-component="navigation"] [data-navigation-item] {
+    position: relative;
+  }
+
+  [data-component="navigation"] [data-navigation-link] {
+    display: inline-flex;
+    align-items: center;
+    /* Fluid padding that responds to container */
+    padding-block: clamp(0.375rem, 1cqi, 0.75rem);
+    padding-inline: clamp(0.25rem, 0.5cqi, 0.5rem);
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: var(--font-weight-medium);
+    /* Container and viewport aware font sizing */
+    font-size: clamp(1rem, 2vw + 2cqi, 1.5rem);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+  }
+
+  [data-component="navigation"] [data-navigation-link]:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  [data-component="navigation"] [data-navigation-link]:focus-visible {
+    outline: max(0.125rem, 0.2cqi) solid white;
+    outline-offset: clamp(0.125rem, 0.5cqi, 0.375rem);
+  }
+
+  [data-component="navigation"] [data-navigation-link][aria-current="page"] {
+    color: rgba(255, 255, 255, 1);
+    font-weight: 700;
+    letter-spacing: clamp(0.01em, 0.02em + 0.01cqi, 0.03em);
+    text-shadow: 0 0 clamp(0.5rem, 1cqi, 1rem) rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Container query enhancements */
+  @container (min-width: 20rem) {
+    [data-component="navigation"] [data-navigation-list] {
+      gap: clamp(1.25rem, 5cqi, 3rem);
+    }
+    
+    [data-component="navigation"] [data-navigation-link] {
+      font-size: clamp(1.125rem, 2.5vw + 2.5cqi, 1.625rem);
+      padding-inline: clamp(0.5rem, 1cqi, 1rem);
+    }
+  }
+
+  @container (min-width: 30rem) {
+    [data-component="navigation"] [data-navigation-list] {
+      gap: clamp(1.5rem, 6cqi, 4rem);
+    }
+    
+    [data-component="navigation"] [data-navigation-link] {
+      font-size: clamp(1.25rem, 3vw + 3cqi, 1.75rem);
+      padding-block: clamp(0.5rem, 1.5cqi, 1rem);
+    }
+  }
+</style>

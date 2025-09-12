@@ -1,0 +1,38 @@
+[
+  {
+    "adapter": "pwa-node",
+    "label": "Debug Deno App",
+    "mode": "launch",
+    "name": "Debug Deno App",
+    "type": "pwa-node",
+    "request": "launch",
+    "program": "deno",
+    "args": ["run", "--inspect-wait", "--allow-all", "${file}"],
+    "console": "integratedTerminal",
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "adapter": "pwa-node",
+    "label": "Debug Blog Dev Server",
+    "mode": "launch",
+    "name": "Debug Blog Dev Server",
+    "type": "pwa-node",
+    "request": "launch",
+    "program": "deno",
+    "args": ["task", "dev", "--inspect-wait"],
+    "console": "integratedTerminal",
+    "cwd": "${workspaceFolder}/blog"
+  },
+  {
+    "adapter": "pwa-node",
+    "label": "Debug Deno Tests",
+    "mode": "launch",
+    "name": "Debug Deno Tests",
+    "type": "pwa-node",
+    "request": "launch",
+    "program": "deno",
+    "args": ["test", "--inspect-wait", "--allow-all"],
+    "console": "integratedTerminal",
+    "cwd": "${workspaceFolder}"
+  }
+]

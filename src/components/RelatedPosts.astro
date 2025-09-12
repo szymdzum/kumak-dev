@@ -1,0 +1,56 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PostCard from "@components/PostCard.astro";
+
+export interface Props {
+  posts: CollectionEntry<"blog">[];
+  title?: string;
+}
+
+const { posts, title = "Related Posts" } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <section class="related-posts">
+    <h2 class="related-posts__title">{title}</h2>
+    <div class="related-posts__grid">
+      {posts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  }
+
+  .related-posts__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 2rem 0;
+    color: var(--accent-color, #6366f1);
+    text-align: center;
+  }
+
+  .related-posts__grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .related-posts__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-posts__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

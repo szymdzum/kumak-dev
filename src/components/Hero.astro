@@ -1,0 +1,51 @@
+---
+import { siteConfig } from "@site-config";
+import AncientSymbols from "./AncientSymbols.astro";
+import AnimatedGrid from "./AnimatedGrid.astro";
+import Stack from "./Stack.astro";
+import HeroTitle from "./HeroTitle.astro";
+
+export interface Props {
+  showBackground?: boolean;
+  animationDuration?: string;
+}
+
+const { 
+  showBackground = true,
+  animationDuration = "8s" 
+} = Astro.props;
+---
+
+<section class="hero" role="banner" aria-label="Site header with animated grid background">
+  {showBackground && (
+    <AnimatedGrid 
+      opacity={0.4} 
+      blur={1} 
+      animationDuration={animationDuration}
+    />
+  )}
+  
+  <Stack as="header" gap="large" class="hero-content">
+    <HeroTitle>{siteConfig.name}</HeroTitle>
+    <AncientSymbols />
+  </Stack>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: clamp(400px, 60vh, 80vh);
+    display: grid;
+    place-items: center;
+    border-bottom: 1px solid rgba(171, 160, 160, 0.2);
+    margin-bottom: clamp(2rem, 4vh, 4rem);
+  }
+
+  .hero-content {
+    padding: clamp(2rem, 6vh, 4rem) clamp(1rem, 4vw, 2rem);
+    text-align: center;
+    max-width: min(90vw, 1200px);
+    width: 100%;
+    align-items: center;
+  }
+</style>

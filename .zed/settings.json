@@ -1,0 +1,158 @@
+{
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "VSCode Dark Modern"
+  },
+  "experimental.theme_overrides": {
+    "panel.background": "#1e1e1e",
+    "editor.background": "#252525",
+    "tab_bar.background": "#181818",
+    "terminal.background": "#1a1a1a",
+    "status_bar.background": "#161616",
+    "title_bar.background": "#141414",
+    "syntax": {
+      "keyword": { "color": "#569CD6" },
+      "string": { "color": "#CE9178" },
+      "comment": { "color": "#6A9955" },
+      "function": { "color": "#DCDCAA" },
+      "variable": { "color": "#9CDCFE" },
+      "constant": { "color": "#4FC1FF" },
+      "operator": { "color": "#D4D4D4" },
+      "property": { "color": "#CE9178" },
+      "number": { "color": "#B5CEA8" },
+      "boolean": { "color": "#569CD6" },
+      "type": { "color": "#CE9178" },
+      "tag": { "color": "#569CD6" },
+      "attribute": { "color": "#CE9178" },
+      "punctuation": { "color": "#CE9178" }
+    }
+  },
+  "ui_font_family": "Noto Sans",
+  "ui_font_size": 16,
+  "buffer_font_size": 16,
+  "buffer_line_height": "comfortable",
+  "cursor_blink": false,
+  "show_whitespaces": "selection",
+  "show_wrap_guides": true,
+  "wrap_guides": [80, 120],
+  "indent_guides": {
+    "enabled": true,
+    "line_width": 1,
+    "active_line_width": 2
+  },
+  "current_line_highlight": "line",
+  "git": {
+    "git_gutter": "tracked_files",
+    "inline_blame": {
+      "enabled": true
+    }
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_type_hints": true,
+    "show_parameter_hints": true,
+    "show_other_hints": true
+  },
+  "format_on_save": "on",
+  "code_actions_on_format": ["source.organizeImports", "source.fixAll"],
+  "file_scan_exclusions": [
+    "**/.astro",
+    "**/node_modules",
+    "**/dist",
+    "**/coverage",
+    "**/.git"
+  ],
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["deno", "!typescript-language-server"],
+      "format_on_save": "on",
+      "formatter": "language_server",
+      "inlay_hints": {
+        "enabled": true,
+        "show_parameter_hints": true
+      },
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "JavaScript": {
+      "language_servers": ["deno", "!typescript-language-server"],
+      "format_on_save": "on",
+      "formatter": "language_server",
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "TSX": {
+      "language_servers": ["deno", "!typescript-language-server"],
+      "format_on_save": "on",
+      "formatter": "language_server",
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "Astro": {
+      "format_on_save": "on",
+      "formatter": "language_server",
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "JSON": {
+      "format_on_save": "on",
+      "tab_size": 2,
+      "hard_tabs": false
+    }
+  },
+  "file_types": {
+    "Astro": ["astro"],
+    "JSON": ["json", "jsonc"]
+  },
+  "lsp": {
+    "deno": {
+      "binary": {
+        "path": "/Users/szymondzumak/.deno/bin/deno",
+        "arguments": ["lsp"]
+      },
+      "initialization_options": {
+        "enable": true,
+        "lint": true,
+        "unstable": true
+      }
+    },
+    "astro": {
+      "binary": {
+        "path": "/opt/homebrew/bin/npx",
+        "arguments": ["@astrojs/language-server", "--stdio"]
+      },
+      "initialization_options": {
+        "typescript": {
+          "tsdk": "./node_modules/typescript/lib"
+        }
+      }
+    },
+    "typescript-language-server": {
+      "binary": {
+        "path": "/opt/homebrew/bin/typescript-language-server",
+        "arguments": ["--stdio"]
+      },
+      "initialization_options": {
+        "preferences": {
+          "includePackageJsonAutoImports": "off"
+        }
+      }
+    },
+    "vscode-json-language-server": {
+      "binary": {
+        "path": "/opt/homebrew/bin/vscode-json-language-server",
+        "arguments": ["--stdio"]
+      }
+    }
+  },
+  "agent_servers": {
+    "Claude Code": {
+      "command": "claude-code",
+      "args": ["--agent"],
+      "env": {
+        "CLAUDE_CODE_CONFIG": "/Users/szymondzumak/Developer/dev-hub/blog/CLAUDE.md"
+      }
+    }
+  }
+}

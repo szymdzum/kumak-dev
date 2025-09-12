@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '$1' | jq -r '.tool_input.content' | grep -q ': any' && echo \"Found 'any' type. Rejected.\" >&2 && exit 1 || exit 0"
+          }
+        ]
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post/cleanup-crew.sh"
+          },
+          {
+            "type": "command",
+            "command": "echo '$1' | jq -r '.tool_input.content' | grep -q ': any' && echo \"Found 'any' type. Rejected.\" >&2 && exit 1 || exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+---
+import { BlogRoutes } from "@utils/url.ts";
+
+export interface Props {
+  tags: string[];
+  linkTags?: boolean;
+}
+
+const { tags, linkTags = true } = Astro.props;
+---
+
+<div class="tags">
+  {tags.map((tag) => (
+    linkTags ? (
+      <a href={BlogRoutes.tag(tag)} class="tag">
+        #{tag}
+      </a>
+    ) : (
+      <span class="tag">
+        #{tag}
+      </span>
+    )
+  ))}
+</div>
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--muted-background, rgba(255, 255, 255, 0.1));
+    color: var(--text-color, #ffffff);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2));
+  }
+
+  .tag:hover {
+    background: var(--accent-color, #6366f1);
+    border-color: var(--accent-color, #6366f1);
+    transform: translateY(-1px);
+  }
+
+  .tag:not([href]) {
+    cursor: default;
+  }
+
+  .tag:not([href]):hover {
+    transform: none;
+    background: var(--muted-background, rgba(255, 255, 255, 0.1));
+    border-color: var(--border-color, rgba(255, 255, 255, 0.2));
+  }
+</style>

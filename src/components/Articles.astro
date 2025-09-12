@@ -1,0 +1,54 @@
+---
+import { getCollection } from "astro:content";
+import { PostsManager } from "../utils/postSorter";
+import PostCard from "./PostCard.astro";
+
+const limit = 9;
+const allPosts = await getCollection("blog");
+const latestPosts = PostsManager.getLatest(allPosts, limit);
+---
+
+<section data-component="articles" data-stack="large">
+  {
+    latestPosts.map((post) => (
+      <article role="listitem">
+        <PostCard post={post} />
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  [data-component="articles"] {
+    width: 100%;
+    max-width: min(90vw, 80rem);
+    margin: 0 auto;
+    /* Much closer to projects */
+    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-bottom: var(--s3);
+    
+    /* Add framing */
+    padding: clamp(2rem, 4vw, 3rem);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: clamp(0.5rem, 1vw, 1rem);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Stack Layout Primitive (Every Layout pattern) */
+  [data-stack] > * + * {
+    margin-block-start: var(--space-m);
+  }
+
+  [data-stack="small"] > * + * {
+    margin-block-start: var(--space-s);
+  }
+
+  [data-stack="large"] > * + * {
+    margin-block-start: var(--space-l);
+  }
+
+  [data-stack="xl"] > * + * {
+    margin-block-start: var(--space-xl);
+  }
+</style>

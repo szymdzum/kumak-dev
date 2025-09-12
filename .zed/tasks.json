@@ -1,0 +1,47 @@
+[
+  {
+    "label": "dev: Start development server",
+    "command": "deno",
+    "args": ["task", "dev"],
+    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "test: Run all tests",
+    "command": "deno",
+    "args": ["task", "test"],
+    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
+    "use_new_terminal": true
+  },
+  {
+    "label": "test:watch: Run tests in watch mode",
+    "command": "deno",
+    "args": ["task", "test:watch"],
+    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "check: Run all quality checks (types, lint, format)",
+    "command": "deno",
+    "args": ["task", "check-all"],
+    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
+    "use_new_terminal": true
+  },
+  {
+    "label": "build: Build for production",
+    "command": "deno",
+    "args": ["task", "build"],
+    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
+    "use_new_terminal": true
+  },
+  {
+    "label": "preview: Preview production build",
+    "command": "deno",
+    "args": ["task", "preview"],
+    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false
+  }
+]

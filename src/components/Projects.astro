@@ -1,0 +1,44 @@
+---
+import ProjectCard from "@components/ProjectCard.astro";
+import { featuredProjects } from "../site-config";
+---
+
+<section class="projects-section">
+  <div class="auto-grid">
+    {
+      featuredProjects
+        .filter((project) => project.featured)
+        .map((project) => (
+          <ProjectCard
+            title={project.title}
+            description={project.description}
+            tags={project.tags}
+            githubUrl={project.githubUrl}
+            demoUrl={project.demoUrl}
+          />
+        ))
+    }
+  </div>
+
+</section>
+
+<style>
+  .projects-section {
+    position: relative;
+    z-index: 50;
+    margin-top: -15rem; /* Negative margin to create overlap */
+    
+    /* Center the section content, not the section itself */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .auto-grid {
+    max-width: min(90vw, 80rem);
+    width: 100%;
+    padding-inline: clamp(1rem, 3vw, 2rem);
+  }
+
+
+</style>

@@ -1,0 +1,84 @@
+---
+export interface Props {
+  opacity?: number;
+  blur?: number;
+  animationDuration?: string;
+  disabled?: boolean;
+}
+
+const { 
+  opacity = 0.4, 
+  blur = 1, 
+  animationDuration = "8s",
+  disabled = false 
+} = Astro.props;
+---
+
+<figure class="animated-grid" aria-hidden="true">
+  <svg
+    viewBox="0 0 100 80"
+    xmlns="http://www.w3.org/2000/svg"
+    width="100%"
+    height="100%"
+    preserveAspectRatio="xMidYMid slice"
+    class:list={["grid-svg", { "no-animation": disabled }]}
+  >
+    <title>Animated perspective grid background</title>
+    <rect width="100" height="80" fill="#000000"></rect>
+    
+    <g stroke="#FFFFFF" stroke-width="0.18">
+      <line x1="0" y1="20" x2="100" y2="20"></line>
+      <line x1="0" y1="40" x2="100" y2="40"></line>
+      <line x1="0" y1="60" x2="100" y2="60"></line>
+      
+      <line x1="20" y1="0" x2="20" y2="80"></line>
+      <line x1="40" y1="0" x2="40" y2="80"></line>
+      <line x1="60" y1="0" x2="60" y2="80"></line>
+      <line x1="80" y1="0" x2="80" y2="80"></line>
+      
+      <line x1="50" y1="40" x2="0" y2="0"></line>
+      <line x1="50" y1="40" x2="100" y2="0"></line>
+      <line x1="50" y1="40" x2="0" y2="80"></line>
+      <line x1="50" y1="40" x2="100" y2="80"></line>
+      
+      <rect x="25" y="20" width="50" height="40" fill="none"></rect>
+      <rect x="35" y="30" width="30" height="20" fill="none"></rect>
+    </g>
+  </svg>
+</figure>
+
+<style define:vars={{ opacity, blur, animationDuration }}>
+  .animated-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    margin: 0;
+    opacity: var(--opacity);
+    filter: blur(calc(var(--blur) * 1px)) saturate(0.7) brightness(0.8);
+  }
+
+  .grid-svg {
+    position: absolute;
+    inset: 0;
+    animation: gentle-pulse var(--animationDuration) ease-in-out infinite;
+  }
+
+  .grid-svg.no-animation {
+    animation: none;
+  }
+
+  @keyframes gentle-pulse {
+    0%, 100% { 
+      transform: scale(1); 
+    }
+    50% { 
+      transform: scale(1.05); 
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grid-svg {
+      animation: none;
+    }
+  }
+</style>

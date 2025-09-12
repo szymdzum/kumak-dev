@@ -1,0 +1,54 @@
+---
+import Navigation from "./Navigation.astro";
+import Social from "./Social.astro";
+---
+
+<header>
+  <div class="header-content">
+    <Navigation />
+    <Social />
+  </div>
+</header>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    /* Container-aware padding that responds to header width */
+    padding-block: clamp(0.75rem, 1.5vw + 0.5cqi, 1.5rem);
+    padding-inline: 0;
+    margin: 0;
+    background-color: rgb(var(--background-rgb));
+    border-bottom: var(--border-thin) solid var(--color-border);
+    container-type: inline-size;
+  }
+
+  .header-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    /* Fluid padding that scales with container */
+    padding-inline: var(--container-inline-padding);
+    gap: clamp(1rem, 3cqi, 2rem);
+  }
+
+  @container (min-width: 30rem) {
+    header {
+      padding-block: clamp(1rem, 2vw + 0.75cqi, 2rem);
+    }
+    
+    .header-content {
+      justify-content: space-around;
+      gap: clamp(1.5rem, 4cqi, 3rem);
+    }
+  }
+
+  @container (min-width: 50rem) {
+    .header-content {
+      gap: clamp(2rem, 5cqi, 4rem);
+      padding-inline: clamp(1.5rem, 4vw, 3rem);
+    }
+  }
+</style>
