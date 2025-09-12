@@ -28,6 +28,7 @@
       "punctuation": { "color": "#CE9178" }
     }
   },
+
   "ui_font_family": "Noto Sans",
   "ui_font_size": 16,
   "buffer_font_size": 16,
@@ -42,30 +43,46 @@
     "active_line_width": 2
   },
   "current_line_highlight": "line",
+
   "git": {
     "git_gutter": "tracked_files",
     "inline_blame": {
       "enabled": true
     }
   },
+
   "inlay_hints": {
     "enabled": true,
     "show_type_hints": true,
     "show_parameter_hints": true,
     "show_other_hints": true
   },
+
   "format_on_save": "on",
-  "code_actions_on_format": ["source.organizeImports", "source.fixAll"],
+  "code_actions_on_format": {
+    "source.organizeImports": true,
+    "source.fixAll": true
+  },
+
   "file_scan_exclusions": [
     "**/.astro",
     "**/node_modules",
     "**/dist",
     "**/coverage",
-    "**/.git"
+    "**/.git",
+    "**/target",
+    "**/.deno",
+    "**/build"
   ],
+
+  "auto_install_extensions": {
+    "deno": true,
+    "astro": true
+  },
+
   "languages": {
     "TypeScript": {
-      "language_servers": ["deno", "!typescript-language-server"],
+      "language_servers": ["deno", "!vtsls", "!typescript-language-server"],
       "format_on_save": "on",
       "formatter": "language_server",
       "inlay_hints": {
@@ -73,23 +90,33 @@
         "show_parameter_hints": true
       },
       "tab_size": 2,
-      "hard_tabs": false
+      "hard_tabs": false,
+      "prettier": {
+        "allowed": false
+      }
     },
     "JavaScript": {
-      "language_servers": ["deno", "!typescript-language-server"],
+      "language_servers": ["deno", "!vtsls", "!typescript-language-server"],
       "format_on_save": "on",
       "formatter": "language_server",
       "tab_size": 2,
-      "hard_tabs": false
+      "hard_tabs": false,
+      "prettier": {
+        "allowed": false
+      }
     },
     "TSX": {
-      "language_servers": ["deno", "!typescript-language-server"],
+      "language_servers": ["deno", "!vtsls", "!typescript-language-server"],
       "format_on_save": "on",
       "formatter": "language_server",
       "tab_size": 2,
-      "hard_tabs": false
+      "hard_tabs": false,
+      "prettier": {
+        "allowed": false
+      }
     },
     "Astro": {
+      "language_servers": ["astro-language-server"],
       "format_on_save": "on",
       "formatter": "language_server",
       "tab_size": 2,
@@ -97,14 +124,18 @@
     },
     "JSON": {
       "format_on_save": "on",
+      "formatter": "language_server",
       "tab_size": 2,
       "hard_tabs": false
+    },
+    "Markdown": {
+      "format_on_save": "off",
+      "soft_wrap": "preferred_line_length",
+      "preferred_line_length": 120,
+      "tab_size": 2
     }
   },
-  "file_types": {
-    "Astro": ["astro"],
-    "JSON": ["json", "jsonc"]
-  },
+
   "lsp": {
     "deno": {
       "binary": {
@@ -114,45 +145,47 @@
       "initialization_options": {
         "enable": true,
         "lint": true,
-        "unstable": true
+        "unstable": true,
+        "suggest": {
+          "imports": {
+            "hosts": {
+              "https://deno.land": true,
+              "https://cdn.skypack.dev": true,
+              "https://esm.sh": true
+            }
+          }
+        }
       }
     },
-    "astro": {
-      "binary": {
-        "path": "/opt/homebrew/bin/npx",
-        "arguments": ["@astrojs/language-server", "--stdio"]
-      },
+    "astro-language-server": {
       "initialization_options": {
         "typescript": {
-          "tsdk": "./node_modules/typescript/lib"
+          "preferences": {
+            "includeInlayParameterNameHints": "all"
+          }
         }
-      }
-    },
-    "typescript-language-server": {
-      "binary": {
-        "path": "/opt/homebrew/bin/typescript-language-server",
-        "arguments": ["--stdio"]
-      },
-      "initialization_options": {
-        "preferences": {
-          "includePackageJsonAutoImports": "off"
-        }
-      }
-    },
-    "vscode-json-language-server": {
-      "binary": {
-        "path": "/opt/homebrew/bin/vscode-json-language-server",
-        "arguments": ["--stdio"]
       }
     }
   },
-  "agent_servers": {
-    "Claude Code": {
-      "command": "claude-code",
-      "args": ["--agent"],
-      "env": {
-        "CLAUDE_CODE_CONFIG": "/Users/szymondzumak/Developer/dev-hub/blog/CLAUDE.md"
-      }
+
+  "tab_bar": {
+    "show_nav_history_buttons": false
+  },
+  "tabs": {
+    "file_icons": true,
+    "git_status": true
+  },
+  "project_panel": {
+    "default_width": 300,
+    "dock": "left"
+  },
+  "terminal": {
+    "shell": {
+      "program": "/bin/zsh"
+    },
+    "working_directory": "current_project_directory",
+    "env": {
+      "TERM": "xterm-256color"
     }
   }
 }

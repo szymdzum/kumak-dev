@@ -3,45 +3,87 @@
     "label": "dev: Start development server",
     "command": "deno",
     "args": ["task", "dev"],
-    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
     "use_new_terminal": true,
-    "allow_concurrent_runs": false
-  },
-  {
-    "label": "test: Run all tests",
-    "command": "deno",
-    "args": ["task", "test"],
-    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
-    "use_new_terminal": true
-  },
-  {
-    "label": "test:watch: Run tests in watch mode",
-    "command": "deno",
-    "args": ["task", "test:watch"],
-    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
-    "use_new_terminal": true,
-    "allow_concurrent_runs": false
-  },
-  {
-    "label": "check: Run all quality checks (types, lint, format)",
-    "command": "deno",
-    "args": ["task", "check-all"],
-    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
-    "use_new_terminal": true
+    "allow_concurrent_runs": false,
+    "reveal": "always"
   },
   {
     "label": "build: Build for production",
     "command": "deno",
     "args": ["task", "build"],
-    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
-    "use_new_terminal": true
+    "use_new_terminal": true,
+    "reveal": "always"
   },
   {
     "label": "preview: Preview production build",
     "command": "deno",
     "args": ["task", "preview"],
-    "cwd": "/Users/szymondzumak/Developer/dev-hub/blog",
     "use_new_terminal": true,
-    "allow_concurrent_runs": false
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "test: Run all tests",
+    "command": "deno",
+    "args": ["task", "test"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "test:watch: Run tests in watch mode",
+    "command": "deno",
+    "args": ["task", "test:watch"],
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always"
+  },
+  {
+    "label": "test:coverage: Run tests with coverage",
+    "command": "deno",
+    "args": ["task", "test:coverage"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "lint: Lint code",
+    "command": "deno",
+    "args": ["task", "lint"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "format: Format code",
+    "command": "deno",
+    "args": ["task", "format"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "check: Type check",
+    "command": "deno",
+    "args": ["task", "check"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "check-all: Run all quality checks",
+    "command": "deno",
+    "args": ["task", "check-all"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "deploy: Deploy to production",
+    "command": "deno",
+    "args": ["task", "deploy"],
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "clean: Clean build artifacts",
+    "command": "rm",
+    "args": ["-rf", "dist", ".astro"],
+    "use_new_terminal": true,
+    "reveal": "always"
   }
 ]

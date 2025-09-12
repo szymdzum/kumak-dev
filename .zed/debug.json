@@ -1,15 +1,17 @@
 [
   {
     "adapter": "pwa-node",
-    "label": "Debug Deno App",
+    "label": "Debug Current Deno File",
     "mode": "launch",
-    "name": "Debug Deno App",
+    "name": "Debug Current Deno File",
     "type": "pwa-node",
     "request": "launch",
     "program": "deno",
-    "args": ["run", "--inspect-wait", "--allow-all", "${file}"],
+    "args": ["run", "--inspect-wait=127.0.0.1:9229", "--allow-all", "${file}"],
     "console": "integratedTerminal",
-    "cwd": "${workspaceFolder}"
+    "env": {
+      "DENO_DIR": "${env:HOME}/.cache/deno"
+    }
   },
   {
     "adapter": "pwa-node",
@@ -19,9 +21,17 @@
     "type": "pwa-node",
     "request": "launch",
     "program": "deno",
-    "args": ["task", "dev", "--inspect-wait"],
+    "args": ["task", "dev"],
     "console": "integratedTerminal",
-    "cwd": "${workspaceFolder}/blog"
+    "env": {
+      "NODE_ENV": "development",
+      "DEBUG": "astro:*"
+    },
+    "serverReadyAction": {
+      "pattern": "Local:.*?(https?://\\S+)",
+      "uriFormat": "%s",
+      "action": "openExternally"
+    }
   },
   {
     "adapter": "pwa-node",
@@ -31,8 +41,29 @@
     "type": "pwa-node",
     "request": "launch",
     "program": "deno",
-    "args": ["test", "--inspect-wait", "--allow-all"],
+    "args": [
+      "test",
+      "--inspect-wait=127.0.0.1:9229",
+      "--allow-all",
+      "${workspaceFolder}/tests/"
+    ],
     "console": "integratedTerminal",
-    "cwd": "${workspaceFolder}"
+    "env": {
+      "DENO_DIR": "${env:HOME}/.cache/deno"
+    }
+  },
+  {
+    "adapter": "pwa-node",
+    "label": "Debug Specific Test File",
+    "mode": "launch",
+    "name": "Debug Specific Test File",
+    "type": "pwa-node",
+    "request": "launch",
+    "program": "deno",
+    "args": ["test", "--inspect-wait=127.0.0.1:9229", "--allow-all", "${file}"],
+    "console": "integratedTerminal",
+    "env": {
+      "DENO_DIR": "${env:HOME}/.cache/deno"
+    }
   }
 ]

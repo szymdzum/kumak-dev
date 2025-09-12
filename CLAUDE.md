@@ -1,9 +1,12 @@
 # CLAUDE.md
-**The Null Hypothesis** is an Astro-based blog with Deno runtime, designed around mystical/gnostic theming. The architecture emphasizes simplicity and type safety while providing sophisticated content management.
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+**Kumak's Blog** is an Astro-based personal blog with Deno runtime, featuring minimal styling and modern web standards. The architecture emphasizes simplicity, performance, and content-focused design.
 
 ### Core Tech Stack
-- **Astro 5.13.5** with SSR mode and Deno adapter
-- **Pure Deno runtime** (no Node.js dependencies)
+- **Astro 5.x** with static output mode
+- **Pure Deno runtime** (no Node.js dependencies)  
 - **Content Collections** with Zod schemas for type safety
 - **Deno Deploy** via GitHub Actions
 
@@ -11,42 +14,44 @@
 ```bash
 # Development
 deno task dev          # Start dev server at localhost:4321
-deno task build        # Build for production
-deno task preview      # Preview production build locally
+deno task build        # Build static site for production
+deno task preview      # Preview production build locally with network URLs
 
 # Quality Assurance
-deno task test         # Run all tests (95 comprehensive tests)
-deno task test:watch   # Run tests in watch mode for development
-deno task test:coverage # Run tests with coverage reporting
-deno task lint         # Lint code with 79 strict rules
-deno task format       # Format code with consistent style
+deno task test         # Run tests
+deno task lint         # Lint code with Deno
+deno task format       # Format code with Deno
 deno task check        # Run lint + format together
-deno task check-all    # Full type checking + lint + format + tests
+deno task check-all    # Full Astro check + lint + format
+deno task fix          # Auto-fix linting issues and format code
 
 # Deployment
-deno task deploy       # Build and deploy to Deno Deploy
+deno task deploy       # Build and deploy to Deno Deploy (devblog project)
+deno task deploy-cli   # Install deployctl and deploy
 ```
 
 ### Key Architecture Patterns
 
 **Component Organization:**
-- `src/layouts/` - Page layout templates
+- `src/components/` - Reusable UI components (.astro files)
+- `src/layouts/` - Page layout templates (Layout.astro, BlogPost.astro, About.astro)
+- `src/pages/` - File-based routing (index, blog, about, projects)
 
 **Content Management:**
-- `src/content/blog/` - Blog posts with frontmatter
-- `src/content/config.ts` - Content collection schemas
-- `src/utils/postSorter.ts` - PostsManager class for sophisticated content queries
+- `src/content/blog/` - Blog posts with frontmatter (supports both .md and .mdx)
+- `src/content/config.ts` - Content collection schemas with Zod validation
+- `src/utils/postSorter.ts` - PostsManager class for content operations
 
 **Configuration:**
-- `src/site-config.ts` - Centralized site metadata, navigation, and featured projects
-- Path aliases: `@components/*`, `@layouts/*`, `@utils/*` for clean imports
+- `src/site-config.ts` - Centralized site metadata and navigation
+- Path aliases defined in deno.json: `@components/*`, `@layouts/*`, `@utils/*`, `@styles/*`
 
 ### PostsManager Utility
 
 The `PostsManager` class provides a fluent API for content operations:
 
 ```typescript
-// Filter by featured posts, limit results, sort by date
+// Example usage for filtering and sorting posts
 const posts = new PostsManager(allPosts)
   .filter('featured')
   .sort('date-desc')
@@ -54,69 +59,56 @@ const posts = new PostsManager(allPosts)
   .get();
 ```
 
-### Testing Infrastructure
-
-Comprehensive test suite with **95 tests** covering all critical functionality:
-
-**Test Structure:**
-```
-tests/
-├── unit/
-│   ├── postSorter.test.ts      # 39 tests - PostsManager functionality
-│   ├── siteConfig.test.ts      # 27 tests - Site configuration validation  
-│   └── contentConfig.test.ts   # 20 tests - Zod schema validation
-├── integration/
-│   └── contentCollections.test.ts # 9 tests - Real-world workflows
-└── utils/
-    └── testHelpers.ts          # Mock data and test utilities
-```
-
-**Quality Standards:**
-- **Strict TypeScript** with `exactOptionalPropertyTypes` and comprehensive checks
-- **79 linting rules** including `no-any`, `no-unused-vars`, `prefer-const`
-- **Automated formatting** with 120-character line width
-- **Type-safe mock data** for consistent testing
-
 ### Content Structure
 
 Blog posts support:
 - Hero images (`heroImage` in frontmatter)
 - Publication and update dates
-- Description and title metadata
+- Description and title metadata  
+- Tags and categories
 - MDX for interactive content
+
+### Build Configuration
+
+- **Output**: Static site generation (not SSR)
+- **Build target**: `dist/` directory with static files
+- **Integrations**: MDX and sitemap support
+- **Image service**: Noop service (no image optimization)
 
 ### Deployment Configuration
 
-- **Primary**: Deno Deploy project `kumak-blog`
-- **Domain**: Currently configured for `kumak.dev` (may need updating)
-- **Workflows**: Two GitHub Actions - simple deploy and full CI/CD with testing
-- **Build output**: SSR with `dist/server/entry.mjs` entrypoint
+- **Platform**: Deno Deploy
+- **Project**: `devblog` 
+- **Domain**: `kumak.dev`
+- **Entrypoint**: Static file server via `jsr:@std/http/file-server`
+- **CI/CD**: GitHub Actions workflow for automatic deployment
 
-## Comprehensive Documentation
+### Styling Architecture
 
-For detailed technical documentation, see the repository-wide documentation:
+- **CSS**: Modern CSS with design tokens in `src/styles/`
+- **Structure**: Modular CSS files (reset, variables, typography, layout, main)
+- **Approach**: Minimal styling focused on typography and readability
 
-- **[Architecture](../docs/claude/context/architecture.md)** - Complete system architecture, build pipeline, and deployment
-- **[Dependencies](../docs/claude/context/dependencies.md)** - Tech stack analysis, Deno runtime, and package management
-- **[Content Management](../docs/claude/context/content-management.md)** - Content Collections, PostsManager utility, and SEO
-- **[Development Workflow](../docs/DEVELOPMENT_WORKFLOW.md)** - Multi-layer protection system for code quality
-- **[Claude Mastery Guides](../docs/claude/guides/)** - Complete workflow system for AI-assisted development
+### Quality Standards
+
+- **TypeScript**: Strict mode with comprehensive compiler options
+- **Linting**: Extensive ruleset (60+ rules) including `no-any`, `no-unused-vars`
+- **Formatting**: Consistent style with 120-character line width, single quotes
+- **Testing**: Minimal test coverage focused on routing
+
+### Development Workflow
+
+Before committing changes:
+```bash
+deno task check-all  # Astro check + linting + formatting
+deno task test       # Run tests
+```
 
 ### Development Notes
 
 - **Follow existing component patterns** in `src/components/`
-- **Use the `PostsManager` utility** for complex content queries
-- **Maintain type safety** with proper frontmatter schemas
-- **Preserve the mystical theme aesthetic** in new components
-- **Run quality checks** before committing: `deno task check-all`
-- **Write tests** for new functionality following existing patterns in `tests/`
+- **Use the `PostsManager` utility** for content queries
+- **Maintain type safety** with proper frontmatter schemas  
+- **Preserve minimal aesthetic** when adding components
 - **Test both local preview and deployed versions** before shipping
-- **Reference detailed documentation** in `../docs/claude/` for implementation guidance
-
-### Quality Workflow
-
-Before committing changes, always run:
-```bash
-deno task check-all  # Type checking + linting + formatting
-deno task test       # Full test suite (95 tests)
-```
+- **Use path aliases** for clean imports across the codebase
