@@ -6,7 +6,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <nav aria-label="Main navigation">
-  <ul>
+  <ul role="list">
     {siteConfig.navItems.map(
       ({ href, title }) => (
       <li>

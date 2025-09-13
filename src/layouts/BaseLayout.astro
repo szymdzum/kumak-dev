@@ -7,26 +7,22 @@ export interface Props {
   readonly title?: string;
   readonly description?: string;
   readonly image?: string;
-  readonly class?: string;
-  readonly bodyClass?: string;
 }
 
 const {
   title,
   description,
-  image,
-  class: containerClass,
-  bodyClass
+  image
 } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <Head title={title} description={description} image={image} />
-  <body class={bodyClass}>
+  <body>
     <Header />
 
-    <main id="main-content" class={containerClass}>
+    <main>
       <slot />
     </main>
 

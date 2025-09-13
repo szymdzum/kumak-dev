@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+> **Context Efficiency Rule**: Keep responses short, precise, and simple. Minimize token usage while maintaining helpfulness. Avoid verbose explanations unless specifically requested.
+
 **Kumak's Blog** - Astro-based personal blog with Deno runtime, emphasizing simplicity, performance, and content-focused design.
 
 ## Tech Stack

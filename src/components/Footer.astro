@@ -1,15 +1,37 @@
 ---
+import { siteConfig } from "@/site-config";
+const currentYear = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-content">
-      <p>Built with Astro and CSS</p>
+<footer>
+  <div class="footer-content">
+    <div>
+      <p>© {currentYear} {siteConfig.author}. Built with Astro and CSS.</p>
+      <p><em>{siteConfig.tagline}</em></p>
     </div>
-    <div class="social-links">
-      <a href="https://github.com/kumakk" target="_blank" rel="noopener noreferrer">
-        GitHub
-      </a>
-    </div>
+
+    <nav aria-label="Social media">
+      {Object.entries(siteConfig.socials).map(([, social]) => (
+        <a
+          href={social.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${siteConfig.author} on ${social.name}`}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            set:html={social.icon}
+          />
+        </a>
+      ))}
+    </nav>
   </div>
 </footer>
