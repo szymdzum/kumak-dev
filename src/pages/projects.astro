@@ -1,11 +1,11 @@
 ---
-import Layout from "@layouts/Layout.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 import ProjectCard from "@components/ProjectCard.astro";
 
 import { featuredProjects } from "@/site-config";
 ---
 
-<Layout
+<BaseLayout
   title="Projects - The Null Hypothesis"
   description="A collection of my coding projects and open-source contributions"
 >
@@ -30,7 +30,7 @@ import { featuredProjects } from "@/site-config";
       }
     </div>
   </section>
-</Layout>
+</BaseLayout>
 
 <style>
 

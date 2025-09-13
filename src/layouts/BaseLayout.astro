@@ -1,0 +1,35 @@
+---
+import Head from "@components/Head.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+
+export interface Props {
+  readonly title?: string;
+  readonly description?: string;
+  readonly image?: string;
+  readonly class?: string;
+  readonly bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  class: containerClass,
+  bodyClass
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <Head title={title} description={description} image={image} />
+  <body class={bodyClass}>
+    <Header />
+
+    <main id="main-content" class={containerClass}>
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

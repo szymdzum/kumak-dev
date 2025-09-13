@@ -1,22 +1,10 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import Layout from "@layouts/Layout.astro";
 import FormattedDate from "@components/FormattedDate.astro";
-import TableOfContents from "@components/TableOfContents.astro";
-import Tags from "@components/Tags.astro";
-import CategoryBadge from "@components/CategoryBadge.astro";
-import RelatedPosts from "@components/RelatedPosts.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 import { formatReadingTime } from "@utils/readingTime";
-import { getRelatedPosts } from "@utils/relatedPosts";
-import { getCollection } from "astro:content";
-import { BlogRoutes } from "@utils/url.ts";
+import type { CollectionEntry } from "astro:content";
 
 type Props = CollectionEntry<"blog">["data"] & {
-  headings?: Array<{
-    depth: number;
-    slug: string;
-    text: string;
-  }>;
   id?: string;
   slug?: string;
   body?: string;
@@ -31,30 +19,14 @@ const {
   draft,
   category,
   tags,
-  showToc,
-  headings = [],
-  id,
-  slug,
   body = ""
 } = Astro.props;
 
-// Get related posts if we have the necessary data
-let relatedPosts: CollectionEntry<"blog">[] = [];
-if (id || slug) {
-  const allPosts = await getCollection("blog");
-  const currentPost = allPosts.find((p: CollectionEntry<"blog">) => p.id === id || p.slug === slug);
-  if (currentPost) {
-    relatedPosts = getRelatedPosts(currentPost, allPosts, 5);
-  }
-}
-
 const readingTime = formatReadingTime(body);
-const showTableOfContents = showToc && headings.length > 3;
 ---
 
-<Layout title={title} description={description}>
-
-  <article class={`article ${showTableOfContents ? 'article--with-toc' : ''}`}>
+<BaseLayout title={title} description={description}>
+  <article class="article">
     {heroImage && (
       <figure class="hero-image">
         <img src={heroImage} alt={title} />
@@ -63,7 +35,7 @@ const showTableOfContents = showToc && headings.length > 3;
 
     <header class="article__header">
       <div class="article__meta">
-        <CategoryBadge category={category} href={BlogRoutes.category(category)} />
+        <span>{category}</span>
         {draft && import.meta.env.DEV && (
           <span class="draft-badge">DRAFT</span>
         )}
@@ -81,7 +53,9 @@ const showTableOfContents = showToc && headings.length > 3;
 
       {tags && tags.length > 0 && (
         <div class="article__tags">
-          <Tags tags={tags} />
+          {tags.map((tag: string) => (
+            <span class="tag">#{tag}</span>
+          ))}
         </div>
       )}
 
@@ -94,20 +68,8 @@ const showTableOfContents = showToc && headings.length > 3;
       )}
     </header>
 
-    {showTableOfContents && (
-      <aside class="toc-sidebar" aria-label="Table of Contents">
-        <TableOfContents headings={headings} />
-      </aside>
-    )}
-
     <div class="article__body prose">
       <slot />
     </div>
-
-    {relatedPosts.length > 0 && (
-      <section aria-label="Related Posts">
-        <RelatedPosts posts={relatedPosts} />
-      </section>
-    )}
   </article>
-</Layout>
+</BaseLayout>

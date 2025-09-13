@@ -1,0 +1,474 @@
+/* CSS Reset Rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/* Improve text rendering */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: light dark;
+}
+
+/* Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Remove list styles on ul, ol elements with a list role */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+
+/* Enhanced link styles */
+a:not([class]) {
+  text-decoration-thickness: max(0.08em, 1px);
+  text-underline-offset: 0.15em;
+}
+
+/* Improve scroll experience */
+:target {
+  scroll-padding-block-start: 2rem;
+}
+
+:focus {
+  scroll-padding-block-end: 8vh;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Global Design Token System - Fluid & Relative Units Only */
+:root {
+  /* Fluid Typography Scale */
+  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1.125rem);
+  --text-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.563rem);
+  --text-xl: clamp(1.563rem, 1.375rem + 0.94vw, 1.953rem);
+  --text-2xl: clamp(1.953rem, 1.719rem + 1.17vw, 2.441rem);
+  --text-3xl: clamp(2.441rem, 2.148rem + 1.465vw, 3.052rem);
+
+  /* Fluid Spacing System */
+  --space-xs: clamp(0.5rem, 0.45rem + 0.25vw, 0.625rem);
+  --space-sm: clamp(0.75rem, 0.675rem + 0.375vw, 0.9375rem);
+  --space-md: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  --space-lg: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+  --space-xl: clamp(2rem, 1.8rem + 1vw, 2.5rem);
+  --space-2xl: clamp(3rem, 2.7rem + 1.5vw, 3.75rem);
+  --space-3xl: clamp(4rem, 3.6rem + 2vw, 5rem);
+
+  /* Content Width Constraints */
+  --content-width: min(65ch, 90vw);
+  --content-width-narrow: min(50ch, 85vw);
+  --content-width-wide: min(80ch, 95vw);
+
+  /* Fluid Borders & Radii */
+  --border-width: max(0.0625rem, 0.1vw);
+  --border-width-thick: max(0.125rem, 0.2vw);
+  --radius-sm: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);
+  --radius: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+  --radius-lg: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+
+  /* Color System - Light Theme */
+  --color-text: #1a202c;
+  --color-text-muted: #4a5568;
+  --color-text-subtle: #718096;
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f7fafc;
+  --color-bg-muted: #edf2f7;
+  --color-border: #e2e8f0;
+  --color-border-subtle: #f1f5f9;
+  --color-primary: #3182ce;
+  --color-primary-hover: #2c5aa0;
+  --color-accent: #ed8936;
+  --color-accent-hover: #dd6b20;
+
+  /* Color System - RGB Values for Alpha Compositions */
+  --color-text-rgb: 26, 32, 44;
+  --color-bg-rgb: 255, 255, 255;
+  --color-primary-rgb: 49, 130, 206;
+  --color-accent-rgb: 237, 137, 54;
+
+  /* Typography Properties */
+  --font-family-base:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  /* Fluid Line Heights */
+  --line-height-tight: clamp(1.1, 1.05 + 0.25vw, 1.3);
+  --line-height-normal: clamp(1.4, 1.35 + 0.25vw, 1.6);
+  --line-height-relaxed: clamp(1.6, 1.55 + 0.25vw, 1.8);
+
+  /* Layout & Container Properties */
+  --container-padding: clamp(1rem, 2.5vw, 2rem);
+  --section-padding: clamp(2rem, 5vw, 4rem);
+  --header-height: clamp(3rem, 8vh, 6rem);
+
+  /* Shadows with Relative Units */
+  --shadow-sm: 0 0.0625rem 0.125rem rgb(var(--color-text-rgb) / 0.05);
+  --shadow: 0 0.25rem 0.5rem rgb(var(--color-text-rgb) / 0.1);
+  --shadow-lg: 0 0.5rem 1rem rgb(var(--color-text-rgb) / 0.15);
+
+  /* Z-index Scale */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal: 40;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.3s ease;
+}
+
+/* Dark Theme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #f7fafc;
+    --color-text-muted: #cbd5e0;
+    --color-text-subtle: #a0aec0;
+    --color-bg: #1a202c;
+    --color-bg-subtle: #2d3748;
+    --color-bg-muted: #4a5568;
+    --color-border: #4a5568;
+    --color-border-subtle: #2d3748;
+    --color-primary: #63b3ed;
+    --color-primary-hover: #90cdf4;
+    --color-accent: #f6ad55;
+    --color-accent-hover: #fbb040;
+
+    /* RGB Values for Dark Theme */
+    --color-text-rgb: 247, 250, 252;
+    --color-bg-rgb: 26, 32, 44;
+    --color-primary-rgb: 99, 179, 237;
+    --color-accent-rgb: 246, 173, 85;
+
+    /* Adjust shadows for dark theme */
+    --shadow-sm: 0 0.0625rem 0.125rem rgb(0 0 0 / 0.2);
+    --shadow: 0 0.25rem 0.5rem rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 0.5rem 1rem rgb(0 0 0 / 0.4);
+  }
+}
+
+/* Base Styles */
+html {
+  font-family: var(--font-family-base);
+  font-size: var(--text-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: color var(--transition-normal), background-color var(--transition-normal);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography Styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-lg);
+}
+h2 {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-md);
+}
+h3 {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-md);
+}
+h4 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-sm);
+}
+h5 {
+  font-size: var(--text-base);
+  margin-bottom: var(--space-sm);
+}
+h6 {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-xs);
+}
+
+p {
+  font-size: var(--text-base);
+  line-height: var(--line-height-normal);
+  margin: 0 0 var(--space-md) 0;
+  max-width: var(--content-width);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-decoration-thickness: max(0.0625rem, 0.1em);
+  text-underline-offset: 0.2em;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Lists */
+ul,
+ol {
+  margin: 0 0 var(--space-md) 0;
+  padding-left: var(--space-lg);
+  max-width: var(--content-width);
+}
+
+li {
+  margin-bottom: var(--space-xs);
+}
+
+/* Code */
+code {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  background-color: rgb(var(--color-text-rgb) / 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border-subtle);
+}
+
+pre {
+  font-family: var(--font-family-mono);
+  background-color: rgb(var(--color-text-rgb) / 0.03);
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  border: var(--border-width) solid var(--color-border);
+  overflow-x: auto;
+  margin: var(--space-lg) 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  border: none;
+}
+
+/* Utility Classes */
+.container {
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+.flow > * + * {
+  margin-top: var(--space-md);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: var(--border-width-thick) solid var(--color-primary);
+  outline-offset: 0.2em;
+}
+
+/* ===========================
+   Semantic Element Styles
+   =========================== */
+
+/* Article elements */
+article {
+  max-width: var(--content-width);
+}
+
+article > header {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+article > header h1 {
+  margin-bottom: var(--space-md);
+}
+
+/* Navigation lists */
+nav[aria-label] ul,
+nav[aria-label] ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav[aria-label] li {
+  margin-bottom: var(--space-xs);
+}
+
+/* Definition lists in sidebars */
+aside dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-xs) var(--space-md);
+}
+
+aside dt {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+aside dd {
+  margin: 0;
+}
+
+/* Sticky sidebar content */
+aside > nav {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-lg));
+}
+
+/* ===========================
+   Data Attribute Utilities
+   =========================== */
+
+/* Table of contents depth styling */
+[data-toc-level='3'] {
+  margin-inline-start: var(--space-md);
+}
+
+[data-toc-level='4'] {
+  margin-inline-start: var(--space-lg);
+}
+
+/* Article metadata styling */
+[data-article-meta] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Tag styling */
+[data-tag] {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+/* Hidden on mobile */
+[data-hide='mobile'] {
+  @media (max-width: 60rem) {
+    display: none;
+  }
+}
+
+/* Hidden on desktop */
+[data-hide='desktop'] {
+  @media (min-width: 60rem) {
+    display: none;
+  }
+}
+
+/* Badge styling */
+[data-badge] {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-badge='draft'] {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ===========================
+   ARIA-based Styles
+   =========================== */
+
+/* Current page indicator */
+[aria-current='page'] {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+/* Disabled state */
+[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Hidden but accessible */
+[aria-hidden='true'] {
+  user-select: none;
+}
+
+/* Loading state */
+[aria-busy='true'] {
+  position: relative;
+  pointer-events: none;
+}
+
+[aria-busy='true']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(var(--color-bg-rgb) / 0.7);
+}

@@ -1,18 +1,30 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import FormattedDate from "@components/FormattedDate.astro";
+import { BlogRoutes } from "@utils/url.ts";
 import { Image } from "astro:assets";
-import PostContent from "./PostContent.astro";
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
   post: CollectionEntry<"blog">;
+  index?: number;
 }
 
-const { post } = Astro.props;
+const { post, index = 999 } = Astro.props;
+const shouldLazyLoad = index > 1; // First 2 images load eagerly
 ---
 
-<article data-component="post-card">
-  <PostContent post={post} showTitle={true} />
-  <div data-post-image-container>
+<article>
+  <div>
+    <h3>{post.data.title}</h3>
+    <p>{post.data.description}</p>
+    <div>
+      <a href={BlogRoutes.post(post.slug)}>
+        Read more
+      </a>
+      <FormattedDate date={post.data.pubDate} />
+    </div>
+  </div>
+  <div>
     <Image
       src={post.data.heroImage || "/blog-placeholder-1.jpg"}
       alt={post.data.title}
@@ -20,46 +32,8 @@ const { post } = Astro.props;
       height={450}
       format="webp"
       quality={80}
-      loading="lazy"
-      data-post-image
+      loading={shouldLazyLoad ? "lazy" : "eager"}
+      fetchpriority={index === 0 ? "high" : "auto"}
     />
   </div>
 </article>
-
-<style>
-  [data-component="post-card"] {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: var(--space-lg, 2rem);
-    border-radius: var(--radius, 0.25rem);
-    transition: transform 0.2s ease;
-    margin-bottom: var(--s4);
-    margin-top: var(--s4);
-    align-items: start;
-  }
-
-  [data-post-image-container] {
-    overflow: hidden;
-    border-radius: var(--radius, 0.25rem);
-    aspect-ratio: 4/3;
-  }
-
-  [data-post-image] {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  [data-component="post-card"]:hover [data-post-image] {
-    transform: scale(1.05);
-  }
-
-  /* Responsive layout */
-  @media (max-width: 768px) {
-    [data-component="post-card"] {
-      grid-template-columns: 1fr;
-      gap: var(--space-md, 1rem);
-    }
-  }
-</style>
