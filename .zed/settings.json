@@ -179,11 +179,16 @@
     "default_width": 300,
     "dock": "left"
   },
+  "status_bar": {
+    "show": true
+  },
   "terminal": {
     "shell": {
       "program": "/bin/zsh"
     },
     "working_directory": "current_project_directory",
+    "dock": "bottom",
+    "default_height": 300,
     "env": {
       "TERM": "xterm-256color"
     }

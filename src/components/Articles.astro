@@ -9,7 +9,7 @@ const latestPosts = PostsManager.getLatest(allPosts, limit);
 ---
 
 <section>
-  {latestPosts.map((post) => (
-    <PostCard post={post} />
+  {latestPosts.map((post, index) => (
+    <PostCard post={post} index={index} />
   ))}
 </section>

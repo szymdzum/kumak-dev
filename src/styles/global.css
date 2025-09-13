@@ -127,7 +127,7 @@ select {
 
   /* Typography Properties */
   --font-family-base:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   --font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -208,7 +208,12 @@ body {
 }
 
 /* Typography Styles */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-family-base);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
@@ -261,7 +266,8 @@ a:hover {
 }
 
 /* Lists */
-ul, ol {
+ul,
+ol {
   margin: 0 0 var(--space-md) 0;
   padding-left: var(--space-lg);
   max-width: var(--content-width);
@@ -316,4 +322,153 @@ pre code {
 :focus-visible {
   outline: var(--border-width-thick) solid var(--color-primary);
   outline-offset: 0.2em;
+}
+
+/* ===========================
+   Semantic Element Styles
+   =========================== */
+
+/* Article elements */
+article {
+  max-width: var(--content-width);
+}
+
+article > header {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+article > header h1 {
+  margin-bottom: var(--space-md);
+}
+
+/* Navigation lists */
+nav[aria-label] ul,
+nav[aria-label] ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav[aria-label] li {
+  margin-bottom: var(--space-xs);
+}
+
+/* Definition lists in sidebars */
+aside dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+aside dt {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+aside dd {
+  margin: 0;
+}
+
+/* Sticky sidebar content */
+aside > nav {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-lg));
+}
+
+/* ===========================
+   Data Attribute Utilities
+   =========================== */
+
+/* Table of contents depth styling */
+[data-toc-level='3'] {
+  margin-inline-start: var(--space-md);
+}
+
+[data-toc-level='4'] {
+  margin-inline-start: var(--space-lg);
+}
+
+/* Article metadata styling */
+[data-article-meta] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Tag styling */
+[data-tag] {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+/* Hidden on mobile */
+[data-hide='mobile'] {
+  @media (max-width: 60rem) {
+    display: none;
+  }
+}
+
+/* Hidden on desktop */
+[data-hide='desktop'] {
+  @media (min-width: 60rem) {
+    display: none;
+  }
+}
+
+/* Badge styling */
+[data-badge] {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-badge='draft'] {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ===========================
+   ARIA-based Styles
+   =========================== */
+
+/* Current page indicator */
+[aria-current='page'] {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+/* Disabled state */
+[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Hidden but accessible */
+[aria-hidden='true'] {
+  user-select: none;
+}
+
+/* Loading state */
+[aria-busy='true'] {
+  position: relative;
+  pointer-events: none;
+}
+
+[aria-busy='true']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(var(--color-bg-rgb) / 0.7);
 }

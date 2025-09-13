@@ -1,15 +1,10 @@
 ---
 import FormattedDate from "@components/FormattedDate.astro";
-import Layout from "@layouts/Layout.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 import { formatReadingTime } from "@utils/readingTime";
 import type { CollectionEntry } from "astro:content";
 
 type Props = CollectionEntry<"blog">["data"] & {
-  headings?: Array<{
-    depth: number;
-    slug: string;
-    text: string;
-  }>;
   id?: string;
   slug?: string;
   body?: string;
@@ -30,8 +25,10 @@ const {
 const readingTime = formatReadingTime(body);
 ---
 
-<Layout title={title} description={description}>
-
+<BaseLayout
+  title={title}
+  description={description}
+>
   <article class="article">
     {heroImage && (
       <figure class="hero-image">
@@ -78,4 +75,4 @@ const readingTime = formatReadingTime(body);
       <slot />
     </div>
   </article>
-</Layout>
+</BaseLayout>

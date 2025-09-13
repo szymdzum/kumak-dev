@@ -1,22 +1,22 @@
 ---
-import Layout from "@layouts/Layout.astro";
 import ProjectCard from "@components/ProjectCard.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 
 import { featuredProjects } from "@/site-config";
 ---
 
-<Layout
+<BaseLayout
   title="Projects - The Null Hypothesis"
   description="A collection of my coding projects and open-source contributions"
 >
-  <section class="projects-page">
+  <section>
     <header>
       <h1>Projects</h1>
-      <p class="subtitle">
+      <p>
         A collection of my coding projects and open-source contributions
       </p>
     </header>
-    <div class="auto-grid">
+    <div>
       {
         featuredProjects.map((project) => (
           <ProjectCard
@@ -30,7 +30,7 @@ import { featuredProjects } from "@/site-config";
       }
     </div>
   </section>
-</Layout>
+</BaseLayout>
 
 <style>
 

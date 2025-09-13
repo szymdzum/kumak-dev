@@ -1,0 +1,26 @@
+#!/bin/sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Run formatting check
+echo "📐 Checking code formatting..."
+if ! deno fmt --check; then
+    echo "❌ Code formatting check failed. Run 'deno task format' to fix."
+    exit 1
+fi
+
+# Run linting
+echo "🔍 Running linter..."
+if ! deno lint; then
+    echo "❌ Linting failed. Fix the issues above."
+    exit 1
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+if ! deno test --allow-read --allow-env; then
+    echo "❌ Tests failed. Fix the failing tests above."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

@@ -6,9 +6,11 @@ import type { CollectionEntry } from "astro:content";
 
 interface Props {
   post: CollectionEntry<"blog">;
+  index?: number;
 }
 
-const { post } = Astro.props;
+const { post, index = 999 } = Astro.props;
+const shouldLazyLoad = index > 1; // First 2 images load eagerly
 ---
 
 <article>
@@ -30,7 +32,8 @@ const { post } = Astro.props;
       height={450}
       format="webp"
       quality={80}
-      loading="lazy"
+      loading={shouldLazyLoad ? "lazy" : "eager"}
+      fetchpriority={index === 0 ? "high" : "auto"}
     />
   </div>
 </article>
