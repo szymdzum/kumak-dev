@@ -13,9 +13,9 @@ const posts = (await getCollection("blog")).sort(
   title="Blog - The Null Hypothesis"
   description="Thoughts on software engineering, system design, and digital philosophy"
 >
-  <section class="blog-posts-container">
-    <h1 class="page-title">Blog</h1>
-    <div class="posts-grid auto-grid">
+  <section>
+    <h1>Blog</h1>
+    <div>
       {posts.map((post: CollectionEntry<"blog">, index: number) => (
         <PostCard post={post} index={index} />
       ))}

@@ -357,9 +357,9 @@ nav[aria-label] li {
 
 /* Definition lists in sidebars */
 aside dl {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-xs) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
 aside dt {
