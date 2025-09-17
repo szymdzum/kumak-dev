@@ -78,18 +78,17 @@ const posts = new PostsManager(allPosts)
 - Semantic HTML, WCAG AA accessibility
 - Zero legacy dependencies (EA-only)
 
-## MCP Context Servers Available
-- **Astro docs**: Use `mcp__astro_docs__*` tools when you need Astro documentation references
-  - Configured in `~/.claude/settings.json` 
-  - Provides access to official Astro documentation
-  - Restart Claude Code to activate new MCP servers
+## Hooks Configuration
+- **Type Safety**: Pre/post-tool hooks reject `any` types
+- **Cleanup**: Automated code cleanup via `.claude/hooks/`
+- **Quality Gates**: Enforced via `.claude/settings.json`
 
 ## Documentation
 
-**Current Setup:**
+**Available:**
 - `CURRENT_CONFIG.md` - Complete infrastructure documentation
-- `DEPLOY_EA_MIGRATION.md` - EA migration guide
-- `OPTIMIZATION_REPORT.md` - Performance analysis
+- `WARP.md` - Warp terminal integration guide  
+- `README.md` - Project overview
 
 **Code Style:**
 - `.claude/code-guide.md` - TypeScript/Astro patterns
