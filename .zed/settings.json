@@ -179,9 +179,7 @@
     "default_width": 300,
     "dock": "left"
   },
-  "status_bar": {
-    "show": true
-  },
+
   "terminal": {
     "shell": {
       "program": "/bin/zsh"

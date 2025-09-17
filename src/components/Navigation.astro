@@ -5,13 +5,15 @@ import { isPathActive } from "@/utils/path";
 const currentPath = Astro.url.pathname;
 ---
 
-<nav aria-label="Main navigation">
+<nav role="navigation" aria-label="Main navigation" data-nav="main">
   <ul role="list">
     {siteConfig.navItems.map(
       ({ href, title }) => (
       <li>
-        <a href={href}
+        <a
+          href={href}
           aria-current={isPathActive(currentPath, href) ? "page" : undefined}
+          data-nav-link
         >
           {title}
         </a>
