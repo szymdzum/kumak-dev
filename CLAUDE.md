@@ -2,13 +2,13 @@
 
 > **Context Efficiency Rule**: Keep responses short, precise, and simple. Minimize token usage while maintaining helpfulness. Avoid verbose explanations unless specifically requested.
 
-**Kumak's Blog** - Astro-based personal blog with Deno runtime, emphasizing simplicity, performance, and content-focused design.
+**Kumak's Blog** - Astro static blog on Deno Deploy Early Access, live at https://kumak.dev
 
 ## Tech Stack
-- **Astro 5.x** with static output mode
-- **Deno runtime** (no Node.js dependencies)
-- **Content Collections** with Zod validation
-- **Deno Deploy** via GitHub Actions
+- **Astro 5.13.7** static output, MDX integration
+- **Deno 2.x** runtime (JSR packages only)
+- **Deno Deploy EA** - `devblog` project, 6 regions, 9ms latency
+- **GitHub Actions** CI/CD with quality gates
 
 ## Essential Commands
 ```bash
@@ -22,9 +22,18 @@ deno task check-all    # Astro check + lint + format
 deno task test         # Run tests
 deno task fix          # Auto-fix linting and formatting
 
-# Deployment
-deno task deploy       # Build and deploy to Deno Deploy
+# Deployment (EA integrated)
+git push origin main   # Auto-deploy via GitHub Actions
 ```
+
+## Infrastructure
+
+**Deployment:**
+- **EA Project**: `devblog` on console.deno.com
+- **Domains**: kumak.dev, www.kumak.dev (Cloudflare proxy)
+- **SSL**: Let's Encrypt auto-renewal via EA
+- **Pipeline**: GitHub Actions → EA build → 6 regions
+- **Performance**: 0.00% error rate, <2min total deployment
 
 ## Architecture
 
@@ -58,17 +67,16 @@ const posts = new PostsManager(allPosts)
 
 ## Development Requirements
 
-**Before committing:**
-```bash
-deno task check-all && deno task test
-```
+**Pre-commit (automated):**
+- Format check, lint (79 rules), tests (2/2 passing)
+- TypeScript validation, build verification
+- Auto-triggered on commit, blocks if failing
 
 **Standards:**
-- TypeScript strict mode (no `any` types)
-- Semantic HTML and WCAG AA accessibility
-- Use `PostsManager` for content operations
-- Follow existing component patterns
-- Preserve minimal aesthetic
+- TypeScript strict, no `any` types
+- Use `PostsManager` for content queries  
+- Semantic HTML, WCAG AA accessibility
+- Zero legacy dependencies (EA-only)
 
 ## MCP Context Servers Available
 - **Astro docs**: Use `mcp__astro_docs__*` tools when you need Astro documentation references
@@ -76,11 +84,13 @@ deno task check-all && deno task test
   - Provides access to official Astro documentation
   - Restart Claude Code to activate new MCP servers
 
-## Code Style Guide
+## Documentation
 
-See [@.claude/code-guide.md](.claude/code-guide.md) for detailed conventions:
-- TypeScript and Astro patterns
-- CSS architecture and design tokens  
-- Testing and documentation standards
-- Performance and accessibility guidelines
-- dont make inline  comments be token efficient
+**Current Setup:**
+- `CURRENT_CONFIG.md` - Complete infrastructure documentation
+- `DEPLOY_EA_MIGRATION.md` - EA migration guide
+- `OPTIMIZATION_REPORT.md` - Performance analysis
+
+**Code Style:**
+- `.claude/code-guide.md` - TypeScript/Astro patterns
+- Token efficient, minimal comments
