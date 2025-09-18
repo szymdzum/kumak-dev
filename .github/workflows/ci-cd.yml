@@ -61,5 +61,16 @@ jobs:
           path: dist/
           retention-days: 30
 
-  # Note: Deployment is handled automatically by Deno Deploy Early Access
-  # via GitHub integration. No manual deployment step needed.
+  # Deployment is handled automatically by Deno Deploy Early Access
+  # via GitHub integration when this workflow passes. No manual deployment step needed.
+
+  deploy:
+    needs: quality-gates
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger EA Deployment
+        run: |
+          echo "✅ Quality gates passed - Deno Deploy EA will automatically deploy"
+          echo "🔗 Monitor deployment at: https://console.deno.com"
+          echo "🌐 Site will be available at: https://kumak.dev"

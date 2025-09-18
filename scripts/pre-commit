@@ -2,17 +2,10 @@
 
 echo "🔍 Running pre-commit checks..."
 
-# Run formatting check
-echo "📐 Checking code formatting..."
-if ! deno fmt --check; then
-    echo "❌ Code formatting check failed. Run 'deno task format' to fix."
-    exit 1
-fi
-
-# Run linting
-echo "🔍 Running linter..."
-if ! deno lint; then
-    echo "❌ Linting failed. Fix the issues above."
+# Run comprehensive checks (TypeScript, linting, formatting)
+echo "🔬 Running comprehensive checks (TypeScript + lint + format)..."
+if ! deno task check-all; then
+    echo "❌ Comprehensive checks failed. Fix the issues above."
     exit 1
 fi
 
