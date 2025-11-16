@@ -19,12 +19,28 @@ const posts = (await getCollection("blog"))
 >
   <Hero />
 
-  <section style="margin-top: var(--space-3xl);">
-    <h2 style="margin-bottom: var(--space-lg);">Recent Posts</h2>
-    <div style="display: flex; flex-direction: column; gap: var(--space-xl);">
+  <section class="posts">
+    <h2>Recent Posts</h2>
+    <div class="posts-list">
       {posts.map((post: CollectionEntry<"blog">) => (
         <PostCard post={post} />
       ))}
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .posts {
+    margin-top: var(--space-3xl);
+  }
+
+  .posts h2 {
+    margin-bottom: var(--space-lg);
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+</style>

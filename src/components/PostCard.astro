@@ -9,14 +9,14 @@ interface Props {
 const { post } = Astro.props;
 ---
 
-<article>
-  <h3 style="margin-bottom: var(--rhythm-quarter);">
-    <a href={`/${post.slug}/`} style="text-decoration: none; color: var(--color-text);">
+<article class="post-card">
+  <h3>
+    <a href={`/${post.slug}/`}>
       {post.data.title}
     </a>
   </h3>
-  <p style="margin-bottom: var(--space-sm);">{post.data.description}</p>
-  <div style="display: flex; gap: var(--space-md); align-items: center; font-size: var(--text-sm); color: var(--color-text-muted);">
+  <p>{post.data.description}</p>
+  <div class="meta">
     <FormattedDate date={post.data.pubDate} />
     <span aria-hidden="true">•</span>
     <a href={`/${post.slug}/`}>
@@ -24,3 +24,30 @@ const { post } = Astro.props;
     </a>
   </div>
 </article>
+
+<style>
+  .post-card h3 {
+    margin-bottom: var(--rhythm-quarter);
+  }
+
+  .post-card h3 a {
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .post-card h3 a:hover {
+    color: var(--color-primary);
+  }
+
+  .post-card p {
+    margin-bottom: var(--space-sm);
+  }
+
+  .meta {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+</style>
