@@ -1,6 +1,6 @@
 ---
 import Hero from "@components/Hero.astro";
-import PostCard from "@components/PostCard.astro";
+import BlogPostCard from "@components/BlogPostCard.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
@@ -23,7 +23,7 @@ const posts = (await getCollection("blog"))
     <h2>Recent Posts</h2>
     <div class="posts-list">
       {posts.map((post: CollectionEntry<"blog">) => (
-        <PostCard post={post} />
+        <BlogPostCard post={post} />
       ))}
     </div>
   </section>

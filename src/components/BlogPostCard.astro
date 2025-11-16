@@ -9,7 +9,7 @@ interface Props {
 const { post } = Astro.props;
 ---
 
-<article class="post-card">
+<article>
   <h3>
     <a href={`/${post.slug}/`}>
       {post.data.title}
@@ -26,20 +26,20 @@ const { post } = Astro.props;
 </article>
 
 <style>
-  .post-card h3 {
+  article h3 {
     margin-bottom: var(--rhythm-quarter);
   }
 
-  .post-card h3 a {
+  article h3 a {
     text-decoration: none;
     color: var(--color-text);
   }
 
-  .post-card h3 a:hover {
+  article h3 a:hover {
     color: var(--color-primary);
   }
 
-  .post-card p {
+  article p {
     margin-bottom: var(--space-sm);
   }
 

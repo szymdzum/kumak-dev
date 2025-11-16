@@ -1,6 +1,6 @@
 ---
 import Head from "@components/Head.astro";
-import Header from "@components/Header.astro";
+import NavBar from "@components/NavBar.astro";
 import Footer from "@components/Footer.astro";
 
 export interface Props {
@@ -20,7 +20,7 @@ const {
 <html lang="en">
   <Head title={title} description={description} image={image} />
   <body>
-    <Header />
+    <NavBar />
 
     <main>
       <slot />
@@ -61,7 +61,7 @@ const {
     font-size: var(--text-2xl);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
-    margin-top: var(--rhythm-double);
+    margin-top: var(--rhythm-single);
     margin-bottom: var(--rhythm-half);
   }
 

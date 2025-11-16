@@ -27,7 +27,6 @@ export const siteConfig = {
 
   // Navigation items
   navItems: [
-    { title: "Home", href: "/" },
     { title: "About", href: "/about" },
   ],
 } as const;

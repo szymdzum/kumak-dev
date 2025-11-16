@@ -1,0 +1,135 @@
+---
+import { siteConfig } from "@/site-config";
+import { isPathActive } from "@/utils/path";
+
+interface Props {}
+
+const currentPath = Astro.url.pathname;
+---
+
+<header>
+  <div class="container">
+    <a href="/" class="logo" aria-label="Kumak.dev home">
+      Kumak.dev
+    </a>
+    <div class="nav-group">
+      <nav aria-label="Main navigation">
+        <ul role="list">
+          {siteConfig.navItems.map(({ href, title }) => (
+            <li>
+              <a
+                href={href}
+                aria-current={isPathActive(currentPath, href) ? "page" : undefined}
+              >
+                {title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav aria-label="Social media">
+        {Object.entries(siteConfig.socials).map(([, social]) => (
+          <a
+            href={social.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${siteConfig.author} on ${social.name}`}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={social.icon}
+            />
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+</header>
+
+<style>
+  header {
+    border-bottom: var(--border-width) solid var(--color-border);
+    padding: var(--space-md) 0;
+  }
+
+  .container {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--text-lg);
+    transition: color var(--transition-fast);
+  }
+
+  .logo:hover {
+    color: var(--color-primary);
+  }
+
+  .nav-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+
+  nav[aria-label="Main navigation"] ul {
+    display: flex;
+    gap: var(--space-lg);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  nav[aria-label="Main navigation"] li {
+    margin: 0;
+  }
+
+  nav[aria-label="Main navigation"] a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition-fast);
+  }
+
+  nav[aria-label="Main navigation"] a:hover {
+    color: var(--color-primary);
+  }
+
+  nav[aria-label="Main navigation"] a[aria-current="page"] {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  nav[aria-label="Social media"] {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  nav[aria-label="Social media"] a {
+    color: var(--color-text);
+    transition: color var(--transition-fast);
+  }
+
+  nav[aria-label="Social media"] a:hover {
+    color: var(--color-primary);
+  }
+
+  nav[aria-label="Social media"] svg {
+    display: block;
+  }
+</style>
