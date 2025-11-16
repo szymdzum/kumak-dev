@@ -14,7 +14,7 @@
   },
   "tasks": {
     "dev": "./node_modules/.bin/astro dev",
-    "build": "./node_modules/.bin/astro build",
+    "build": "deno run --allow-read --allow-write --allow-env --allow-net scripts/generate-og-images.ts && ./node_modules/.bin/astro build",
     "preview": "deno task preview-urls && deno task preview-serve",
     "preview-serve": "deno run --allow-net --allow-read jsr:@std/http/file-server dist --port 4321",
     "preview-urls": "echo '🚀 Preview server starting...' && echo '📍 Local: http://localhost:4321' && echo '📍 Network: http://'$(ipconfig getifaddr en0 2>/dev/null || echo 'localhost')':4321' && echo ''",

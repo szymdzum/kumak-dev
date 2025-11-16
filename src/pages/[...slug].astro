@@ -21,9 +21,10 @@ const post = Astro.props;
 const { Content } = await render(post);
 
 const { title, description, pubDate } = post.data;
+const ogImage = `/og/${post.slug}.png`;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} image={ogImage}>
   <article>
     <header>
       <h1>{title}</h1>
