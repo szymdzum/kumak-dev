@@ -28,8 +28,8 @@ export const siteConfig = {
   // Navigation items
   navItems: [
     { title: "Home", href: "/" },
-    { title: "Blog", href: "/blog" },
     { title: "About", href: "/about" },
+    { title: "Projects", href: "/projects" },
   ],
 } as const;
 
