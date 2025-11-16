@@ -1,6 +1,6 @@
 ---
 import FormattedDate from "@components/FormattedDate.astro";
-import { BlogRoutes } from "@utils/url.ts";
+import { siteConfig } from "@/site-config";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
@@ -18,7 +18,7 @@ const shouldLazyLoad = index > 1; // First 2 images load eagerly
     <h3>{post.data.title}</h3>
     <p>{post.data.description}</p>
     <div>
-      <a href={BlogRoutes.post(post.slug)}>
+      <a href={`/${post.slug}/`}>
         Read more
       </a>
       <FormattedDate date={post.data.pubDate} />
@@ -26,7 +26,7 @@ const shouldLazyLoad = index > 1; // First 2 images load eagerly
   </div>
   <div>
     <Image
-      src={post.data.heroImage || "/blog-placeholder-1.jpg"}
+      src={post.data.heroImage || siteConfig.image}
       alt={post.data.title}
       width={600}
       height={450}
