@@ -1,4 +1,8 @@
-/* CSS Reset Rules */
+/* ===========================
+   CSS RESET
+   =========================== */
+
+/* Box sizing rules */
 *,
 *::before,
 *::after {
@@ -6,32 +10,14 @@
 }
 
 /* Remove default margin */
-body,
-h1,
-h2,
-h3,
-h4,
-p,
-figure,
-blockquote,
-dl,
-dd {
+* {
   margin: 0;
 }
 
 /* Set core body defaults */
 body {
   min-height: 100vh;
-  text-rendering: optimizeSpeed;
   line-height: 1.5;
-}
-
-/* Improve text rendering */
-html {
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color-scheme: light dark;
 }
 
 /* Improve media defaults */
@@ -44,28 +30,6 @@ svg {
   max-width: 100%;
 }
 
-/* Remove list styles on ul, ol elements with a list role */
-ul[role="list"],
-ol[role="list"] {
-  list-style: none;
-  padding: 0;
-}
-
-/* Enhanced link styles */
-a:not([class]) {
-  text-decoration-thickness: max(0.08em, 1px);
-  text-underline-offset: 0.15em;
-}
-
-/* Improve scroll experience */
-:target {
-  scroll-padding-block-start: 2rem;
-}
-
-:focus {
-  scroll-padding-block-end: 8vh;
-}
-
 /* Inherit fonts for inputs and buttons */
 input,
 button,
@@ -74,22 +38,32 @@ select {
   font: inherit;
 }
 
-/* Global Design Token System - Harmonic Scale Foundation */
+/* Remove list styles on ul, ol elements with a list role */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+  padding: 0;
+}
+
+/* ===========================
+   DESIGN TOKEN SYSTEM
+   =========================== */
+
 :root {
   /* Core Harmonic Scale (1.25 ratio - Major Third) */
-  --scale-xs: 0.64; /* 1 ÷ 1.25² */
-  --scale-sm: 0.8; /* 1 ÷ 1.25 */
-  --scale-base: 1; /* baseline */
-  --scale-lg: 1.25; /* 1 × 1.25 */
-  --scale-xl: 1.563; /* 1 × 1.25² */
-  --scale-2xl: 1.953; /* 1 × 1.25³ */
-  --scale-3xl: 2.441; /* 1 × 1.25⁴ */
+  --scale-xs: 0.64;
+  --scale-sm: 0.8;
+  --scale-base: 1;
+  --scale-lg: 1.25;
+  --scale-xl: 1.563;
+  --scale-2xl: 1.953;
+  --scale-3xl: 2.441;
 
   /* Base Units */
   --base-font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
   --base-spacing: clamp(0.875rem, 0.8rem + 0.4vw, 1rem);
 
-  /* Harmonic Typography Scale */
+  /* Typography Scale */
   --text-xs: calc(var(--scale-xs) * var(--base-font-size));
   --text-sm: calc(var(--scale-sm) * var(--base-font-size));
   --text-base: var(--base-font-size);
@@ -98,7 +72,7 @@ select {
   --text-2xl: calc(var(--scale-2xl) * var(--base-font-size));
   --text-3xl: calc(var(--scale-3xl) * var(--base-font-size));
 
-  /* Harmonic Spacing Scale */
+  /* Spacing Scale */
   --space-xs: calc(var(--scale-xs) * var(--base-spacing));
   --space-sm: calc(var(--scale-sm) * var(--base-spacing));
   --space-md: var(--base-spacing);
@@ -112,14 +86,14 @@ select {
   --content-width-narrow: min(50ch, 85vw);
   --content-width-wide: min(80ch, 95vw);
 
-  /* Fluid Borders & Radii */
+  /* Borders & Radii */
   --border-width: max(0.0625rem, 0.1vw);
   --border-width-thick: max(0.125rem, 0.2vw);
   --radius-sm: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);
   --radius: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
   --radius-lg: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
 
-  /* Color System - Light Theme */
+  /* Colors - Light Theme */
   --color-text: #1a202c;
   --color-text-muted: #4a5568;
   --color-text-subtle: #718096;
@@ -133,7 +107,7 @@ select {
   --color-accent: #ed8936;
   --color-accent-hover: #dd6b20;
 
-  /* Color System - RGB Values for Alpha Compositions */
+  /* RGB Values for Alpha Compositions */
   --color-text-rgb: 26, 32, 44;
   --color-bg-rgb: 255, 255, 255;
   --color-primary-rgb: 49, 130, 206;
@@ -150,10 +124,10 @@ select {
   --font-weight-bold: 700;
   --font-weight-black: 900;
 
-  /* Harmonic Line Heights */
-  --line-height-tight: 1.25; /* Matches harmonic ratio */
-  --line-height-normal: 1.5; /* Golden ratio approximation */
-  --line-height-relaxed: 1.618; /* Golden ratio */
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.618;
 
   /* Vertical Rhythm System */
   --rhythm-quarter: calc(var(--line-height-normal) * 0.25em);
@@ -161,13 +135,7 @@ select {
   --rhythm-single: calc(var(--line-height-normal) * 1em);
   --rhythm-double: calc(var(--line-height-normal) * 2em);
 
-  /* Layout & Container Properties */
-  --container-padding: var(--space-md);
-  --section-padding: var(--space-xl);
-  --header-height: var(--space-3xl);
-  --content-padding: max(var(--container-padding), calc((100% - var(--content-width)) / 2));
-
-  /* Shadows with Relative Units */
+  /* Shadows */
   --shadow-sm: 0 0.0625rem 0.125rem rgb(var(--color-text-rgb) / 0.05);
   --shadow: 0 0.25rem 0.5rem rgb(var(--color-text-rgb) / 0.1);
   --shadow-lg: 0 0.5rem 1rem rgb(var(--color-text-rgb) / 0.15);
@@ -177,8 +145,8 @@ select {
 
   /* Transitions */
   --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
-  --transition-slow: 0.3s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
 }
 
 /* Dark Theme */
@@ -193,24 +161,25 @@ select {
     --color-border: #4a5568;
     --color-border-subtle: #2d3748;
     --color-primary: #63b3ed;
-    --color-primary-hover: #90cdf4;
+    --color-primary-hover: #4299e1;
     --color-accent: #f6ad55;
-    --color-accent-hover: #fbb040;
+    --color-accent-hover: #ed8936;
 
-    /* RGB Values for Dark Theme */
     --color-text-rgb: 247, 250, 252;
     --color-bg-rgb: 26, 32, 44;
     --color-primary-rgb: 99, 179, 237;
     --color-accent-rgb: 246, 173, 85;
 
-    /* Adjust shadows for dark theme */
     --shadow-sm: 0 0.0625rem 0.125rem rgb(0 0 0 / 0.2);
     --shadow: 0 0.25rem 0.5rem rgb(0 0 0 / 0.3);
     --shadow-lg: 0 0.5rem 1rem rgb(0 0 0 / 0.4);
   }
 }
 
-/* Base Styles */
+/* ===========================
+   BASE DEFAULTS
+   =========================== */
+
 html {
   font-family: var(--font-family-base);
   font-size: var(--text-base);
@@ -225,101 +194,9 @@ body {
   padding: 0;
 }
 
-/* Typography Styles */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-family-base);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  color: var(--color-text);
-  margin: 0;
-}
-
-h1 {
-  font-size: var(--text-3xl);
-  margin-bottom: var(--rhythm-half);
-}
-h2 {
-  font-size: var(--text-2xl);
-  margin-bottom: var(--rhythm-half);
-}
-h3 {
-  font-size: var(--text-xl);
-  margin-bottom: var(--rhythm-quarter);
-}
-h4 {
-  font-size: var(--text-lg);
-  margin-bottom: var(--rhythm-quarter);
-}
-h5 {
-  font-size: var(--text-base);
-  margin-bottom: var(--rhythm-quarter);
-}
-h6 {
-  font-size: var(--text-sm);
-  margin-bottom: var(--rhythm-quarter);
-}
-
-p {
-  font-size: var(--text-base);
-  line-height: var(--line-height-normal);
-  margin: 0 0 var(--rhythm-half) 0;
-  max-width: var(--content-width);
-}
-
-a {
-  color: var(--color-primary);
-  text-decoration: underline;
-  text-decoration-thickness: max(0.0625rem, 0.1em);
-  text-underline-offset: 0.2em;
-  transition: color var(--transition-fast);
-}
-
-a:hover {
-  color: var(--color-primary-hover);
-}
-
-/* Lists */
-ul,
-ol {
-  margin: 0 0 var(--rhythm-half) 0;
-  padding-left: var(--space-lg);
-  max-width: var(--content-width);
-}
-
-li {
-  margin-bottom: 0;
-}
-
-/* Code */
-code {
-  font-family: var(--font-family-mono);
-  font-size: 0.9em;
-  background-color: rgb(var(--color-text-rgb) / 0.05);
-  padding: 0.2em 0.4em;
-  border-radius: var(--radius-sm);
-  border: var(--border-width) solid var(--color-border-subtle);
-}
-
-pre {
-  font-family: var(--font-family-mono);
-  background-color: rgb(var(--color-text-rgb) / 0.03);
-  padding: var(--space-md);
-  border-radius: var(--radius);
-  border: var(--border-width) solid var(--color-border);
-  overflow-x: auto;
-  margin: var(--rhythm-single) 0;
-}
-
-pre code {
-  background: none;
-  padding: 0;
-  border: none;
-}
+/* ===========================
+   UTILITY CLASSES
+   =========================== */
 
 .flow > * + * {
   margin-top: var(--rhythm-single);
@@ -329,6 +206,18 @@ pre code {
   text-align: center;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Focus Styles */
 :focus-visible {
   outline: var(--border-width-thick) solid var(--color-primary);
@@ -336,63 +225,9 @@ pre code {
 }
 
 /* ===========================
-   Semantic Element Styles
+   DATA ATTRIBUTE UTILITIES
    =========================== */
 
-/* Article elements */
-article {
-  max-width: var(--content-width);
-}
-
-article > header {
-  margin-bottom: var(--rhythm-single);
-  padding-bottom: var(--space-md);
-  border-bottom: var(--border-width) solid var(--color-border);
-}
-
-article > header h1 {
-  margin-bottom: var(--rhythm-quarter);
-}
-
-/* Navigation lists */
-nav[aria-label] ul,
-nav[aria-label] ol {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-nav[aria-label] li {
-  margin-bottom: var(--rhythm-quarter);
-}
-
-/* Definition lists in sidebars */
-aside dl {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-aside dt {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
-}
-
-aside dd {
-  margin: 0;
-}
-
-/* Sticky sidebar content */
-aside > nav {
-  position: sticky;
-  top: calc(var(--header-height) + var(--space-lg));
-}
-
-/* ===========================
-   Data Attribute Utilities
-   =========================== */
-
-/* Badge styling */
 [data-badge] {
   display: inline-block;
   padding: var(--space-xs) var(--space-sm);
@@ -408,173 +243,6 @@ aside > nav {
   color: var(--color-bg);
 }
 
-/* ===========================
-   ARIA-based Styles
-   =========================== */
-
-/* Hidden but accessible */
 [aria-hidden="true"] {
   user-select: none;
-}
-
-/* ===========================
-   Layout Grid System
-   =========================== */
-
-/* Sticky footer with CSS Grid */
-body {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: 100vh;
-  min-height: 100dvh; /* Modern browsers */
-  margin: 0;
-}
-
-/* ===========================
-   Site Header (Sticky)
-   =========================== */
-
-/* Header layout */
-body > header {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
-  background-color: var(--color-bg);
-  border-bottom: var(--border-width) solid var(--color-border);
-  transition: box-shadow var(--transition-normal);
-  padding-inline: var(--content-padding);
-  padding-block: var(--space-sm);
-  min-height: var(--header-height);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-/* ===========================
-   Main Navigation
-   =========================== */
-
-/* Navigation list */
-header nav ul {
-  display: flex;
-  gap: var(--space-xs);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex-wrap: wrap;
-}
-
-/* Navigation links */
-header nav a {
-  display: inline-block;
-  padding: 0.125rem 0.25rem;
-}
-
-/* Mobile navigation */
-@media (max-width: 40rem) {
-  header nav ul {
-    gap: var(--space-xs);
-  }
-
-  header nav a {
-    padding: 0.125rem 0.25rem;
-  }
-}
-
-/* ===========================
-   Main Content Area
-   =========================== */
-
-body > main {
-  display: grid;
-  grid-template-columns:
-    [full-start] 1fr
-    [content-start] min(100% - 2 * var(--container-padding), var(--content-width)) [content-end]
-    1fr [full-end];
-  padding-block: var(--section-padding);
-}
-
-/* Default: constrained content width */
-body > main > * {
-  grid-column: content;
-}
-
-/* Full-bleed sections when needed */
-body > main > .full-bleed {
-  grid-column: full;
-}
-
-/* ===========================
-   Site Footer
-   =========================== */
-
-body > footer {
-  background-color: var(--color-bg);
-  border-top: var(--border-width) solid var(--color-border);
-  margin-top: auto;
-  padding-inline: var(--content-padding);
-  padding-block: var(--space-xl);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-lg);
-}
-
-/* Footer text */
-body > footer p {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-xs);
-}
-
-body > footer p + p {
-  margin-top: var(--rhythm-quarter);
-  color: var(--color-text-muted);
-  font-size: var(--text-xs);
-}
-
-/* Italic tagline */
-body > footer em {
-  font-style: italic;
-}
-
-/* ===========================
-   Social Links (Footer nav)
-   =========================== */
-
-footer nav {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-footer nav a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-/* ===========================
-   Responsive Layout
-   =========================== */
-
-@media (max-width: 40rem) {
-  body > footer {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--space-md);
-  }
-
-  body > footer nav {
-    justify-content: center;
-  }
-}
-
-/* ===========================
-   Layout Custom Properties
-   =========================== */
-
-:root {
-  --header-height: var(--space-xl);
 }

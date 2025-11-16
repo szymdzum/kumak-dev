@@ -29,7 +29,8 @@ const { title, description, pubDate } = post.data;
         <FormattedDate date={pubDate} />
       </time>
     </header>
-
-    <Content />
+    <div class="prose">
+      <Content />
+    </div>
   </article>
 </BaseLayout>
