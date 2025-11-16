@@ -9,7 +9,8 @@
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   GitHub Repo   │───▶│ GitHub Actions   │───▶│ Deno Deploy EA │
-│   szymdzum/blog │    │  CI Workflow     │    │   6 regions     │
+│ szymdzum/kumak- │    │  CI Workflow     │    │   6 regions     │
+│       dev       │    │                  │    │                 │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                        │                       │
          ▼                        ▼                       ▼
@@ -332,7 +333,7 @@ git push origin main
 ```bash
 # Agent can query these for system status
 https://console.deno.com/szymdzum/devblog     # Deno Deploy dashboard
-https://github.com/szymdzum/blog/actions      # GitHub Actions CI/CD
+https://github.com/szymdzum/kumak-dev/actions # GitHub Actions CI/CD
 https://kumak.dev                             # Live production site
 ```
 

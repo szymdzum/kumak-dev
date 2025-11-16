@@ -2,7 +2,7 @@
 
 > Personal blog built with Astro, powered by Deno, and deployed to Deno Deploy.
 
-[![Deploy Status](https://github.com/szymdzum/blog/workflows/CI/CD/badge.svg)](https://github.com/szymdzum/blog/actions)
+[![Deploy Status](https://github.com/szymdzum/kumak-dev/workflows/CI/CD/badge.svg)](https://github.com/szymdzum/kumak-dev/actions)
 
 Features:
 
@@ -58,8 +58,8 @@ All commands use Deno tasks defined in `deno.json`:
 
 ```bash
 # Clone the repository
-git clone https://github.com/szymdzum/blog.git
-cd blog
+git clone https://github.com/szymdzum/kumak-dev.git
+cd kumak-dev
 
 # Start development server
 deno task dev
