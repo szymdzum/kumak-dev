@@ -1,5 +1,5 @@
 ---
-import FormattedDate from "@components/FormattedDate.astro";
+import DateFormatter from "@components/DateFormatter.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import CodeBlock from "@components/CodeBlock.astro";
 import { type CollectionEntry, getCollection, render } from "astro:content";
@@ -27,7 +27,7 @@ const { title, description, pubDate } = post.data;
     <header>
       <h1>{title}</h1>
       <time datetime={pubDate.toISOString().split("T")[0]}>
-        <FormattedDate date={pubDate} />
+        <DateFormatter date={pubDate} />
       </time>
     </header>
     <div class="prose">

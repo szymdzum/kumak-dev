@@ -1,5 +1,5 @@
 ---
-import FormattedDate from "@components/FormattedDate.astro";
+import DateFormatter from "@components/DateFormatter.astro";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -17,7 +17,7 @@ const { post } = Astro.props;
   </h3>
   <p>{post.data.description}</p>
   <div class="meta">
-    <FormattedDate date={post.data.pubDate} />
+    <DateFormatter date={post.data.pubDate} />
     <span aria-hidden="true">•</span>
     <a href={`/${post.slug}/`}>
       Read >>
