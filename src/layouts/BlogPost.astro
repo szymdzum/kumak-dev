@@ -29,41 +29,41 @@ const readingTime = formatReadingTime(body);
   title={title}
   description={description}
 >
-  <article class="article">
+  <article>
     {heroImage && (
-      <figure class="hero-image">
+      <figure>
         <img src={heroImage} alt={title} />
       </figure>
     )}
 
-    <header class="article__header">
-      <div class="article__meta">
+    <header>
+      <div class="meta">
         <span>{category}</span>
         {draft && import.meta.env.DEV && (
-          <span class="draft-badge">DRAFT</span>
+          <span data-badge="draft">DRAFT</span>
         )}
-        <span class="separator" aria-hidden="true">•</span>
+        <span aria-hidden="true">•</span>
         <time datetime={pubDate.toISOString().split('T')[0]}>
           <FormattedDate date={pubDate} />
         </time>
-        <span class="separator" aria-hidden="true">•</span>
-        <span class="reading-time">{readingTime}</span>
+        <span aria-hidden="true">•</span>
+        <span>{readingTime}</span>
       </div>
 
-      <h1 class="article__title">{title}</h1>
+      <h1>{title}</h1>
 
-      <p class="article__description">{description}</p>
+      <p>{description}</p>
 
       {tags && tags.length > 0 && (
-        <div class="article__tags">
+        <div class="tags">
           {tags.map((tag: string) => (
-            <span class="tag">#{tag}</span>
+            <span>#{tag}</span>
           ))}
         </div>
       )}
 
       {updatedDate && (
-        <div class="article__updated">
+        <div class="updated">
           <time datetime={updatedDate.toISOString().split('T')[0]}>
             Last updated: <FormattedDate date={updatedDate} />
           </time>
@@ -71,7 +71,7 @@ const readingTime = formatReadingTime(body);
       )}
     </header>
 
-    <div class="article__body prose">
+    <div class="prose">
       <slot />
     </div>
   </article>

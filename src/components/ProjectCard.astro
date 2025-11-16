@@ -10,16 +10,16 @@ export interface Props {
 const { title, description, tags, githubUrl, demoUrl } = Astro.props;
 ---
 
-<div class="project-card">
-  <div class="card-content">
+<article>
+  <div>
     <h3>{title}</h3>
     <p>{description}</p>
     <div class="tags">
-      {tags.map((tag) => <span class="tag">{tag}</span>)}
+      {tags.map((tag) => <span>{tag}</span>)}
     </div>
   </div>
 
-  <div class="card-actions">
+  <div>
     <a href={githubUrl} target="_blank" rel="noopener noreferrer">
       Code
     </a>
@@ -29,4 +29,4 @@ const { title, description, tags, githubUrl, demoUrl } = Astro.props;
       </a>
     )}
   </div>
-</div>
+</article>

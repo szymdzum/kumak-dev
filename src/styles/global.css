@@ -392,47 +392,6 @@ aside > nav {
    Data Attribute Utilities
    =========================== */
 
-/* Table of contents depth styling */
-[data-toc-level="3"] {
-  margin-inline-start: var(--space-md);
-}
-
-[data-toc-level="4"] {
-  margin-inline-start: var(--space-lg);
-}
-
-/* Article metadata styling */
-[data-article-meta] {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-/* Tag styling */
-[data-tag] {
-  display: inline-block;
-  padding: var(--space-xs) var(--space-sm);
-  background: var(--color-bg-subtle);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-}
-
-/* Hidden on mobile */
-[data-hide="mobile"] {
-  @media (max-width: 60rem) {
-    display: none;
-  }
-}
-
-/* Hidden on desktop */
-[data-hide="desktop"] {
-  @media (min-width: 60rem) {
-    display: none;
-  }
-}
-
 /* Badge styling */
 [data-badge] {
   display: inline-block;
@@ -453,29 +412,9 @@ aside > nav {
    ARIA-based Styles
    =========================== */
 
-/* Disabled state */
-[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
 /* Hidden but accessible */
 [aria-hidden="true"] {
   user-select: none;
-}
-
-/* Loading state */
-[aria-busy="true"] {
-  position: relative;
-  pointer-events: none;
-}
-
-[aria-busy="true"]::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgb(var(--color-bg-rgb) / 0.7);
 }
 
 /* ===========================
