@@ -5,7 +5,8 @@ import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog")).sort(
-  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
 
@@ -16,8 +17,8 @@ const posts = (await getCollection("blog")).sort(
   <section>
     <h1>Blog</h1>
     <div>
-      {posts.map((post: CollectionEntry<"blog">, index: number) => (
-        <PostCard post={post} index={index} />
+      {posts.map((post: CollectionEntry<"blog">) => (
+        <PostCard post={post} />
       ))}
     </div>
   </section>

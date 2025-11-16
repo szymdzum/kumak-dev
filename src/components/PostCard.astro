@@ -1,39 +1,21 @@
 ---
 import FormattedDate from "@components/FormattedDate.astro";
-import { siteConfig } from "@/site-config";
-import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
   post: CollectionEntry<"blog">;
-  index?: number;
 }
 
-const { post, index = 999 } = Astro.props;
-const shouldLazyLoad = index > 1; // First 2 images load eagerly
+const { post } = Astro.props;
 ---
 
 <article>
+  <h3>{post.data.title}</h3>
+  <p>{post.data.description}</p>
   <div>
-    <h3>{post.data.title}</h3>
-    <p>{post.data.description}</p>
-    <div>
-      <a href={`/${post.slug}/`}>
-        Read more
-      </a>
-      <FormattedDate date={post.data.pubDate} />
-    </div>
-  </div>
-  <div>
-    <Image
-      src={post.data.heroImage || siteConfig.image}
-      alt={post.data.title}
-      width={600}
-      height={450}
-      format="webp"
-      quality={80}
-      loading={shouldLazyLoad ? "lazy" : "eager"}
-      fetchpriority={index === 0 ? "high" : "auto"}
-    />
+    <a href={`/${post.slug}/`}>
+      Read more
+    </a>
+    <FormattedDate date={post.data.pubDate} />
   </div>
 </article>
