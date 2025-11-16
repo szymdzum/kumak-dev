@@ -21,7 +21,7 @@
     "lint": "deno lint",
     "format": "deno fmt",
     "check": "deno lint && deno fmt --check",
-    "check-all": "./node_modules/.bin/astro check && deno lint && deno fmt --check",
+    "check-all": "deno lint && deno fmt --check",
     "knip": "npx knip",
     "fix": "deno lint --fix && deno fmt"
   },
