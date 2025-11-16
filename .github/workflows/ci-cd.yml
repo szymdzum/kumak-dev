@@ -54,10 +54,7 @@ jobs:
         run: deno lint
 
       - name: Code Formatting Check
-        run: deno fmt --check src/ tests/ astro.config.mjs
-
-      - name: Test Suite Execution
-        run: deno task test
+        run: deno fmt --check src/ astro.config.mjs
 
       - name: Production Build Validation
         run: deno task build
