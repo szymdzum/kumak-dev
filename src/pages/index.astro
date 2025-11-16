@@ -20,7 +20,7 @@ const posts = (await getCollection("blog"))
   <Hero />
 
   <section class="posts">
-    <h2>Recent Posts</h2>
+    <h2><span class="prompt">Recent Posts</span></h2>
     <div class="posts-list">
       {posts.map((post: CollectionEntry<"blog">) => (
         <BlogPostCard post={post} />
@@ -31,20 +31,24 @@ const posts = (await getCollection("blog"))
 
 <style>
   .posts {
-    margin-top: var(--space-3xl);
+    margin-top: var(--space-2xl);
   }
 
   .posts h2 {
     font-family: var(--font-family-display);
-    font-size: var(--text-2xl);
+    font-size: var(--text-base);
     font-weight: var(--font-weight-bold);
     letter-spacing: -0.01em;
     margin-bottom: var(--space-lg);
   }
 
+  .posts h2 .prompt {
+    color: var(--color-primary);
+  }
+
   .posts-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
+    gap: var(--space-lg);
   }
 </style>

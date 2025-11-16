@@ -131,10 +131,8 @@ interface Props {
     });
   }
 
-  // Initialize on Astro page transitions
   document.addEventListener('astro:page-load', initCopyButtons);
 
-  // Initialize on initial page load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCopyButtons);
   } else {

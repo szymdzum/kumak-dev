@@ -1,19 +1,83 @@
 ---
-import { siteConfig } from "@site-config";
-
 interface Props {}
+
+const loopCount = 28;
+const segments = 120;
+const majorRadius = 115;
+const tubeRadius = 44;
+const baseCx = 250;
+const baseCy = 110;
+const sideAngle = Math.PI / 2; // rotate torus so we view it from the side
+const tiltAngle = Math.PI / 14; // keep a slight downward tilt for depth
+const cosSide = Math.cos(sideAngle);
+const sinSide = Math.sin(sideAngle);
+const cosTilt = Math.cos(tiltAngle);
+const sinTilt = Math.sin(tiltAngle);
+const zRotation = Math.PI / 2; // rotate final projection to lay the torus horizontally
+const cosZ = Math.cos(zRotation);
+const sinZ = Math.sin(zRotation);
+
+const projectPoint = (theta: number, phi: number) => {
+  const x = (majorRadius + tubeRadius * Math.cos(theta)) * Math.cos(phi);
+  const y = (majorRadius + tubeRadius * Math.cos(theta)) * Math.sin(phi);
+  const z = tubeRadius * Math.sin(theta);
+
+  const x1 = x * cosSide + z * sinSide;
+  const z1 = -x * sinSide + z * cosSide;
+  const y1 = y;
+
+  const y2 = y1 * cosTilt - z1 * sinTilt;
+  const x2 = x1 * cosZ - y2 * sinZ;
+  const y3 = x1 * sinZ + y2 * cosZ;
+
+  return {
+    x: baseCx + x2,
+    y: baseCy + y3,
+  };
+};
+// Generate projected torus loops: phi sweeps around the ring, theta walks each loop.
 ---
 
 <section class="hero">
-  <h1>{siteConfig.name}</h1>
+  <svg class="torus" viewBox="70 40 360 160" xmlns="http://www.w3.org/2000/svg">
+    <g class="torus-loops">
+      {Array.from({ length: loopCount }, (_, index) => {
+        const phi = -Math.PI / 2 + (index / (loopCount - 1)) * Math.PI;
+        const commands = Array.from({ length: segments + 1 }, (_, segmentIndex) => {
+          const theta = (segmentIndex / segments) * Math.PI * 2;
+          const { x, y } = projectPoint(theta, phi);
+          return `${segmentIndex === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+        });
+
+        const emphasis = Math.abs(Math.cos(phi));
+        const strokeWidth = 0.4 + emphasis * 0.55;
+        const opacity = 0.25 + emphasis * 0.6;
+
+        return (
+          <path
+            d={`${commands.join(" ")} Z`}
+            fill="none"
+            stroke="white"
+            stroke-width={strokeWidth}
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            opacity={opacity}
+          />
+        );
+      })}
+    </g>
+  </svg>
 </section>
 
 <style>
-  .hero h1 {
-    font-family: var(--font-family-display);
-    font-size: var(--text-3xl);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.02em;
-    margin-bottom: var(--space-md);
+  .hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .torus {
+    width: 100%;
+    height: auto;
   }
 </style>
