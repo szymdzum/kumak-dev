@@ -9,8 +9,8 @@ const currentPath = Astro.url.pathname;
 
 <header>
   <div class="container">
-    <a href="/" class="logo" aria-label="Kumak.dev home">
-      Kumak.dev
+    <a href="/" class="logo" aria-label="The Null Hypothesis home">
+      The Null Hypothesis
     </a>
     <div class="nav-group">
       <nav aria-label="Main navigation">
@@ -70,10 +70,12 @@ const currentPath = Astro.url.pathname;
   }
 
   .logo {
+    font-family: var(--font-family-display);
     color: var(--color-text);
     text-decoration: none;
     font-weight: var(--font-weight-bold);
     font-size: var(--text-lg);
+    letter-spacing: -0.02em;
     transition: color var(--transition-fast);
   }
 
