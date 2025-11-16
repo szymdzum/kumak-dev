@@ -38,32 +38,45 @@ git push origin main   # Auto-deploy via GitHub Actions
 ## Architecture
 
 **Structure:**
-- `src/components/` - Reusable UI components
-- `src/layouts/` - Page layout templates  
-- `src/pages/` - File-based routing
+- `src/components/` - 6 components (Footer, FormattedDate, Head, Header, Hero, PostCard)
+- `src/layouts/` - BaseLayout only
+- `src/pages/` - 4 pages (index, about, [...slug], rss.xml)
 - `src/content/blog/` - Markdown/MDX blog posts
-- `src/utils/postSorter.ts` - PostsManager utility
+- `src/utils/` - path.ts (navigation helpers)
 
 **Configuration:**
 - `src/site-config.ts` - Site metadata and navigation
 - `src/content/config.ts` - Content schemas with Zod
-- Path aliases: `@components/*`, `@layouts/*`, `@utils/*`, `@styles/*`
+- Path aliases: `@components/*`, `@layouts/*`, `@utils/*`
 
-## Key Utilities
+## CSS Architecture
 
-**PostsManager** - Content query utility:
-```typescript
-const posts = new PostsManager(allPosts)
-  .filter('featured')
-  .sort('date-desc')
-  .limit(3)
-  .get()
+**Clear Responsibility Model:**
+```
+global.css (248 lines)     → Design tokens + reset + utilities ONLY
+Component <style>          → All component presentation
+BaseLayout <style>         → Page layout + prose styles
 ```
 
-**Design System:**
-- CSS design tokens in `src/styles/variables.css`
-- Modular CSS architecture
-- Container-aware responsive units
+**Decision Tree:**
+- CSS variable/token? → `global.css`
+- Reset rule? → `global.css`
+- Utility class? → `global.css`
+- Component-specific? → Component `<style>` block
+- Page layout/prose? → `BaseLayout <style is:global>`
+
+**Rules:**
+- ✅ All component styles in scoped `<style>` blocks
+- ✅ Use design tokens from global.css (--space-*, --color-*, --text-*)
+- ❌ NO component styles in global.css
+- ❌ NO element selectors in global (h1, nav, article)
+- ❌ NO inline styles
+
+**Design Tokens:**
+- Spacing: `--space-xs` through `--space-3xl` (harmonic 1.25 scale)
+- Typography: `--text-xs` through `--text-3xl`
+- Colors: `--color-text`, `--color-primary`, `--color-bg` (dark theme support)
+- Rhythm: `--rhythm-quarter`, `--rhythm-half`, `--rhythm-single`
 
 ## Development Requirements
 
