@@ -8,7 +8,19 @@ export default defineConfig({
   site: "https://kumak.dev",
   output: "static",
 
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx({
+      remarkPlugins: [],
+      rehypePlugins: [],
+    }),
+    sitemap(),
+  ],
+
+  markdown: {
+    shikiConfig: {
+      theme: "github-dark-dimmed",
+    },
+  },
 
   // Performance optimizations
   compressHTML: true,

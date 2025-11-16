@@ -1,6 +1,7 @@
 ---
 import FormattedDate from "@components/FormattedDate.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import CodeBlock from "@components/CodeBlock.astro";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
 export const prerender = true;
@@ -30,7 +31,7 @@ const { title, description, pubDate } = post.data;
       </time>
     </header>
     <div class="prose">
-      <Content />
+      <Content components={{ pre: CodeBlock }} />
     </div>
   </article>
 </BaseLayout>
