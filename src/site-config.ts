@@ -29,7 +29,6 @@ export const siteConfig = {
   navItems: [
     { title: "Home", href: "/" },
     { title: "About", href: "/about" },
-    { title: "Projects", href: "/projects" },
   ],
 } as const;
 
