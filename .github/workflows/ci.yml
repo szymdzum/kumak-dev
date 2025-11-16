@@ -37,3 +37,11 @@ jobs:
 
       - name: Build
         run: deno task build
+
+      - name: Deploy to Deno Deploy
+        if: github.ref == 'refs/heads/main'
+        uses: denoland/deployctl@v1
+        with:
+          project: devblog
+          entrypoint: https://deno.land/std/http/file_server.ts
+          root: dist
