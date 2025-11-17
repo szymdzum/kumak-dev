@@ -3,6 +3,7 @@ import DateFormatter from "@components/DateFormatter.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import CodeBlock from "@components/CodeBlock.astro";
 import Giscus from "@components/Giscus.astro";
+import CopyPageButton from "@components/CopyPageButton.astro";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
 export const prerender = true;
@@ -36,14 +37,17 @@ const readingTime = estimateReadingTime(post.body);
     <header class="post-header">
       <h1>{title}</h1>
       <div class="post-meta">
-        <span class="published-label">Published</span>
-        <time datetime={pubDate.toISOString().split("T")[0]}>
-          <DateFormatter date={pubDate} />
-        </time>
-        <span class="separator">·</span>
-        <span class="reading-time">{readingTime} min read</span>
-        <span class="separator">·</span>
-        <span class="category">{category}</span>
+        <div class="meta-left">
+          <span class="published-label">Published</span>
+          <time datetime={pubDate.toISOString().split("T")[0]}>
+            <DateFormatter date={pubDate} />
+          </time>
+          <span class="separator">·</span>
+          <span class="reading-time">{readingTime} min read</span>
+          <span class="separator">·</span>
+          <span class="category">{category}</span>
+        </div>
+        <CopyPageButton markdown={post.body} />
       </div>
     </header>
     <div class="prose">
@@ -73,10 +77,18 @@ const readingTime = estimateReadingTime(post.body);
   .post-meta {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--space-xs);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
+  }
+
+  .meta-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
   }
 
   .separator {

@@ -73,6 +73,7 @@ ol[role="list"] {
   --text-3xl: calc(var(--scale-3xl) * var(--base-font-size));
 
   /* Spacing Scale */
+  --space-2xs: 0.25rem;
   --space-xs: calc(var(--scale-xs) * var(--base-spacing));
   --space-sm: calc(var(--scale-sm) * var(--base-spacing));
   --space-md: var(--base-spacing);
