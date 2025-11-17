@@ -6,6 +6,10 @@ interface Props {
 }
 
 const { class: className } = Astro.props;
+
+const themeUrl = import.meta.env.DEV
+  ? `${Astro.url.origin}/giscus-theme.css`
+  : `${siteConfig.url}/giscus-theme.css`;
 ---
 
 <div class:list={["giscus-wrapper", className]}>
@@ -21,7 +25,7 @@ const { class: className } = Astro.props;
     data-reactions-enabled="1"
     data-emit-metadata="0"
     data-input-position="bottom"
-    data-theme={`${Astro.site?.origin ?? "https://kumak.dev"}/giscus-theme.css`}
+    data-theme={themeUrl}
     data-lang="en"
     data-loading="lazy"
     crossorigin="anonymous"
