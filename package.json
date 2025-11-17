@@ -6,6 +6,7 @@
     "@astrojs/rss": "^4.0.13",
     "@astrojs/sitemap": "^3.6.0",
     "@deno/astro-adapter": "^0.3.2",
+    "@iconify-json/lucide": "^1.2.73",
     "astro": "^5.15.8",
     "astro-icon": "^1.1.5",
     "typescript": "^5.9.3"

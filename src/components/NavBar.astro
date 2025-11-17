@@ -1,4 +1,5 @@
 ---
+import { Icon } from 'astro-icon/components';
 import { siteConfig } from "@/site-config";
 import { isPathActive } from "@/utils/path";
 
@@ -28,25 +29,14 @@ const currentPath = Astro.url.pathname;
         </ul>
       </nav>
       <nav aria-label="Social media">
-        {Object.entries(siteConfig.socials).map(([, social]) => (
+        {Object.entries(siteConfig.socials).map(([key, social]) => (
           <a
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${siteConfig.author} on ${social.name}`}
           >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-              set:html={social.icon}
-            />
+            <Icon name={`lucide:${key}`} size={28} />
           </a>
         ))}
       </nav>
