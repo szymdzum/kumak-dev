@@ -1,0 +1,34 @@
+---
+import { siteConfig } from "@/site-config";
+
+interface Props {
+  pubDate: Date;
+  updatedDate?: Date;
+  author?: string;
+  category: string;
+  tags?: string[];
+  image?: string;
+}
+
+const {
+  pubDate,
+  updatedDate,
+  author = siteConfig.author,
+  category,
+  tags = [],
+  image = siteConfig.image,
+} = Astro.props;
+
+const imageURL = new URL(image, Astro.site).href;
+---
+
+<!-- Article-specific Open Graph tags -->
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content={pubDate.toISOString()} />
+{updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+<meta property="article:author" content={author} />
+<meta property="article:section" content={category} />
+{tags.map((tag) => <meta property="article:tag" content={tag} />)}
+
+<!-- Override default og:image for articles if custom image provided -->
+{image !== siteConfig.image && <meta property="og:image" content={imageURL} />}

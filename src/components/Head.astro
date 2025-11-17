@@ -31,6 +31,11 @@ const {
   <meta property="og:description" content={description} />
   <meta property="og:image" content={new URL(image, Astro.site).href} />
 
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={new URL(image, Astro.site).href} />
+
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
   <!-- Preload critical fonts -->
@@ -58,4 +63,6 @@ const {
   </style>
 
   <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={title} />
+
+  <slot name="head" />
 </head>

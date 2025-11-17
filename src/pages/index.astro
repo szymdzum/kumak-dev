@@ -2,6 +2,7 @@
 import Hero from "@components/Hero.astro";
 import BlogPostCard from "@components/BlogPostCard.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import SchemaOrg from "@components/SchemaOrg.astro";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 
@@ -17,6 +18,7 @@ const posts = (await getCollection("blog"))
   title="The Null Hypothesis - Software Engineering & Digital Philosophy"
   description="A space where decades of code meet moments of clarity"
 >
+  <SchemaOrg type="WebSite" slot="head" />
   <Hero />
 
   <section class="posts">

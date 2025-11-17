@@ -19,7 +19,9 @@ const {
 
 <!doctype html>
 <html lang="en">
-  <Head title={title} description={description} image={image} />
+  <Head title={title} description={description} image={image}>
+    <slot name="head" slot="head" />
+  </Head>
   <body>
     <NavBar />
 

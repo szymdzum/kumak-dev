@@ -1,0 +1,276 @@
+---
+title: "How My Agent Learned GitLab"
+description: "Teaching an agent to use CLI tools isn't about writing perfect documentation. It's about creating a feedback loop where the tool teaches, the agent learns, and reflection builds institutional knowledge."
+pubDate: 2025-11-17
+category: "tutorial"
+tags: ["agent-skills", "cli", "gitlab", "learning", "developer-tools"]
+keywords: [
+  "Claude Code",
+  "agent skills",
+  "CLI tools",
+  "GitLab",
+  "glab",
+  "self-directed learning",
+  "institutional knowledge",
+]
+author: "Szymon Dzumak"
+showToc: true
+featured: true
+externalLinks:
+  - title: "GitLab Investigation Skill (Gist)"
+    url: "https://gist.github.com/szymdzum/304645336c57c53d59a6b7e4ba00a7a6"
+  - title: "Claude Agent Skills Documentation"
+    url: "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+---
+
+[Skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) are documents that guide an agent on using tools effectively. Think of a skill as instructions for "how I would use this CLI tool" - the commands I'd run, the patterns I'd follow, the mistakes I'd avoid. Agent Skills are just a conceptual framework backed by ordinary Markdown files with YAML metadata (at least for CC)
+
+What's interesting isn't the skill itself. It's how it develops.
+
+This is the story of how [this GitLab investigation skill](https://gist.github.com/szymdzum/304645336c57c53d59a6b7e4ba00a7a6) went from basic command syntax to institutional knowledge through three investigation sessions. Each session, the agent would encounter problems, self-correct using the CLI tool's built-in feedback, and then we'd reflect on what went wrong and update the skill file. The next session would start better.
+
+## Session One: Real-Time Self-Correction
+
+I work with a monorepo that has over 80 CI/CD jobs across 12 stages. When pipelines fail, I need to trace through parent pipelines, child pipelines, failed jobs, and error logs to identify the root cause. There's an MCP server for GitLab. I tried it once, then installed `glab` and wrote a basic skill file with command examples.
+
+"Investigate pipeline 2961721" was my first request. Claude ran a command. Got 20 jobs back. The pipeline had 80+.
+
+I watched Claude notice the discrepancy, run `glab api --help`, spot the `--paginate` flag, and try again. This time: all the jobs.
+
+That's when I realised CLI tools have something different. They let agents teach themselves.
+
+In the first investigation, Claude obtained the pipeline status and listed the failed jobs. Then pulled logs with `glab ci trace <job-id>`. The logs looked clean. No errors visible. But the job had definitely failed.
+
+I didn't explain what was wrong. I asked Claude: "The job failed, but you're not seeing errors. What might be happening?"
+
+Claude reasoned through it: "Errors might be going to stderr instead of stdout." Then checked `glab ci trace --help`, found nothing about stderr handling, and figured out the solution: `glab ci trace <job-id> 2>&1` to redirect stderr to stdout. Reran it. Errors appeared.
+
+This is what CLI tools enable. When something doesn't work, the agent can:
+
+1. See the command failed (exit code 1)
+2. Read the error message on stderr
+3. Run `--help` to see available options
+4. Try a different approach
+5. Verify it worked
+
+All of this happened in one session, in real-time, without my explanation of the solution. The tool provided the feedback loop.
+
+## After the Session: Reflection
+
+At the end of that first investigation, I asked: "What went wrong during this session? What did you learn?"
+
+Claude listed the issues:
+
+- Forgot to paginate, only saw 20 of 80+ jobs.
+- Missed stderr output, couldn't see errors.
+- Didn't know about child pipelines (UI tests were running separately)
+
+We talked through each one. Why did pagination matter? Because the API returns 20 results per page by default, and pipelines typically have more than 80 jobs. Why did stderr matter? Because that's where errors go. Why did child pipelines matter? Because UI tests and deploys trigger downstream pipelines.
+
+Then we updated the skill file with what became critical best practices:
+
+```markdown
+## Critical Best Practices
+
+1. **Always use --paginate** for job queries (pipelines have 80+ jobs)
+2. **Always capture stderr** with `2>&1` when getting logs
+3. **Always check for child pipelines** via bridges API
+4. **Limit log output** to avoid overwhelming context (use `tail -100` or `head -50`)
+```
+
+Twenty minutes of reflection. Four critical lessons documented. The next session will start better.
+
+## Session Two: Faster, Smarter
+
+"Check pipeline 2965483", started the subsequent investigation.
+
+This time, Claude:
+
+- Used `--paginate` from the start.
+- Captured stderr when pulling logs
+- Checked for child pipelines via the bridges API
+
+Found a failed child pipeline, got its jobs, pulled logs with stderr captured, and identified the error. Start to finish: five minutes.
+
+But something new happened. All 15 Image build jobs failed. Claude started pulling logs for each one. I watched it fetch the first three—identical errors. The base Docker image was missing from ECR.
+
+"You just pulled three identical error messages," I pointed out. "What does that tell you?"
+
+Claude recognised the pattern: "When multiple jobs of the same type fail, they likely have the same error. I should check one representative job instead of all 15."
+
+End of session, we added a new pattern to the skill file:
+
+```markdown
+## Pattern: Multiple Failed Jobs
+
+When many jobs fail (e.g., all Image builds), check ONE representative job first -
+they often have identical errors.
+
+# Get first failed job
+
+FIRST_FAILED=$(glab api "projects/2558/pipelines/<PIPELINE_ID>/jobs" --paginate |\
+jq -r '.[] | select(.status == "failed") | .id' | head -1)
+
+# Check its log
+
+glab ci trace $FIRST_FAILED 2>&1 | tail -100
+```
+
+## Session Three: Pattern Recognition
+
+Third investigation, a different failure mode. Checkout server build timed out. Claude saw the error, started digging into what might have caused it.
+
+"Wait," I said. "Before you investigate, check the duration. How long did it run?"
+
+Claude checked: 44 minutes. "That's within normal range for checkout server builds," I told it. "This is a known issue, not an actual failure."
+
+Added to the skill file:
+
+```markdown
+## Common Error Patterns
+
+Build Timeout:
+ERROR: Job failed: execution took longer than <time>
+→ Checkout server builds can take 44+ minutes (known issue)
+```
+
+By the third session, the skill file had also accumulated common pitfalls to avoid:
+
+```markdown
+## Common Pitfalls to Avoid
+
+- ❌ Forgetting `--paginate` (only gets first 20 jobs)
+- ❌ Not checking child pipelines (missing UI Test/Deploy jobs)
+- ❌ Confusing Pipeline IDs (~2M) with Job IDs (~20M+)
+- ❌ Missing stderr output (forgetting `2>&1`)
+- ❌ Dumping entire logs (use tail/head/grep)
+- ❌ Investigating old pipelines with no jobs (check job count first)
+```
+
+And specific error signatures that appear in this codebase:
+
+```markdown
+Missing Docker Image:
+manifest for <image> not found: manifest unknown
+→ Base runner image not available in ECR (common during Node version transitions)
+
+BundleMon Credentials:
+bad project credentials
+{"message":"forbidden"}
+→ BundleMon service access issue (doesn't fail the build, but shows in logs)
+```
+
+This is no longer just a command reference. It's institutional knowledge about this specific codebase, including what's standard, common patterns to look for, and efficient investigation methods.
+
+## What Makes This Work
+
+The learning process works because CLI tools provide everything an agent needs to self-correct.
+
+**Clear error messages**: When `glab api "projects/2558/pipelines/invalid"` fails, stderr shows: "404 Not Found - Pipeline not found." Not "invalid input" or "request failed." The error tells you exactly what went wrong.
+
+**Exit codes**: Every command returns 0 for success and a non-zero value for failure. The agent knows a command failed before reading any output. It can programmatically detect errors and respond.
+
+**Help flags**: Run `glab ci --help` and see every available subcommand. Run `glab ci trace --help` and see every flag, every option, complete syntax examples. This is self-service documentation that's always available, always in sync with the installed version.
+
+**Immediate feedback**: When you run a command, you get a response instantly. No protocol negotiation, no server startup time, no serialisation layers. Try something, see if it works, adjust as needed, and try again. The feedback loop is tight.
+
+This is how the agent learns in real-time. It doesn't need me to explain what `--paginate` does—it reads the help text. It doesn't need me to explain stderr—it sees the command succeeded but no errors appeared, reasons through what might be wrong, and finds the solution.
+
+The CLI tool provides a structured approach for learning. The agent needs to use it.
+
+Over time, these trial-and-error discoveries become documented workflows. For example, the child pipeline pattern that emerged in session one:
+
+```bash
+# Pattern: Child Pipeline Failures
+
+# Step 1: Find failed child pipeline
+CHILD_ID=$(glab api "projects/2558/pipelines/<PIPELINE_ID>/bridges" | \
+  jq -r '.[] | select(.status == "failed") | .downstream_pipeline.id')
+
+# Step 2: Get failed jobs from child pipeline
+glab api "projects/2558/pipelines/$CHILD_ID/jobs" --paginate | \
+  jq -r '.[] | select(.status == "failed") | "\(.name) - Job \(.id)"'
+
+# Step 3: Get one job's log (they're usually identical)
+glab ci trace <job-id> 2>&1 | tail -100
+```
+
+This three-step workflow emerged from Claude's missing UI test failures, the discovery of the Bridges API through exploration, and optimisation after observing that child pipeline jobs often share error messages. Now it's documented, reusable, and reliable.
+
+## The Post-Session Reflection
+
+After each investigation session, I ask the same questions:
+
+"What went wrong during this session?" "What went well?"\
+"What should you do differently next time?"
+
+Claude reviews what happened. List mistakes. Explains what it learned. We talk through why each issue mattered and how to avoid it.
+
+Then we update the skill file. Sometimes it's a new command pattern. Sometimes it's a reminder about pagination. Sometimes it's project-specific knowledge, such as "checkout builds take 44 minutes."
+
+This reflection step is critical. Without it, the agent might learn within a session but not retain lessons across sessions. The skill file becomes the agent's memory—not just of commands, but of mistakes, patterns, and project-specific context.
+
+Three sessions. Two hours total, including reflection time. The skill file went from basic command syntax to 200 lines of documented patterns, standard errors, project-specific quirks, and investigation strategies.
+
+I didn't write comprehensive documentation up front. The agent and I built it together, through use, through failures, through reflection.
+
+## Why Documentation at Hand Matters
+
+The help flag is always there. Current, accurate, comprehensive. When Claude runs `glab api --help`, it sees:
+
+```
+Usage:
+  glab api <endpoint> [flags]
+
+Flags:
+  --paginate          Make additional HTTP requests to fetch all pages
+  -X, --method        HTTP method (default GET)
+  -F, --field         Add a parameter
+  -H, --header        Add an HTTP request header
+```
+
+This isn't documentation that the agent has to search for or request. It's built into the tool. Always available. Always current.
+
+When Claude forgets about pagination, it runs `glab api --help`, sees `--paginate`, and understands immediately. When it needs to make a POST request, it checks the help text, sees `-X, --method`, and uses it.
+
+The help flag enables real-time learning. The agent doesn't need to wait for me to explain. It can explore options, try them, and determine if they are effective. The tool provides everything required for self-correction.
+
+## The Skill File as Memory
+
+The skill file isn't replacing the help flag—it's capturing lessons that emerge from using the tool.
+
+[Looking at the actual skill file](https://gist.github.com/szymdzum/304645336c57c53d59a6b7e4ba00a7a6), it organises knowledge into sections:
+
+- **When to Use**: Triggers that indicate this skill is needed
+- **Quick Start**: Finding pipelines for a branch without having the pipeline ID
+- **Core Workflow**: Step-by-step investigation patterns
+- **Common Patterns**: Documented solutions for recurring scenarios
+- **Critical Best Practices**: The always-do-this reminders
+- **Common Pitfalls**: The never-do-this warnings
+- **Common Error Patterns**: Specific error signatures and what they mean
+- **Project Context**: Names, IDs, and structure specific to this codebase
+
+Things like:
+
+- "Pipelines in this codebase have 80+ jobs, always paginate"
+- "UI tests run in child pipelines, check bridges API"
+- "When all Image builds fail, check one representative job"
+- "Checkout builds taking 44 minutes is normal, not a failure"
+
+These are patterns that came from experience, not from reading documentation. They possess institutional knowledge about how this specific codebase operates, including standard failure modes and efficient methods for investigating issues.
+
+The help flag tells you what's possible. The skill file tells you what's effective. Together, they create a learning environment where the agent gets better with each session.
+
+## What I've Learned
+
+Teaching an agent to use a CLI tool is different from teaching it to use an API or an MCP server.
+
+With a CLI tool, you're not explaining how things work. You're providing a structure that allows the agent to teach itself. The tool gives clear errors. The help flag shows what's possible. Exit codes signal success or failure. The feedback loop is immediate.
+
+Your role is to facilitate reflection. After each session, you ask what went wrong and what went well. You help the agent understand why mistakes mattered and how to avoid them. Then you write it down so next time starts better.
+
+Three sessions transformed a previously unfamiliar tool into something the agent uses confidently. Not because I wrote perfect documentation, but because CLI tools provide everything needed for self-directed learning.
+
+The errors are clear. The documentation is at hand. The feedback is immediate. The agent needs to use the tool, reflect on what happened, and record what they learned.
+
+[That's how this skill developed](https://gist.github.com/szymdzum/304645336c57c53d59a6b7e4ba00a7a6).

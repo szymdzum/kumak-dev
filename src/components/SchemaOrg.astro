@@ -1,0 +1,87 @@
+---
+import { siteConfig } from "@/site-config";
+
+interface Props {
+  type: "BlogPosting" | "WebSite";
+  title?: string;
+  description?: string;
+  pubDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+  image?: string;
+  url?: string;
+}
+
+const {
+  type,
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  author = siteConfig.author,
+  image,
+  url,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = image ? new URL(image, Astro.site).href : new URL(siteConfig.image, Astro.site).href;
+
+let schema = {};
+
+if (type === "BlogPosting") {
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "description": description,
+    "image": imageURL,
+    "datePublished": pubDate?.toISOString(),
+    "dateModified": updatedDate?.toISOString() || pubDate?.toISOString(),
+    "author": {
+      "@type": "Person",
+      "@id": `${siteConfig.url}#author`,
+      "name": author,
+      "url": siteConfig.socials.github.url,
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": siteConfig.name,
+      "url": siteConfig.url,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteConfig.url}/favicon.svg`,
+      },
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": url || canonicalURL.href,
+    },
+    "url": url || canonicalURL.href,
+  };
+} else if (type === "WebSite") {
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": siteConfig.name,
+    "description": siteConfig.description,
+    "url": siteConfig.url,
+    "author": {
+      "@type": "Person",
+      "@id": `${siteConfig.url}#author`,
+      "name": siteConfig.author,
+      "url": siteConfig.socials.github.url,
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": siteConfig.name,
+      "url": siteConfig.url,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteConfig.url}/favicon.svg`,
+      },
+    },
+  };
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

@@ -5,7 +5,7 @@ export const siteConfig = {
   url: "https://kumak.dev",
   description: "A blog about technology, programming, and more",
   tagline: "Where decade of code meet moments of clarity.",
-  image: "/social-image-home.jpg",
+  image: "/social-image.jpg",
   // Author/owner info
   author: "Kumak",
 
