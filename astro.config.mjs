@@ -2,6 +2,8 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import icon from "astro-icon";
+import { externalLinks } from "./src/utils/external-links.ts";
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,9 +13,10 @@ export default defineConfig({
   integrations: [
     mdx({
       remarkPlugins: [],
-      rehypePlugins: [],
+      rehypePlugins: [[externalLinks, { domain: "kumak.dev" }]],
     }),
     sitemap(),
+    icon(),
   ],
 
   markdown: {

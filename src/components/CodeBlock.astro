@@ -1,8 +1,6 @@
 ---
-/**
- * Enhanced code block with copy-to-clipboard functionality
- * Used for all MDX code blocks via custom component mapping
- */
+import { Icon } from 'astro-icon/components';
+
 interface Props {
   [key: string]: unknown;
 }
@@ -10,13 +8,8 @@ interface Props {
 
 <div class="codeblock">
   <button class="codeblock-copy" type="button" aria-label="Copy code to clipboard">
-    <svg class="copy-icon" width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10.5 2H3.5C2.67 2 2 2.67 2 3.5V10.5C2 11.33 2.67 12 3.5 12H10.5C11.33 12 12 11.33 12 10.5V3.5C12 2.67 11.33 2 10.5 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M5 2V1C5 0.45 5.45 0 6 0H13C13.55 0 14 0.45 14 1V8C14 8.55 13.55 9 13 9H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <svg class="check-icon" width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M13.5 4L6 11.5L2.5 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+    <Icon name="lucide:copy" class="copy-icon" size={20} />
+    <Icon name="lucide:check" class="check-icon" size={20} />
   </button>
   <pre {...Astro.props}><slot /></pre>
 </div>
@@ -31,9 +24,9 @@ interface Props {
     top: var(--space-sm);
     right: var(--space-sm);
     padding: 0;
-    background: rgb(var(--color-bg-rgb) / 0.8);
-    backdrop-filter: blur(4px);
-    border: var(--border-width) solid rgb(var(--color-text-rgb) / 0.2);
+    background: rgb(var(--color-bg-rgb) / var(--opacity-strong));
+    backdrop-filter: blur(var(--blur-sm));
+    border: var(--border-width) solid rgb(var(--color-text-rgb) / var(--opacity-subtle));
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -44,10 +37,10 @@ interface Props {
     z-index: 10;
   }
 
-  .copy-icon path,
-  .check-icon path {
-    stroke: var(--color-text-muted);
-    transition: stroke var(--transition-fast);
+  .copy-icon,
+  .check-icon {
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast), opacity var(--transition-fast);
   }
 
   .codeblock:hover .codeblock-copy {
@@ -59,18 +52,13 @@ interface Props {
     border-color: var(--color-border);
   }
 
-  .codeblock-copy:hover .copy-icon path,
-  .codeblock-copy:hover .check-icon path {
-    stroke: var(--color-text);
+  .codeblock-copy:hover .copy-icon,
+  .codeblock-copy:hover .check-icon {
+    color: var(--color-text);
   }
 
   .codeblock-copy:active {
     transform: scale(0.95);
-  }
-
-  .copy-icon,
-  .check-icon {
-    transition: opacity var(--transition-fast), stroke var(--transition-fast);
   }
 
   .check-icon {
@@ -93,39 +81,26 @@ interface Props {
 </style>
 
 <script>
-  const COPIED_TIMEOUT = 2000;
-  const COPIED_CLASS = 'copied';
-
   function initCopyButtons(): void {
-    const codeBlocks = document.querySelectorAll<HTMLElement>('.codeblock');
-
-    codeBlocks.forEach((block) => {
+    document.querySelectorAll<HTMLElement>('.codeblock').forEach((block) => {
       const button = block.querySelector<HTMLButtonElement>('.codeblock-copy');
       const pre = block.querySelector<HTMLPreElement>('pre');
 
       if (!button || !pre) return;
 
-      // Remove existing listener to prevent duplicates
       const newButton = button.cloneNode(true) as HTMLButtonElement;
-      button.parentNode?.replaceChild(newButton, button);
+      button.replaceWith(newButton);
 
       newButton.addEventListener('click', async () => {
-        const code = pre.textContent?.trim() || '';
-
-        if (!code) {
-          console.warn('No code content to copy');
-          return;
-        }
+        const code = pre.textContent?.trim();
+        if (!code) return;
 
         try {
           await navigator.clipboard.writeText(code);
-          newButton.classList.add(COPIED_CLASS);
-
-          setTimeout(() => {
-            newButton.classList.remove(COPIED_CLASS);
-          }, COPIED_TIMEOUT);
+          newButton.classList.add('copied');
+          setTimeout(() => newButton.classList.remove('copied'), 2000);
         } catch (err) {
-          console.error('Failed to copy code to clipboard:', err);
+          console.error('Failed to copy code:', err);
         }
       });
     });
