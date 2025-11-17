@@ -31,9 +31,9 @@ interface Props {
     top: var(--space-sm);
     right: var(--space-sm);
     padding: 0;
-    background: rgb(var(--color-bg-rgb) / 0.8);
-    backdrop-filter: blur(4px);
-    border: var(--border-width) solid rgb(var(--color-text-rgb) / 0.2);
+    background: rgb(var(--color-bg-rgb) / var(--opacity-strong));
+    backdrop-filter: blur(var(--blur-sm));
+    border: var(--border-width) solid rgb(var(--color-text-rgb) / var(--opacity-subtle));
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition-fast);

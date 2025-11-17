@@ -32,7 +32,9 @@ const postUrl = formatUrl(post.slug);
     font-family: var(--font-family-display);
     font-size: var(--text-xl);
     font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
+    line-height: var(--line-height-tight);
+    word-spacing: var(--word-spacing-tight);
+    letter-spacing: var(--letter-spacing-tighter);
     margin-bottom: var(--rhythm-quarter);
   }
 
@@ -48,15 +50,15 @@ const postUrl = formatUrl(post.slug);
 
   article p {
     margin-bottom: var(--space-sm);
-    color: var(--color-text-muted);
+    color: var(--color-text);
   }
 
   .meta {
     display: flex;
     gap: var(--space-md);
     align-items: center;
-    font-size: var(--text-sm);
-    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
   }
 
   .meta a {

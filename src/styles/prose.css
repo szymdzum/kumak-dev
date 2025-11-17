@@ -13,37 +13,41 @@
   font-family: var(--font-family-display);
   font-size: var(--text-3xl);
   font-weight: var(--font-weight-bold);
-  line-height: 1.1;
+  line-height: var(--line-height-tight);
+  word-spacing: var(--word-spacing-tight);
   margin-top: var(--rhythm-double);
   margin-bottom: var(--rhythm-single);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .prose h2 {
   font-family: var(--font-family-display);
   font-size: var(--text-xl);
   font-weight: var(--font-weight-bold);
-  line-height: 1.3;
+  line-height: var(--line-height-tight);
+  word-spacing: var(--word-spacing-tight);
   margin-top: var(--space-3xl);
   margin-bottom: var(--rhythm-half);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tighter);
 }
 
 .prose h3 {
   font-family: var(--font-family-display);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-semibold);
-  line-height: 1.4;
+  line-height: var(--line-height-tight);
+  word-spacing: var(--word-spacing-tight);
   margin-top: var(--space-2xl);
   margin-bottom: var(--rhythm-half);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tighter);
 }
 
 .prose h4,
 .prose h5,
 .prose h6 {
   font-weight: var(--font-weight-semibold);
-  line-height: 1.4;
+  line-height: var(--line-height-tight);
+  word-spacing: var(--word-spacing-tight);
   margin-top: var(--space-xl);
   margin-bottom: var(--rhythm-half);
 }
@@ -70,7 +74,7 @@
   color: var(--color-primary);
   text-decoration: none;
   position: relative;
-  transition: color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .prose a::after {
@@ -81,12 +85,13 @@
   width: 100%;
   height: 1px;
   background: var(--color-primary);
-  opacity: 0.3;
+  opacity: 0;
   transition: opacity var(--transition-fast);
 }
 
 .prose a:hover {
-  color: var(--color-primary-hover);
+  color: var(--color-primary);
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
 }
 
 .prose a:hover::after {

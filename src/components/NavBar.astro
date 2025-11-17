@@ -60,9 +60,6 @@ const currentPath = Astro.url.pathname;
   }
 
   .container {
-    max-width: var(--content-width);
-    margin: 0 auto;
-    padding: 0 var(--space-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -70,11 +67,11 @@ const currentPath = Astro.url.pathname;
 
   .logo {
     font-family: var(--font-family-display);
-    color: var(--color-text);
+    color: var(--color-primary);
     text-decoration: none;
     font-weight: var(--font-weight-bold);
     font-size: var(--text-lg);
-    letter-spacing: -0.02em;
+    letter-spacing: var(--letter-spacing-tight);
     transition: color var(--transition-fast);
   }
 
