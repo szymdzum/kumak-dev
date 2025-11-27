@@ -73,7 +73,7 @@ export default defineConfig({
   },
 
   build: {
-    inlineStylesheets: "never", // Manual inline via Head.astro ?raw import
+    inlineStylesheets: "auto", // Inline small stylesheets to reduce render-blocking
   },
 
   vite: {

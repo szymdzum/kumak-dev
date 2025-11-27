@@ -1,0 +1,19 @@
+# Cache static assets for 1 year (immutable - hashed filenames)
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache fonts for 1 year
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache images for 1 year
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML pages - short cache with revalidation
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Root index
+/
+  Cache-Control: public, max-age=0, must-revalidate
