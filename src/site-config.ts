@@ -18,6 +18,10 @@ export const siteConfig = {
       name: "LinkedIn",
       url: "https://www.linkedin.com/in/szymon-dzumak",
     },
+    rss: {
+      name: "RSS Feed",
+      url: "/rss.xml",
+    },
   },
 
   // Navigation items

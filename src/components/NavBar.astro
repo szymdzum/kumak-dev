@@ -9,7 +9,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header>
-  <div class="container">
+  <div class="nav-container">
     <a href="/" class="logo" aria-label="The Null Hypothesis home">
       [The Null Hypothesis]
     </a>
@@ -29,16 +29,19 @@ const currentPath = Astro.url.pathname;
         </ul>
       </nav>
       <nav aria-label="Social media">
-        {Object.entries(siteConfig.socials).map(([key, social]) => (
-          <a
-            href={social.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${siteConfig.author} on ${social.name}`}
-          >
-            <Icon name={`lucide:${key}`} size={24} />
-          </a>
-        ))}
+        {Object.entries(siteConfig.socials).map(([key, social]) => {
+          const isExternal = social.url.startsWith("http");
+          return (
+            <a
+              href={social.url}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              aria-label={isExternal ? `${siteConfig.author} on ${social.name}` : `Subscribe via ${social.name}`}
+            >
+              <Icon name={`lucide:${key}`} size={24} />
+            </a>
+          );
+        })}
       </nav>
     </div>
   </div>
@@ -49,10 +52,13 @@ const currentPath = Astro.url.pathname;
     padding: var(--space-md) 0;
   }
 
-  .container {
+  .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 var(--space-md);
   }
 
   .logo {
