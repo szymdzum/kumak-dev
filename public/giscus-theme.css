@@ -1,170 +1,175 @@
-/* Giscus Custom Theme - Terminal Dark */
+/* Giscus Custom Theme - Kumak Terminal Dark
+   Uses giscus CSS custom properties for iframe theming
+   Docs: https://github.com/giscus/giscus/blob/main/styles/themes/custom_example.css */
 
-.giscus, .giscus-frame {
-  color-scheme: dark;
+main {
+  --color-prettylights-syntax-comment: #8b8b8b;
+  --color-prettylights-syntax-constant: #00ff41;
+  --color-prettylights-syntax-entity: #00ff41;
+  --color-prettylights-syntax-storage-modifier-import: #e8e8e0;
+  --color-prettylights-syntax-entity-tag: #00ff41;
+  --color-prettylights-syntax-keyword: #ff6b6b;
+  --color-prettylights-syntax-string: #00ff41;
+  --color-prettylights-syntax-variable: #ff6b6b;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #ff6b6b;
+  --color-prettylights-syntax-invalid-illegal-text: #e8e8e0;
+  --color-prettylights-syntax-invalid-illegal-bg: #ff6b6b;
+  --color-prettylights-syntax-carriage-return-text: #e8e8e0;
+  --color-prettylights-syntax-carriage-return-bg: #ff6b6b;
+  --color-prettylights-syntax-string-regexp: #00ff41;
+  --color-prettylights-syntax-markup-list: #e8e8e0;
+  --color-prettylights-syntax-markup-heading: #00ff41;
+  --color-prettylights-syntax-markup-italic: #e8e8e0;
+  --color-prettylights-syntax-markup-bold: #e8e8e0;
+  --color-prettylights-syntax-markup-deleted-text: #ff6b6b;
+  --color-prettylights-syntax-markup-deleted-bg: rgba(255, 107, 107, 0.15);
+  --color-prettylights-syntax-markup-inserted-text: #00ff41;
+  --color-prettylights-syntax-markup-inserted-bg: rgba(0, 255, 65, 0.15);
+  --color-prettylights-syntax-markup-changed-text: #ff6b6b;
+  --color-prettylights-syntax-markup-changed-bg: rgba(255, 107, 107, 0.15);
+  --color-prettylights-syntax-markup-ignored-text: #8b8b8b;
+  --color-prettylights-syntax-markup-ignored-bg: #1d1c24;
+  --color-prettylights-syntax-meta-diff-range: #00ff41;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #8b8b8b;
+
+  /* Canvas/Background */
+  --color-canvas-default: #101113;
+  --color-canvas-overlay: #16151d;
+  --color-canvas-inset: #0d0d0f;
+  --color-canvas-subtle: #16151d;
+
+  /* Borders - using subtle tones for hierarchy */
+  --color-border-default: #2a2a2a;
+  --color-border-muted: #1e1e1e;
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* Text */
+  --color-fg-default: #e8e8e0;
+  --color-fg-muted: #8b8b8b;
+  --color-fg-subtle: #858585;
+
+  /* Accent/Primary - terminal green */
+  --color-accent-fg: #00ff41;
+  --color-accent-emphasis: #00ff41;
+  --color-accent-muted: rgba(0, 255, 65, 0.3);
+  --color-accent-subtle: rgba(0, 255, 65, 0.1);
+
+  /* Buttons */
+  --color-btn-text: #e8e8e0;
+  --color-btn-bg: #1d1c24;
+  --color-btn-border: #2a2a2a;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #252430;
+  --color-btn-hover-border: #00ff41;
+  --color-btn-active-bg: #16151d;
+  --color-btn-active-border: #00ff41;
+  --color-btn-selected-bg: #16151d;
+
+  /* Primary button */
+  --color-btn-primary-text: #101113;
+  --color-btn-primary-bg: #00ff41;
+  --color-btn-primary-border: #00ff41;
+  --color-btn-primary-shadow: 0 0 transparent;
+  --color-btn-primary-inset-shadow: 0 0 transparent;
+  --color-btn-primary-hover-bg: #00cc33;
+  --color-btn-primary-hover-border: #00cc33;
+  --color-btn-primary-selected-bg: #00cc33;
+  --color-btn-primary-disabled-text: rgba(16, 17, 19, 0.5);
+  --color-btn-primary-disabled-bg: rgba(0, 255, 65, 0.5);
+  --color-btn-primary-disabled-border: transparent;
+
+  /* Form elements */
+  --color-fg-on-emphasis: #101113;
+  --color-neutral-muted: rgba(139, 139, 139, 0.2);
+  --color-neutral-subtle: rgba(139, 139, 139, 0.1);
+
+  /* Action list */
+  --color-action-list-item-default-hover-bg: rgba(0, 255, 65, 0.1);
+  --color-action-list-item-default-hover-border: transparent;
+  --color-action-list-item-default-active-bg: rgba(0, 255, 65, 0.15);
+  --color-action-list-item-default-active-border: transparent;
+  --color-action-list-item-default-selected-bg: rgba(0, 255, 65, 0.1);
+
+  /* Header/Navigation */
+  --color-header-text: #e8e8e0;
+  --color-header-bg: #101113;
+  --color-header-logo: #00ff41;
+
+  /* Primer specific */
+  --color-primer-fg-disabled: #5e5e5e;
+  --color-primer-canvas-backdrop: rgba(16, 17, 19, 0.8);
+  --color-primer-canvas-sticky: #101113;
+  --color-primer-border-active: #00ff41;
+  --color-primer-border-contrast: rgba(255, 255, 255, 0.1);
+  --color-primer-shadow-highlight: 0 0 transparent;
+  --color-primer-shadow-inset: 0 0 transparent;
+
+  /* Specific component overrides */
+  --color-social-reaction-bg-hover: rgba(0, 255, 65, 0.1);
+  --color-social-reaction-bg-reacted-hover: rgba(0, 255, 65, 0.2);
 }
 
-/* Main container */
-main.giscus {
-  background: transparent;
-  color: var(--color-text, #f8f8f2);
+/* Soften the harsh white borders */
+.border,
+.border-bottom {
+  border-color: var(--color-border-muted) !important;
 }
 
-/* Reactions section */
-.giscus-reactions {
-  border-color: var(--color-border, #2a2a2a);
+/* Style the comment box textarea border */
+.form-control {
+  border-color: var(--color-border-muted) !important;
 }
 
-.giscus-reaction-count {
-  background: var(--color-bg-muted, #1d1c24);
-  border-color: var(--color-border, #2a2a2a);
-  color: var(--color-text-muted, #8b8b8b);
+.form-control:focus {
+  border-color: var(--color-accent-fg) !important;
+  box-shadow: 0 0 0 1px var(--color-accent-muted) !important;
 }
 
-.giscus-reaction-count:hover {
-  background: var(--color-bg-subtle, #16151d);
-  border-color: var(--color-primary, #00ff41);
-  color: var(--color-text, #f8f8f2);
+/* Tab styling with primary accent */
+.tabnav-tab {
+  color: var(--color-fg-muted) !important;
+  border-bottom-color: transparent !important;
 }
 
-.giscus-reaction-count.has-reacted {
-  background: var(--color-bg-subtle, #16151d);
-  border-color: var(--color-primary, #00ff41);
-  color: var(--color-primary, #00ff41);
+.tabnav-tab:hover {
+  color: var(--color-fg-default) !important;
 }
 
-/* Comments section */
-.giscus-comment-header {
-  color: var(--color-text-muted, #8b8b8b);
+.tabnav-tab[aria-selected="true"] {
+  color: var(--color-accent-fg) !important;
+  border-bottom-color: var(--color-accent-fg) !important;
 }
 
-.giscus-comment-author {
-  color: var(--color-text, #f8f8f2);
+/* Reaction button hover states */
+.BtnGroup-item:hover,
+.btn-outline:hover {
+  border-color: var(--color-accent-fg) !important;
+  color: var(--color-accent-fg) !important;
 }
 
-.giscus-comment-author:hover {
-  color: var(--color-primary, #00ff41);
+/* Links use primary color */
+a {
+  color: var(--color-accent-fg);
 }
 
-.giscus-comment-content {
-  background: transparent;
-  color: var(--color-text, #f8f8f2);
+a:hover {
+  color: #00cc33;
 }
 
-/* Input/Textarea */
-.giscus-comment-box,
-.giscus-comment-box-tabs,
-.giscus-comment-box-preview {
-  background: var(--color-bg-subtle, #16151d);
-  border-color: var(--color-border, #2a2a2a);
-  color: var(--color-text, #f8f8f2);
+/* Timeline connector line */
+.TimelineItem::before {
+  background-color: var(--color-border-muted) !important;
 }
 
-.giscus-comment-box:focus-within {
-  border-color: var(--color-primary, #00ff41);
+/* Reduce visual weight of borders */
+.Box,
+.Box--condensed {
+  border-color: var(--color-border-muted) !important;
 }
 
-.giscus-comment-box-textarea {
-  background: var(--color-bg-subtle, #16151d);
-  color: var(--color-text, #f8f8f2);
-}
-
-.giscus-comment-box-textarea::placeholder {
-  color: var(--color-text-subtle, #5e5e5e);
-}
-
-/* Tabs */
-.giscus-comment-box-tab {
-  color: var(--color-text-muted, #8b8b8b);
-  border-bottom-color: transparent;
-}
-
-.giscus-comment-box-tab.selected,
-.giscus-comment-box-tab:hover {
-  color: var(--color-text, #f8f8f2);
-  border-bottom-color: var(--color-primary, #00ff41);
-}
-
-/* Buttons */
-.giscus-button,
-button.giscus-button {
-  background: var(--color-bg-muted, #1d1c24);
-  border-color: var(--color-border, #2a2a2a);
-  color: var(--color-text, #f8f8f2);
-}
-
-.giscus-button:hover,
-button.giscus-button:hover {
-  background: var(--color-bg-subtle, #16151d);
-  border-color: var(--color-primary, #00ff41);
-  color: var(--color-primary, #00ff41);
-}
-
-.giscus-button-primary,
-button.giscus-button-primary {
-  background: var(--color-primary, #00ff41);
-  border-color: var(--color-primary, #00ff41);
-  color: var(--color-bg, #101113);
-  font-weight: 600;
-}
-
-.giscus-button-primary:hover,
-button.giscus-button-primary:hover {
-  background: var(--color-primary-hover, #00cc33);
-  border-color: var(--color-primary-hover, #00cc33);
-}
-
-/* Sign in button */
-.color-bg-accent-emphasis {
-  background: var(--color-primary, #00ff41) !important;
-  color: var(--color-bg, #101113) !important;
-}
-
-.color-bg-accent-emphasis:hover {
-  background: var(--color-primary-hover, #00cc33) !important;
-}
-
-/* Links */
-.giscus a {
-  color: var(--color-primary, #00ff41);
-}
-
-.giscus a:hover {
-  color: var(--color-primary-hover, #00cc33);
-  text-decoration: underline;
-}
-
-/* Borders */
-.giscus-comment,
-.giscus-reply,
-.giscus-timeline-item {
-  border-color: var(--color-border, #2a2a2a);
-}
-
-/* Code blocks in comments */
-.giscus code {
-  background: var(--color-bg-muted, #1d1c24);
-  color: var(--color-primary, #00ff41);
-  border-radius: 0.25rem;
-  padding: 0.125rem 0.25rem;
-}
-
-.giscus pre {
-  background: var(--color-bg-muted, #1d1c24);
-  border-color: var(--color-border, #2a2a2a);
-}
-
-/* Pagination */
-.giscus-pagination {
-  border-color: var(--color-border, #2a2a2a);
-}
-
-/* Loading state */
-.giscus-loading {
-  color: var(--color-text-muted, #8b8b8b);
-}
-
-/* Ensure all text is visible */
-.giscus * {
-  color: inherit;
+/* Textarea resize handle area */
+.drag-and-drop {
+  border-color: var(--color-border-muted) !important;
+  background-color: var(--color-canvas-subtle) !important;
 }

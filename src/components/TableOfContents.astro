@@ -47,12 +47,10 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
 
   .toc-label {
     display: block;
+    font-family: var(--font-family-display);
     font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     color: var(--color-text-muted);
     margin-bottom: var(--space-xs);
-    font-size: 10px;
   }
 
   ul {
@@ -97,20 +95,37 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
   }
 </style>
 
-<script>
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          document.querySelectorAll('.toc a').forEach((a) => a.classList.remove('active'));
-          const id = entry.target.id;
-          const link = document.querySelector(`.toc a[href="#${id}"]`);
-          if (link) link.classList.add('active');
-        }
-      });
-    },
-    { rootMargin: '-20% 0px -70% 0px' }
-  );
+<script is:inline>
+  const headings = Array.from(document.querySelectorAll('article h2[id]'));
+  const tocLinks = document.querySelectorAll('.toc a');
 
-  document.querySelectorAll('article h2[id]').forEach((h2) => observer.observe(h2));
+  function setActive(id) {
+    tocLinks.forEach((a) => {
+      a.classList.remove('active');
+      a.removeAttribute('aria-current');
+    });
+    const link = document.querySelector(`.toc a[href="#${id}"]`);
+    if (link) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'true');
+    }
+  }
+
+  function updateActiveHeading() {
+    const scrollY = window.scrollY;
+    let current = headings[0]?.id;
+
+    for (const heading of headings) {
+      if (heading.offsetTop <= scrollY + 100) {
+        current = heading.id;
+      } else {
+        break;
+      }
+    }
+
+    if (current) setActive(current);
+  }
+
+  window.addEventListener('scroll', updateActiveHeading, { passive: true });
+  updateActiveHeading();
 </script>
