@@ -190,6 +190,13 @@ Test complex logic. Test edge cases. Test error handling. Test anything where a 
 
 Don't test that React renders React components. Don't test that TypeScript types are correct (the compiler does that). Don't test obvious transformations. Your test suite isn't a proof of correctness; it's a net that catches the bugs that matter.
 
+```typescript
+// Congratulations, you've tested JavaScript
+test('banana equals banana', () => {
+  expect('🍌').toBe('🍌'); // ✅ PASS
+});
+```
+
 This restraint has a benefit beyond saving time: a smaller, focused test suite is easier to maintain. When every test has a clear purpose, you don't end up with a sprawling collection of half-remembered assertions that may or may not still matter.
 
 ## The Coverage Trap
