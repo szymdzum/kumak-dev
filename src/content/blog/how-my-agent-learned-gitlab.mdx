@@ -23,6 +23,14 @@ externalLinks:
     url: "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
 ---
 
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+CLI tools teach agents through clear errors, help flags, and exit codes. Skills develop through use, failure, and reflection, not perfect upfront documentation.
+
+After each session, ask what went wrong. Write it down. Next session starts better.
+</TldrBox>
+
 [Skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) are documents that guide an agent on using tools effectively. Think of a skill as instructions for "how I would use this CLI tool" - the commands I'd run, the patterns I'd follow, the mistakes I'd avoid. Agent Skills are just a conceptual framework backed by ordinary Markdown files with YAML metadata (at least for Claude Code)
 
 What's interesting isn't the skill itself. It's how it develops.
@@ -92,7 +100,7 @@ This time, Claude:
 
 Found a failed child pipeline, got its jobs, pulled logs with stderr captured, and identified the error. Start to finish: five minutes.
 
-But something new happened. All 15 Image build jobs failed. Claude started pulling logs for each one. I watched it fetch the first three—identical errors. The base Docker image was missing from ECR.
+But something new happened. All 15 Image build jobs failed. Claude started pulling logs for each one. I watched it fetch the first three, all identical errors. The base Docker image was missing from ECR.
 
 "You just pulled three identical error messages," I pointed out. "What does that tell you?"
 
@@ -159,7 +167,7 @@ bad project credentials
 → BundleMon service access issue (doesn't fail the build, but shows in logs)
 ```
 
-This is no longer just a command reference. It's institutional knowledge about this specific codebase—what's standard, common patterns to look for, and efficient investigation methods.
+This is no longer just a command reference. It's institutional knowledge about this specific codebase: what's standard, common patterns to look for, and efficient investigation methods.
 
 ## What Makes This Work
 
@@ -173,7 +181,7 @@ The learning process works because CLI tools provide everything an agent needs t
 
 **Immediate feedback**: When you run a command, you get a response instantly. No protocol negotiation, no server startup time, no serialisation layers. Try something, see if it works, adjust as needed, and try again. The feedback loop is tight.
 
-This is how the agent learns in real-time. It doesn't need me to explain what `--paginate` does—it reads the help text. It doesn't need me to explain stderr—it sees the command succeeded but no errors appeared, reasons through what might be wrong, and finds the solution.
+This is how the agent learns in real-time. It doesn't need me to explain what `--paginate` does; it reads the help text. It doesn't need me to explain stderr; it sees the command succeeded but no errors appeared, reasons through what might be wrong, and finds the solution.
 
 The CLI tool provides a structured approach for learning. The agent needs to use it.
 
@@ -208,7 +216,7 @@ Claude reviews what happened. Lists mistakes. Explains what it learned. We talk 
 
 Then we update the skill file. Sometimes it's a new command pattern. Sometimes it's a reminder about pagination. Sometimes it's project-specific knowledge, such as "checkout builds take 44 minutes."
 
-This reflection step is critical. Without it, the agent might learn within a session but not retain lessons across sessions. The skill file becomes the agent's memory—not just of commands, but of mistakes, patterns, and project-specific context.
+This reflection step is critical. Without it, the agent might learn within a session but not retain lessons across sessions. The skill file becomes the agent's memory: not just of commands, but of mistakes, patterns, and project-specific context.
 
 Three sessions. Two hours total, including reflection time. The skill file went from basic command syntax to 200 lines of documented patterns, standard errors, project-specific quirks, and investigation strategies.
 
@@ -237,7 +245,7 @@ The help flag enables real-time learning. The agent doesn't need to wait for me 
 
 ## The Skill File as Memory
 
-The skill file isn't replacing the help flag—it's capturing lessons that emerge from using the tool.
+The skill file isn't replacing the help flag. It's capturing lessons that emerge from using the tool.
 
 [Looking at the actual skill file](https://gist.github.com/szymdzum/304645336c57c53d59a6b7e4ba00a7a6), it organises knowledge into sections:
 
@@ -257,7 +265,7 @@ Things like:
 - "When all Image builds fail, check one representative job"
 - "Checkout builds taking 44 minutes is normal, not a failure"
 
-These patterns came from experience, not from reading documentation. They represent institutional knowledge about how this specific codebase operates—standard failure modes and efficient methods for investigating issues.
+These patterns came from experience, not from reading documentation. They represent institutional knowledge about how this specific codebase operates: standard failure modes and efficient methods for investigating issues.
 
 The help flag tells you what's possible. The skill file tells you what's effective. Together, they create a learning environment where the agent gets better with each session.
 

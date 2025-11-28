@@ -19,6 +19,14 @@ showToc: true
 featured: false
 ---
 
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+CLI tools used 13x fewer tokens than MCP for identical browser automation tasks. MCP returns full accessibility snapshots; CLI returns targeted queries.
+
+Self-documenting CLI tools let agents learn through introspection. Unix composability beats protocol servers for extensibility.
+</TldrBox>
+
 Anthropic published an interesting observation about the [Model Context Protocol and code execution](https://www.anthropic.com/engineering/code-execution-with-mcp). They noted that executable code in the filesystem might be more efficient for AI agents than protocol servers. Isn't that essentially what CLI tools already are?
 
 I decided to test this hypothesis by comparing two approaches to browser automation with AI agents:
@@ -170,7 +178,7 @@ If bdg doesn't provide exactly what you need, you can compose it with `jq`, `gre
 
 **Full protocol access matters.** bdg exposes all 644 CDP methods across 53 domains. If you need `Profiler.startPreciseCoverage` or `Security.setIgnoreCertificateErrors`, it's already there via `bdg cdp Profiler.startPreciseCoverage`. No waiting for server maintainers to add support.
 
-This isn't just about efficiency—it's about not being artificially limited by someone else's API design decisions.
+This isn't just about efficiency. It's about not being artificially limited by someone else's API design decisions.
 
 ## What This Means
 
@@ -249,9 +257,9 @@ This isn't a definitive "CLI beats MCP" statement. It's one data point suggestin
 
 **Token Efficiency:** With MCP, you pay upfront for every tool definition and capability declaration - whether you use them or not. CLI tools like glab, jq, and grep were already in the model's training data. A skill document showing usage patterns is ~3k tokens. MCP server definitions alone can be 5-10k before you invoke any additional functionality.
 
-**Composability:** Unix philosophy wins here. CLI tools pipe together—each does one thing well, and you chain them for complex workflows. MCP servers are monolithic endpoints. If it doesn't expose your exact query, you're stuck. With CLI, you can grep, pipe to files, and combine tools. The model already knows these patterns.
+**Composability:** Unix philosophy wins here. CLI tools pipe together, each doing one thing well, and you chain them for complex workflows. MCP servers are monolithic endpoints. If it doesn't expose your exact query, you're stuck. With CLI, you can grep, pipe to files, and combine tools. The model already knows these patterns.
 
-**Debuggability:** CLI errors are transparent—you see exactly what failed and why. MCP errors hide behind protocol layers and server logs you can't access. The model can identify CLI errors, understand them, and adapt accordingly.
+**Debuggability:** CLI errors are transparent. You see exactly what failed and why. MCP errors hide behind protocol layers and server logs you can't access. The model can identify CLI errors, understand them, and adapt accordingly.
 
 **Real-Time Evolution:** I can update my skill document while the agent uses it, adding patterns and refining examples. With MCP, you're locked to whatever the server exposes. Want new functionality? Wait for the maintainer to add it, redeploy, hope nothing breaks. With CLI, I just update the markdown.
 

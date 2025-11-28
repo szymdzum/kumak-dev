@@ -17,6 +17,14 @@ showToc: true
 featured: false
 ---
 
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+MCP servers often wrap CLI tools that already output structured data. Before adding another protocol layer, check if the CLI already does what you need.
+
+Progressive disclosure, filesystem-based discovery, JSON output. These patterns aren't new. They're how Unix has worked for decades.
+</TldrBox>
+
 A year ago, Anthropic launched the Model Context Protocol. The community built thousands of MCP servers. Two weeks ago, Anthropic published thoughts on making MCP more efficient. Specifically, how to reduce the token overhead when agents connect to many tools. Their approach involves presenting MCP servers as code on a file system, allowing agents to discover tools on demand instead of loading them all up front.
 
 Reading it, I noticed something interesting: the patterns they're describing (progressive disclosure, on-demand loading, filesystem-based tool discovery) are exactly how CLI tools work. And it made me wonder if we've been overlooking a more straightforward approach that was already available.
@@ -71,7 +79,7 @@ gh run view 12345 --json conclusion,status,jobs
 
 The GitHub CLI even includes a built-in `--jq` flag for filtering JSON directly. The tool was designed from the start to be scriptable.
 
-These MCP wrappers add unnecessary serialisation layers to something that already outputs structured data—receiving MCP requests, parsing them, constructing CLI commands, executing them, parsing output, and serialising back to MCP format. This isn't theoretical overhead. [Twilio's performance testing](https://www.twilio.com/en-us/blog/developers/twilio-alpha-mcp-server-real-world-performance) of their MCP server showed that they reduced API calls by 21.6% but increased cache reads by 28.5% and cache writes by 53.7%. Overall cost per task increased by 23.5%. They wrapped an API they already had access to, added an MCP layer to optimise it, and ended up paying more in tokens.
+These MCP wrappers add unnecessary serialisation layers to something that already outputs structured data: receiving MCP requests, parsing them, constructing CLI commands, executing them, parsing output, and serialising back to MCP format. This isn't theoretical overhead. [Twilio's performance testing](https://www.twilio.com/en-us/blog/developers/twilio-alpha-mcp-server-real-world-performance) of their MCP server showed that they reduced API calls by 21.6% but increased cache reads by 28.5% and cache writes by 53.7%. Overall cost per task increased by 23.5%. They wrapped an API they already had access to, added an MCP layer to optimise it, and ended up paying more in tokens.
 
 ## When MCP Actually Makes Sense
 

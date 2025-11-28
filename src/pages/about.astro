@@ -4,55 +4,72 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 
 <BaseLayout
   title="About - The Null Hypothesis"
-  description="Developer, thinker, and digital architect exploring the intersection of code and consciousness"
+  description="Front-end engineer with 13 years of experience building for the web"
 >
   <article>
-    <header class="text-center">
+    <header class="post-header">
       <h1>About</h1>
-      <p>Developer, thinker, and digital architect exploring the intersection of code and consciousness</p>
     </header>
 
-    <section class="flow">
-    <p>
-      Welcome to <strong>The Null Hypothesis</strong> — a space where decades of code meet moments of clarity.
-      I'm Kumak, a software engineer with a passion for exploring the deeper patterns that emerge when
-      technology meets human understanding.
-    </p>
+    <div class="prose">
+      <p>
+        I'm Kumak, a front-end developer who's been writing HTML, CSS, and JavaScript for 13 years.
+        I have a passion for simple things that just work.
+      </p>
 
-    <h2>The Journey</h2>
-    <p>
-      My path through the digital realm has taken me from the early days of web development through
-      the modern landscape of distributed systems, functional programming, and architectural design.
-      Each project has been a lesson in both technical craft and the art of solving human problems
-      through code.
-    </p>
+      <h2>Why "The Null Hypothesis"</h2>
+      <p>
+        In statistics, you start with no assumptions and see what the data tells you.
+        That's how I approach things. No preconceived notions about what should work.
+        Just what actually does.
+      </p>
 
-    <h2>Philosophy</h2>
-    <p>
-      I believe in the power of <strong>simplicity over complexity</strong>, elegant solutions over
-      clever hacks, and systems that grow gracefully rather than collapse under their own weight.
-      The null hypothesis reminds us to question our assumptions, strip away the unnecessary, and
-      focus on what truly matters.
-    </p>
+      <h2>What I Care About</h2>
+      <p>
+        Web standards, accessibility, and semantic HTML. I follow the newest trends, but prefer to
+        be one step behind when implementing them.
+      </p>
 
-    <blockquote>
-      "Those who need to know, know what this really does."
-    </blockquote>
+      <p>
+        I believe in <strong>simplicity over complexity</strong>. Elegant solutions over clever hacks.
+        Systems that grow gracefully rather than collapse under their own weight.
+      </p>
 
-    <h2>What You'll Find Here</h2>
-    <p>
-      This blog explores the intersection of software engineering, system design, and the philosophical
-      questions that emerge when we build digital worlds. Topics range from practical programming
-      patterns to architectural decisions, from debugging methodologies to the broader implications
-      of the systems we create.
-    </p>
+      <h2>Side Projects</h2>
+      <p>
+        In my spare time, I write CLI tools for AI agents. Current project:
+        <a href="https://github.com/szymdzum/browser-debugger-cli">browser-debugger-cli</a>,
+        a tool for browser debugging via Chrome DevTools Protocol.
+      </p>
 
-    <h2>Connect</h2>
-    <p>
-      The conversation doesn't end with the code. Whether you're debugging a complex system,
-      architecting a new solution, or simply curious about the patterns that emerge in our
-      digital world, I'd love to hear from you.
-    </p>
-    </section>
+      <h2>What You'll Find Here</h2>
+      <p>
+        Front-end development, developer tooling, and working with AI agents.
+        Practical patterns over theory. Things I've tested and found useful.
+      </p>
+    </div>
   </article>
 </BaseLayout>
+
+<style>
+  .post-header {
+    margin-bottom: var(--space-xl);
+    padding-bottom: calc(var(--space-xs) * 0.5);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .post-header h1 {
+    font-family: var(--font-family-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tighter);
+    word-spacing: var(--word-spacing-tight);
+  }
+
+  @media (max-width: 480px) {
+    .post-header h1 {
+      font-size: var(--text-xl);
+    }
+  }
+</style>

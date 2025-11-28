@@ -83,14 +83,14 @@ When you test the contract, you're testing what matters. You're creating a speci
 The difference is stark in practice:
 
 ```typescript
-// Testing implementation — breaks when you refactor
+// Testing implementation - breaks when you refactor
 test('calls navItemVariants with correct params', () => {
   const spy = vi.spyOn(styles, 'navItemVariants');
   render(<NavItem to="/orders">Orders</NavItem>);
   expect(spy).toHaveBeenCalledWith({ active: false });
 });
 
-// Testing contract — survives any rewrite
+// Testing contract - survives any rewrite
 test('renders as a link to the specified route', () => {
   render(<NavItem to="/orders">Orders</NavItem>);
   const link = screen.getByRole('link', { name: /orders/i });
@@ -117,12 +117,12 @@ You lose visibility into internals. You gain freedom to change them.
 The black box principle also clarifies what to mock. External systems (APIs, databases, third-party services) exist outside your black box. Mock those. Your own modules exist inside. Don't mock those; let them run.
 
 ```typescript
-// Mock external systems — they're outside your control
+// Mock external systems - they're outside your control
 vi.mock('~/api/client', () => ({
   fetchUser: vi.fn().mockResolvedValue({ name: 'Test User' })
 }));
 
-// Don't mock your own code — let it run
+// Don't mock your own code - let it run
 // ❌ vi.mock('~/components/ui/NavItem');
 // ❌ vi.spyOn(myModule, 'internalHelper');
 ```
@@ -140,13 +140,13 @@ An example test says: "When I render the navigation with these specific items, I
 Example tests are fragile. They encode specific scenarios that might or might not represent the full space of valid inputs. Property tests are robust. They encode invariants: things that should always be true, regardless of specific inputs.
 
 ```typescript
-// Example test — tests one specific case
+// Example test - tests one specific case
 test('renders Orders link', () => {
   render(<Navigation items={[{ to: '/orders', label: 'Orders' }]} />);
   expect(screen.getByText('Orders')).toBeInTheDocument();
 });
 
-// Property test — tests the invariant
+// Property test - tests the invariant
 test('renders all provided items as navigable links', () => {
   const items = [
     { to: '/orders', label: 'Orders' },
@@ -201,12 +201,12 @@ Traditional unit testing isolates each function, each component, each module. Yo
 Integration-style unit tests take a different approach. Test the assembled component, not its parts. Render the whole navigation menu, not each navigation item separately. Let the real code run, verify the final output behaves correctly.
 
 ```typescript
-// Isolated unit tests — many small tests, implementation-coupled
+// Isolated unit tests - many small tests, implementation-coupled
 describe('NavItem', () => { /* ... */ });
 describe('NavList', () => { /* ... */ });
 describe('NavHeader', () => { /* ... */ });
 
-// Integration-style unit test — one robust test
+// Integration-style unit test - one robust test
 test('AccountNavigation renders complete navigation', () => {
   render(<AccountNavigation user={mockUser} />);
 
