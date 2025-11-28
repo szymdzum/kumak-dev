@@ -1,0 +1,63 @@
+---
+interface ExternalLink {
+  title: string;
+  url: string;
+}
+
+interface Props {
+  links?: ExternalLink[];
+}
+
+const { links = [] } = Astro.props;
+---
+
+{links.length > 0 && (
+  <aside class="further-reading">
+    <h2>Further Reading</h2>
+    <ul>
+      {links.map((link) => (
+        <li>
+          <a href={link.url} target="_blank" rel="noopener noreferrer">
+            {link.title}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </aside>
+)}
+
+<style>
+  .further-reading {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-lg);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  h2 {
+    font-family: var(--font-family-display);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    padding: var(--space-xs) 0;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>

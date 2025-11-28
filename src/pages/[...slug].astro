@@ -7,6 +7,7 @@ import CopyPageButton from "@components/CopyPageButton.astro";
 import SchemaOrg from "@components/SchemaOrg.astro";
 import ArticleMeta from "@components/ArticleMeta.astro";
 import ArticleFooter from "@components/ArticleFooter.astro";
+import FurtherReading from "@components/FurtherReading.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
@@ -25,7 +26,7 @@ type Props = CollectionEntry<"blog">;
 const post = Astro.props;
 const { Content, headings } = await render(post);
 
-const { title, description, pubDate, updatedDate, category, tags, author, heroImage } = post.data;
+const { title, description, pubDate, updatedDate, category, tags, author, heroImage, externalLinks } = post.data;
 
 function estimateReadingTime(content: string): number {
   const wordsPerMinute = 200;
@@ -76,6 +77,7 @@ const readingTime = estimateReadingTime(post.body);
     <div class="prose">
       <Content components={{ pre: CodeBlock }} />
     </div>
+    <FurtherReading links={externalLinks} />
     <ArticleFooter />
     <Giscus />
   </article>
