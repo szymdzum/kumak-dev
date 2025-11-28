@@ -36,6 +36,17 @@ Something strange happens when you start working with AI agents. Code that would
 
 Code becomes fluid. Malleable. You describe what you want, and it reshapes itself. This fluidity changes everything about how we think about tests.
 
+```
+$ npm test
+
+FAIL src/components/NavItem.test.tsx
+  ✕ calls navItemVariants with correct params
+  ✕ passes active prop to styling function
+  ✕ renders with expected className
+
+3 tests failed. The component works perfectly.
+```
+
 ## The New Equilibrium
 
 For decades, we've lived with a particular tension in software development. Tests exist to catch bugs, but they also exist as documentation, as proof of intent, as a safety net. We accepted that comprehensive tests came with a cost: they made changes harder. Touch anything, and you might spend as much time fixing tests as fixing code.
