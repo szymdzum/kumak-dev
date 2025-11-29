@@ -28,46 +28,71 @@ interface LlmsFullTxtConfig {
   items: LlmsFullItem[];
 }
 
+const MDX_PATTERNS = {
+  imports: /^import\s+.+from\s+['"].+['"];?\s*$/gm,
+  jsxBlocks: /<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g,
+  jsxSelfClosing: /<[A-Z][a-zA-Z]*[^>]*\/>/g,
+} as const;
+
+function stripMdxSyntax(content: string): string {
+  return Object.values(MDX_PATTERNS)
+    .reduce((text, pattern) => text.replace(pattern, ""), content)
+    .trim();
+}
+
 function textResponse(content: string): Response {
   return new Response(content, {
     headers: { "Content-Type": "text/plain; charset=utf-8" },
   });
 }
 
-export function llmsTxt(config: LlmsTxtConfig): Response {
-  const lines = [
-    `# ${config.name}`,
-    "",
-    `> ${config.description}`,
-    "",
-    "## Posts",
-    "",
-    ...config.items.map(
-      (item) => `- [${item.title}](${config.site}${item.link}): ${item.description}`,
-    ),
-  ];
-
-  if (config.optional?.length) {
-    lines.push("", "## Optional", "");
-    for (const item of config.optional) {
-      lines.push(`- [${item.title}](${config.site}${item.link}): ${item.description}`);
-    }
-  }
-
-  lines.push("");
-  return textResponse(lines.join("\n"));
+function formatDate(date: Date): string {
+  return date.toISOString().split("T")[0];
 }
 
-function stripMdxSyntax(content: string): string {
-  return content
-    .replace(/^import\s+.*from\s+['"].*['"];?\s*$/gm, "")
-    .replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, "")
-    .replace(/<[A-Z][a-zA-Z]*[^>]*\/>/g, "")
-    .trim();
+function formatLink(item: LlmsItem, site: string): string {
+  return `- [${item.title}](${site}${item.link}): ${item.description}`;
+}
+
+function buildDocument(sections: string[][]): string {
+  return sections.map((lines) => lines.join("\n")).join("\n\n");
+}
+
+export function llmsTxt(config: LlmsTxtConfig): Response {
+  const header = [`# ${config.name}`, `> ${config.description}`];
+  const posts = ["## Posts", ...config.items.map((item) => formatLink(item, config.site))];
+
+  const sections = [header, posts];
+
+  if (config.optional?.length) {
+    const optional = [
+      "## Optional",
+      ...config.optional.map((item) => formatLink(item, config.site)),
+    ];
+    sections.push(optional);
+  }
+
+  return textResponse(buildDocument(sections) + "\n");
+}
+
+function formatPostSection(item: LlmsFullItem, site: string): string[] {
+  return [
+    `## ${item.title}`,
+    "",
+    `URL: ${site}${item.link}`,
+    `Published: ${formatDate(item.pubDate)}`,
+    `Category: ${item.category}`,
+    "",
+    `> ${item.description}`,
+    "",
+    stripMdxSyntax(item.body),
+    "",
+    "---",
+  ];
 }
 
 export function llmsFullTxt(config: LlmsFullTxtConfig): Response {
-  const lines = [
+  const header = [
     `# ${config.name}`,
     "",
     `> ${config.description}`,
@@ -76,28 +101,11 @@ export function llmsFullTxt(config: LlmsFullTxtConfig): Response {
     `Site: ${config.site}`,
     "",
     "---",
-    "",
   ];
 
-  for (const item of config.items) {
-    const cleanBody = stripMdxSyntax(item.body);
-    lines.push(
-      `## ${item.title}`,
-      "",
-      `URL: ${config.site}${item.link}`,
-      `Published: ${item.pubDate.toISOString().split("T")[0]}`,
-      `Category: ${item.category}`,
-      "",
-      `> ${item.description}`,
-      "",
-      cleanBody,
-      "",
-      "---",
-      "",
-    );
-  }
+  const posts = config.items.flatMap((item) => formatPostSection(item, config.site));
 
-  return textResponse(lines.join("\n"));
+  return textResponse([...header, "", ...posts, ""].join("\n"));
 }
 
 interface LlmsPostConfig {
@@ -108,18 +116,18 @@ interface LlmsPostConfig {
 
 export function llmsPost(config: LlmsPostConfig): Response {
   const { post, site, link } = config;
-  const cleanBody = stripMdxSyntax(post.body ?? "");
+  const { title, description, pubDate, category } = post.data;
 
   const lines = [
-    `# ${post.data.title}`,
+    `# ${title}`,
     "",
-    `> ${post.data.description}`,
+    `> ${description}`,
     "",
     `URL: ${site}${link}`,
-    `Published: ${post.data.pubDate.toISOString().split("T")[0]}`,
-    `Category: ${post.data.category}`,
+    `Published: ${formatDate(pubDate)}`,
+    `Category: ${category}`,
     "",
-    cleanBody,
+    stripMdxSyntax(post.body ?? ""),
     "",
   ];
 

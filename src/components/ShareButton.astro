@@ -29,7 +29,8 @@ const { title, description } = Astro.props;
           try {
             await navigator.share({ title, text: description, url });
           } catch (err) {
-            if ((err as Error).name !== 'AbortError') {
+            const isAbort = err instanceof Error && err.name === 'AbortError';
+            if (!isAbort) {
               console.error('Share failed:', err);
             }
           }

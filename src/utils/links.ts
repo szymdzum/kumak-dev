@@ -20,8 +20,11 @@ function isExternalLink(href: string, siteDomain: string): boolean {
 }
 
 function applyExternalLinkAttributes(element: Element): void {
-  element.properties!.target = "_blank";
-  element.properties!.rel = "noopener noreferrer";
+  if (!element.properties) {
+    element.properties = {};
+  }
+  element.properties.target = "_blank";
+  element.properties.rel = "noopener noreferrer";
 }
 
 function walkTree(node: Root | RootContent, callback: NodeCallback): void {
@@ -41,7 +44,7 @@ export const externalLinks: RehypePlugin<[ExternalLinksOptions?]> = (options) =>
       if (!isElement(node)) return;
       if (!isAnchorWithHref(node)) return;
 
-      const href = String(node.properties!.href);
+      const href = String(node.properties?.href ?? "");
 
       if (isExternalLink(href, siteDomain)) {
         applyExternalLinkAttributes(node);
