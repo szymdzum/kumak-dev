@@ -1,0 +1,196 @@
+---
+title: "Design for Dialogue, Not Documentation"
+description: "Agents start fresh every session. Instead of dumping docs upfront, build tools they can search and feedback that guides. One take on agent-friendly tooling."
+pubDate: 2025-11-28
+category: "philosophy"
+tags: ["cli", "ai-agents", "developer-tools", "self-documenting"]
+keywords:
+  [
+    "CLI design",
+    "AI agents",
+    "self-documenting tools",
+    "progressive disclosure",
+    "agent-friendly",
+  ]
+author: "Szymon Dzumak"
+showToc: true
+featured: false
+draft: true
+externalLinks:
+  - title: "bdg - Browser Debugger CLI"
+    url: "https://github.com/szymdzum/browser-debugger-cli"
+  - title: "Self-Documenting Systems - Full Reference"
+    url: "https://github.com/szymdzum/browser-debugger-cli/blob/main/docs/principles/SELF_DOCUMENTING_SYSTEMS.md"
+  - title: "Command Line Interface Guidelines"
+    url: "https://clig.dev/"
+  - title: "Error Message Guidelines - Nielsen Norman Group"
+    url: "https://www.nngroup.com/articles/error-message-guidelines/"
+  - title: "Actionable Errors - Microsoft"
+    url: "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-error-handling-guidelines"
+---
+
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+Agents start fresh every 200k tokens. How quickly can you teach them what's possible? I pushed `--help` to its extreme: tools that teach through dialogue, not documentation. Progressive disclosure instead of doc dumps.
+</TldrBox>
+
+I'm building a CLI tool for browser debugging. The idea is simple: let AI agents control Chrome through the [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) via `bash_tool`. Capture screenshots, inspect network requests, execute JavaScript. The kind of thing that's tedious to do manually but trivial to automate.
+
+The Chrome DevTools Protocol has 53 domains and over 600 methods. That's a lot of capability. It's also a lot of documentation. And here's where I hit a wall: how do I teach an agent what's possible without dumping thousands of tokens of docs into context every session?
+
+Agents have context windows. Every session starts fresh. Every tool needs to be learned again. Feeding comprehensive documentation felt wasteful. I'd be paying a tool tax before any real work begins.
+
+From my observation, when Claude gets stuck with CLI tools, it naturally reaches for `--help`. When that's not enough, it tries `command --help`. When the output is JSON, it parses and adapts. The pattern is consistent: ask the tool, learn from the response, try again.
+
+That got me thinking. If `--help` is the agent's natural discovery method, how far can I push it? What if the tool could teach itself?
+
+## Don't Make Me RTFM
+
+There's a saying: when all else fails, read the manual. It's funny because it's true. Nobody wants to read the manual.
+
+Documentation is a wall of text about things you don't need yet. You're trying to solve one specific problem, but first you have to wade through setup instructions, configuration options, and twelve variations of a feature you'll never use. For humans, this causes eye-glazing. For agents, eye-glazing costs tokens.
+
+And documentation lies. Not intentionally. But the tool ships a new version, someone forgets to update the docs, and now the agent is following instructions for a method that was renamed three months ago. The tool and its documentation are two artifacts pretending to be one. They drift apart the moment someone commits without updating the README.
+
+## The Socratic Method
+
+Socrates had a trick. He never lectured. He asked questions until students discovered the answer themselves. Each answer revealed the next question. Understanding built through dialogue, layer by layer.
+
+Tools can work the same way. When an agent asks "what can you do?", the tool answers. When it asks "what methods exist in this domain?", the tool lists them. When it asks "how do I use this specific method?", the tool provides the schema and examples. Each question leads naturally to the next.
+
+The tool becomes both subject and teacher. And unlike a 50-page manual, it only gives you what you asked for.
+
+## Progressive Disclosure
+
+Here's what that looks like in practice. Watch the conversation unfold:
+
+```shell
+# Agent asks: "What can you do?"
+bdg --help --json
+
+# Agent asks: "What domains exist?"
+bdg cdp --list
+
+# Agent asks: "What can I do with Network?"
+bdg cdp Network --list
+
+# Agent asks: "How do I get cookies?"
+bdg cdp Network.getCookies --describe
+
+# Agent executes with confidence
+bdg cdp Network.getCookies
+```
+
+Each answer reveals exactly what's needed for the next question. No more, no less. Each question narrows the search. By the fifth question, the agent knows exactly what it's looking for.
+
+But what if the agent doesn't know the exact method name? Semantic search bridges the gap:
+
+```shell
+$ bdg cdp --search cookie
+Found 14 methods matching "cookie":
+
+  Network.getCookies
+    # Returns all browser cookies for the current URL
+  Network.setCookie
+    # Sets a cookie with the given cookie data
+  Network.deleteCookies
+    # Deletes browser cookies with matching name
+  Storage.getCookies
+    # Returns all browser cookies
+  ...
+```
+
+The agent thinks "I need something with cookies" and the tool finds everything relevant. Each result includes a working example. No guessing required.
+
+Building [bdg](https://github.com/szymdzum/browser-debugger-cli), I pushed this to the extreme. (The [full design principles](https://github.com/szymdzum/browser-debugger-cli/blob/main/docs/principles/SELF_DOCUMENTING_SYSTEMS.md) go deeper.) Writing documentation for the entire Chrome DevTools Protocol would be a full-time job. Instead, I made every layer queryable. The protocol teaches itself.
+
+Five interactions. Zero documentation. The tool became its own manual.
+
+## Errors That Teach
+
+[Actionable error messages](https://www.nngroup.com/articles/error-message-guidelines/) have been a UX best practice for decades. Nielsen's Heuristic #9: "Help Users Recognize, Diagnose, and Recover from Errors." Microsoft calls them [Fix-it actions](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-error-handling-guidelines): when the system knows the correct value, offer it.
+
+What's new is the flip. Traditional error handling focuses on helping users recover. Agent-friendly error handling focuses on helping *tools* teach. The user asks for help; the tool provides guidance. Same principles, different direction.
+
+And agents need it more. Humans can work around bad UX. They open a browser tab, search Stack Overflow, find another way. Agents can't. They're stuck with what you give them, racing against a context window that's always shrinking. Every unhelpful error burns tokens. Every dead end costs round trips. Good practices become essential practices.
+
+And agents make mistakes constantly. LLMs hallucinate. It's not a bug, it's a feature: they connect dots. But dot-connecting needs guardrails. They'll type `Network.getCokies` instead of `Network.getCookies`. They'll use singular when the API expects plural. They'll invent plausible-sounding methods that don't exist.
+
+A typical error:
+
+```shell
+$ bdg cdp Network.getCokies
+Error: Method not found
+```
+
+Now what? The agent has to guess, search, retry. Burn tokens. Burn time.
+
+Teaching errors provide the path forward:
+
+```shell
+$ bdg cdp Network.getCokies
+Error: Method 'Network.getCokies' not found
+
+Did you mean:
+  - Network.getCookies
+  - Network.setCookies
+  - Network.setCookie
+```
+
+The correction arrives in the same response as the error. No round trip. No context switch. The agent adapts immediately.
+
+The [fuzzy matching](https://github.com/szymdzum/browser-debugger-cli/blob/main/docs/principles/TYPO_DETECTION.md) is smarter than simple typo detection. Try `Networking.getCookies` with the wrong domain name, and it still suggests `Network.getCookies`. The tool understands what you meant, not just what you typed.
+
+Even empty results guide you forward:
+
+```shell
+$ bdg dom query "article h2"
+No nodes found matching "article h2"
+
+Suggestions:
+  Verify: bdg dom eval "document.querySelector('article h2')"
+  List:   bdg dom query "*"
+```
+
+And success states show next steps too:
+
+```shell
+$ bdg dom query "h1, h2, h3"
+Found 5 nodes:
+  [0] <h2> Recent Posts
+  [1] <h3> Testing in the Age of AI Agents
+  ...
+
+Next steps:
+  Get HTML: bdg dom get 0
+  Details:  bdg details dom 0
+```
+
+Every interaction answers "what now?" Errors suggest fixes. Empty results suggest alternatives. Success shows what to do with the data. There's always a next step.
+
+This is about stacking best practices. Helpful message tells the agent what went wrong. Suggestions tell it how to fix it. Exit codes tell it what kind of wrong.
+
+Most tools return 1 for any error. Not helpful. Semantic exit codes create ranges with meaning. 80-89 for user errors: bad input, fix it before retrying. 100-109 for external errors: API timeout, retry with backoff. The agent can branch its logic without parsing error messages.
+
+Message, suggestion, exit code. Three layers of guidance stacked together, giving the agent every chance to recover before burning more context.
+
+## The Result
+
+I tested this with an agent starting from zero knowledge. No prior context about bdg, no documentation provided. Just the tool.
+
+Five commands later, it was executing CDP methods successfully. It discovered the tool's structure, explored the domains, found the method it needed, understood the parameters, and executed. The tool taught the agent how to use it.
+
+When I introduced typos deliberately, the suggestions caught them. When commands failed, the exit codes and error messages pointed toward solutions. The agent recovered without external help.
+
+The context cost? Roughly 500 tokens for discovery, versus thousands for a documentation dump. And those 500 tokens bought understanding, not just information.
+
+## The Shift
+
+We've spent decades writing documentation for humans. Sequential readers who remember context, infer from examples, and tolerate ambiguity. Agents operate differently. They query capabilities, parse structured output, and make programmatic decisions. They start fresh every session.
+
+Tools designed for agents aren't dumbed down. They're more explicit. They expose their structure. They teach through dialogue.
+
+External documentation will always drift from reality. The tool itself never lies about its own capabilities.
+
+Design for dialogue, not documentation.

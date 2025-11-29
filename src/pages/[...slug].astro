@@ -15,7 +15,7 @@ import { estimateReadingTime, type BlogPost } from "@utils/posts";
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => {
+  const posts = await getCollection("blog", ({ data }: BlogPost) => {
     return import.meta.env.DEV || !data.draft;
   });
   return posts.map((post: BlogPost) => ({
@@ -57,7 +57,7 @@ const readingTime = estimateReadingTime(post.body);
   <div class="article-layout">
     <article>
       <header>
-        <h1>{title}</h1>
+        <h1 id="top">{title}</h1>
         <div class="meta-row">
           <dl>
             <dt>Published</dt>
@@ -81,7 +81,7 @@ const readingTime = estimateReadingTime(post.body);
       <ArticleFooter />
       <Giscus />
     </article>
-    <TableOfContents headings={headings} />
+    <TableOfContents headings={headings} title={title} />
   </div>
 </BaseLayout>
 

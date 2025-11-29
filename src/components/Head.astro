@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from "astro:transitions";
 import { siteConfig } from "@/site-config";
 import "../styles/global.css";
 
@@ -64,6 +65,8 @@ const imageURL = new URL(image, Astro.site).href;
   </style>
 
   <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={title} />
+
+  <ViewTransitions />
 
   <slot name="head" />
 </head>

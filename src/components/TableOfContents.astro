@@ -7,9 +7,10 @@ interface Heading {
 
 interface Props {
   headings: Heading[];
+  title: string;
 }
 
-const { headings } = Astro.props;
+const { headings, title } = Astro.props;
 
 const tocHeadings = headings.filter((h) => h.depth === 2);
 ---
@@ -19,6 +20,9 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     <div>
       <span>On this page</span>
       <ul>
+        <li>
+          <a href="#top">{title}</a>
+        </li>
         {tocHeadings.map((heading) => (
           <li>
             <a href={`#${heading.slug}`}>{heading.text.replace(/^#\s*/, '')}</a>
