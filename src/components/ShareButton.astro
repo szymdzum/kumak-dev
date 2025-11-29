@@ -1,0 +1,87 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<button class="share-button" data-title={title} data-description={description || ''} aria-label="Share this article">
+  <Icon name="lucide:share-2" size={16} />
+  <span class="share-text">Share</span>
+</button>
+
+<script>
+  function initShareButtons(): void {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.share-button');
+
+    buttons.forEach((button) => {
+      const title = button.dataset.title || document.title;
+      const description = button.dataset.description || '';
+      const url = window.location.href;
+      const textSpan = button.querySelector<HTMLSpanElement>('.share-text');
+
+      button.addEventListener('click', async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({ title, text: description, url });
+          } catch (err) {
+            if ((err as Error).name !== 'AbortError') {
+              console.error('Share failed:', err);
+            }
+          }
+        } else {
+          try {
+            await navigator.clipboard.writeText(url);
+            if (textSpan) {
+              textSpan.textContent = 'Link copied';
+              setTimeout(() => {
+                textSpan.textContent = 'Share';
+              }, 2000);
+            }
+          } catch (err) {
+            console.error('Fallback copy failed:', err);
+          }
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initShareButtons);
+</script>
+
+<style>
+  .share-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .share-button:hover {
+    color: var(--color-text);
+  }
+
+  .share-button :global(svg) {
+    flex-shrink: 0;
+  }
+
+  .share-text {
+    display: inline-block;
+  }
+
+  @media (max-width: 360px) {
+    .share-text {
+      display: none;
+    }
+  }
+</style>

@@ -1,7 +1,7 @@
 ---
 title: "Testing in the Age of AI Agents"
 description: "When code changes at the speed of thought, tests become less about verification and more about defining what should remain stable. A philosophy for testing when AI agents write and rewrite your code."
-pubDate: 2025-11-28
+pubDate: 2025-11-29
 category: "philosophy"
 tags: ["testing", "ai-agents", "software-philosophy", "refactoring"]
 keywords: [
@@ -27,26 +27,20 @@ externalLinks:
 import TldrBox from '@components/TldrBox.astro';
 
 <TldrBox>
-AI agents make code change cheap. If your tests are coupled to implementation details, they become the new friction.
+AI agents make code change cheap. But tests aren't about cost. They're your ground truth for correctness.
 
-Test what the code *does*, not how it does it. Contract-based tests survive rewrites. Implementation coupled tests fight them.
+Test what the code *does*, not how it does it. Contract-based tests define what "correct" means. Implementation-coupled tests lose that definition every time they change.
 </TldrBox>
 
-Something strange happens when you start working with AI agents. Code that would take hours to write appears in minutes. Refactors that seemed daunting become trivial. The friction that once slowed changes down largely disappears. The tedium of updating every reference, the fear of breaking something obscure. Gone.
+AI agents don't just write code faster. They make rewriting trivial. Your codebase becomes fluid, reshaping itself as fast as you can describe what you want.
 
-Code becomes fluid. Malleable. You describe what you want, and it reshapes itself. This fluidity changes everything about how we think about tests.
+But when everything is in flux, how do you know the features still work? How do you stay free to change internals without breaking what users depend on? Something needs to hold the shape while everything inside it moves.
 
-## The New Equilibrium
+That something is your tests. Not tests that document how the code works today, but tests that define what it must always do. When internals shift constantly, tests become your anchor.
 
-For decades, we've lived with a particular tension in software development. Tests exist to catch bugs, but they also exist as documentation, as proof of intent, as a safety net. We accepted that comprehensive tests came with a cost: they made changes harder. Touch anything, and you might spend as much time fixing tests as fixing code.
+## The Wrong Friction
 
-This was a reasonable trade-off when change was expensive. When every modification required careful, manual edits across dozens of files, test maintenance was just part of the cost of doing business. You paid for safety with friction.
-
-AI agents break this equilibrium.
-
-When an agent can rewrite a module in seconds, the cost of change approaches zero. But if your tests are tightly coupled to implementation details, you've created a new kind of friction. Not in the code itself, but in the tests that surround it. The agent rewrites your component, and now you're spending twenty minutes fixing test expectations that spy on internal functions and assert on DOM structures that no longer exist.
-
-The tests haven't caught a bug. The behaviour is identical. You're just paying a tax on change.
+If your tests are tightly coupled to implementation details, you've created friction in the wrong place. The agent rewrites your component, and now you're fixing test expectations that spy on internal functions and assert on DOM structures that no longer exist.
 
 ```
 $ npm test
@@ -59,22 +53,29 @@ $ npm test
 3 tests failed. The component works perfectly. 🙃
 ```
 
+The tests haven't caught a bug. The behaviour is identical. You're just paying a tax on change.
+
+But here's the deeper question: if AI can rewrite code cheaply, why can't it rewrite tests cheaply too? Why does test change matter if the agent can fix them in seconds?
+
+The answer isn't about cost. It's about what tests fundamentally represent.
+
 ## What Tests Are Actually For
 
-This forces a more fundamental question: what are tests actually for?
+Tests are your definition of correctness. They're the fixed point against which all change is measured.
 
-The obvious answer is "catching bugs." But that's incomplete. A test that breaks when behaviour changes is valuable. A test that breaks when implementation changes, but behaviour stays the same, is worse than useless. It actively punishes improvement.
+When a test passes, it means the code meets the specification. When a test fails, either the code is wrong or the specification changed. This only works if the specification itself is stable. If tests change every time code changes, you've lost your reference point. You're measuring with a ruler that stretches.
+
+The obvious purpose of tests is "catching bugs." But that's incomplete. A test that breaks when behaviour changes is valuable. A test that breaks when implementation changes, but behaviour stays the same, is worse than useless. It actively punishes improvement. And when AI "fixes" that test, the failure's signal vanishes. Did the behaviour actually stay the same? The test no longer tells you.
 
 Good tests encode intent. They say:
-```
-"This is the contract. This is what matters. Everything else is negotiable."
-```
 
-[Kent Beck](https://tidyfirst.substack.com/p/canon-tdd) captured this distinction precisely: tests should be "sensitive to behavior changes and insensitive to structure changes." A test that responds to behaviour is doing its job. A test that responds to structure is doing the opposite. It's punishing you for improving code that works.
+> "This is the contract. This is what matters. Everything else is negotiable."
+
+[Kent Beck](https://tidyfirst.substack.com/p/canon-tdd) captured this distinction precisely: tests should be "sensitive to behavior changes and insensitive to structure changes." A test that responds to behaviour is doing its job. A test that responds to structure is doing the opposite of its job.
 
 When you test that a navigation component renders a link to `/orders`, you're encoding intent: users should be able to navigate to their orders. When you test that the component calls a specific internal styling function with specific parameters, you're encoding an implementation detail that could change tomorrow.
 
-The first test survives refactoring. The second test fights it.
+The first test survives refactoring. The second test fights it. But more importantly: the first test can verify that a refactor preserved behaviour. The second test can only verify that someone updated the test to match whatever the code does now.
 
 ## The Contract Principle
 
@@ -142,6 +143,38 @@ When you mock your own code, you're encoding the current implementation into you
 
 As Ian Cooper [put it](https://keyvanakbary.github.io/learning-notes/talks/tdd-where-did-it-all-go-wrong/): "Your API is your contract, your tests should test the API, not the implementation details. Coupling is the first problem in software." The same coupling that makes code hard to change makes tests hard to live with.
 
+## When AI Writes Your Tests
+
+The black box philosophy becomes even more critical when AI writes your tests.
+
+Here's the circular verification problem: tests exist to verify that code is correct. If AI writes both the code and the tests, what verifies what? The test was supposed to catch AI mistakes. But AI wrote the test. You've created a loop with no external reference point.
+
+> AI writes code → AI writes tests → tests pass → "correct"?
+
+Black box tests break this circularity because they're human-auditable. When a test says "there's a link that goes to `/orders`," you can read that assertion and verify it matches the requirement. You don't need to understand implementation details. You can look at the test and say: "Yes, that's what the system should do."
+
+Implementation-coupled tests aren't auditable this way. To verify the test is correct, you'd need to understand the implementation it's coupled to. You're back to trusting AI about AI's work.
+
+This suggests specific rules for when AI writes tests:
+
+**Treat assertions as immutable.** AI can refactor how a test runs, the setup, the helpers, the structure. AI should not change what a test asserts without explicit human approval. The assertion is the contract. The rest is scaffolding.
+
+```typescript
+// AI can change this (setup)
+const user = await setupTestUser({ role: 'admin' });
+
+// AI should NOT change this (assertion) without approval
+expect(user.canAccessDashboard()).toBe(true);
+```
+
+**Failing behaviour tests require human attention.** When a contract-level test fails, AI shouldn't auto-fix it. The failure is information. A human must decide: is this a real bug (fix the code) or did requirements change (update the contract explicitly)?
+
+**Separate test creation from test modification.** AI drafting new tests for new features is relatively safe. AI modifying existing tests is riskier. New tests add coverage. Modified tests might silently remove it.
+
+The black box principle makes this workable. Tests that encode observable behaviour are tests humans can review, even if AI wrote them. Tests that encode implementation details require understanding the implementation to review. One scales with AI assistance. The other doesn't.
+
+The principles are clear: test contracts, not implementations. Treat modules as black boxes. Write tests that humans can audit. What follows are concrete techniques for putting these principles into practice.
+
 ## Properties Over Examples
 
 There's a subtle distinction between testing examples and testing properties.
@@ -177,7 +210,7 @@ The first test proves the component works with one item. The second test proves 
 
 This doesn't mean property-based testing frameworks (though those exist and are valuable). It means thinking in terms of properties when you write any test. Ask: "What should always be true about this code?" Not: "What happens with this particular input?"
 
-Properties survive refactoring because they describe fundamental behaviour, not incidental outcomes.
+Properties survive refactoring because they describe fundamental behaviour, not incidental outcomes. They're also easier to audit: "all items become navigable links" is a statement you can verify against requirements directly, without checking every specific case.
 
 ## The Refactoring Test
 
@@ -190,6 +223,8 @@ Would your tests pass?
 If yes, you've tested the contract. If no, you've tested the implementation. Go back and fix the test.
 
 This isn't hypothetical. When working with AI agents, "complete rewrites" happen regularly. The agent suggests a different approach. You accept it. Everything should still work. Your tests should prove it.
+
+The rewrite test is also an auditability test. If your tests would pass for any correct implementation, they can be verified against the specification alone. No implementation knowledge required.
 
 ## What Not to Test
 
@@ -208,7 +243,7 @@ test('banana equals banana', () => {
 });
 ```
 
-This restraint has a benefit beyond saving time: a smaller, focused test suite is easier to maintain. When every test has a clear purpose, you don't end up with a sprawling collection of half-remembered assertions that may or may not still matter.
+This restraint has a benefit beyond saving time: a smaller, focused test suite is easier to audit. When every test has a clear purpose, you can review what AI wrote and verify it matches intent. A sprawling collection of half-remembered assertions is impossible to audit at all.
 
 ## The Coverage Trap
 
@@ -238,7 +273,9 @@ The first test executes the function. The second test verifies the business rule
 
 Coverage can be a useful signal that you've forgotten something. If a critical path shows 0% coverage, that's worth investigating. But as a quality metric, it's actively harmful. It rewards quantity over purpose and creates pressure to write tests that exist only to satisfy the metric.
 
-The real question isn't "how much code did my tests execute?" It's "would my tests catch a bug that matters?"
+Google learned this at scale: "A brittle test is one that fails in the face of an unrelated change to production code that does not introduce any real bugs." Coverage-driven tests are often brittle tests. They spy on every function, assert on every intermediate value, and break whenever anyone improves the code.
+
+The real question isn't "how much code did my tests execute?" It's "would my tests catch a bug that matters?" And when AI writes code, the stakes are higher: brittle tests don't just waste time, they obscure whether AI's changes preserved behaviour or broke it.
 
 ## The Integration Insight
 
@@ -270,32 +307,20 @@ This approach tests the same behaviour with fewer, more robust tests. It also mi
 
 You still need actual integration tests and end-to-end tests for cross-system behaviour. But for component testing, the integration mindset (test the assembled thing, not the pieces) serves you well.
 
-## The Speed Paradox
-
-Here's the paradox: tests that enable fast iteration appear to slow down initial development.
-
-Writing contract-based tests requires more thought upfront. You have to identify what actually matters, what the real invariants are. You can't just spy on every function and call it coverage.
-
-But this investment pays compound returns. Every time you refactor without fixing tests, you've earned back that initial investment. Every time an agent rewrites a module and the tests still pass, you've proven the approach works.
-
-The alternative, brittle tests that break on every change, feels faster initially. You're "done" with tests sooner. But then you spend the rest of the project fighting them. Each change requires test changes. Each refactor requires test refactoring. The tests become a drag coefficient on improvement.
-
-Google learned this at scale: "A brittle test is one that fails in the face of an unrelated change to production code that does not introduce any real bugs." At their scale, even a small percentage of brittle tests wastes tremendous engineering time. At any scale, brittle tests erode trust in the test suite itself.
-
-Fast tests enable fast development. Not fast to write. Fast to live with.
+Integration-style tests are inherently black-box. They verify what users experience, not how components talk to each other internally. That makes them auditable: you can look at the test and say "yes, this is what the navigation should do" without understanding how `NavItem` and `NavList` are structured.
 
 ## A Philosophy for Flux
 
-Working with AI agents fundamentally changes the economics of code change. When change is cheap, stability must come from somewhere else. Tests become that source of stability. But only if they're designed for it.
+Working with AI agents fundamentally changes the economics of code change. But the argument for stable, contract-based tests isn't about economics. It's about epistemology.
+
+Tests are how you know code is correct. When both code and tests are fluid, when AI can change either at will, you lose the ability to verify anything. The test that passed yesterday means nothing if it was rewritten to match today's code. You're not testing behaviour. You're testing that AI is consistent with itself.
 
 The philosophy that emerges is simple to state and takes practice to apply:
 
-```
-Test what the code does, not how it does it.
-```
+> Test what the code does, not how it does it.
 
 The code inside can change. The contract remains stable. Tests verify the contract. Everything else is free to evolve.
 
-This isn't about testing less. It's about testing differently. Tests become specifications, not surveillance. They define what matters, not document what exists.
+This isn't about testing less. It's about testing differently. Tests become specifications, not surveillance. They define what matters, not document what exists. And because they encode observable behaviour rather than internal structure, they remain human-auditable even when AI writes them.
 
-When code is in constant flux, tests are your anchor. Make sure they're anchored to the right things.
+When code is in constant flux, tests are your fixed point. They're not stable because change is expensive. They're stable because they define what "correct" means. Without that fixed point, you have no way to know if your fluid code is flowing in the right direction.

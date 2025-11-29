@@ -119,9 +119,9 @@
   border-radius: var(--radius-sm);
   border: var(--border-width) solid var(--color-border);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin: var(--rhythm-1-5x) 0;
-  white-space: pre-wrap;
-  word-break: break-word;
+  white-space: pre;
   box-shadow: inset 0 0 0 1px rgb(var(--color-primary-rgb) / 0.05);
 }
 
@@ -130,6 +130,24 @@
   padding: 0;
   border: none;
   font-size: 1em;
+}
+
+/* Custom scrollbar for code blocks */
+.prose pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  background: #eedb96;
+  border-radius: var(--radius-sm);
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+  background: #f5e6b3;
 }
 
 /* Override Shiki theme colors for WCAG AA contrast (4.5:1) */
@@ -141,10 +159,15 @@
   color: #e5757e !important; /* variables: 4.78:1 */
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .prose pre {
-    font-size: 0.75em;
+    font-size: 0.8125em; /* 13px at 16px base */
     padding: var(--space-md);
+    margin-left: calc(-1 * var(--space-md));
+    margin-right: calc(-1 * var(--space-md));
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
 
   .prose code {
@@ -154,33 +177,17 @@
 
 /* Blockquotes */
 .prose blockquote {
-  position: relative;
-  border-left: calc(var(--border-width-thick) * 2) solid var(--color-primary);
+  border-left: calc(var(--border-width-thick) * 2) solid #eedb96;
   padding-left: var(--space-lg);
-  padding-top: var(--space-sm);
-  padding-bottom: var(--space-sm);
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-md);
   margin-left: 0;
   margin-top: var(--rhythm-1-5x);
   margin-bottom: var(--rhythm-1-5x);
   color: var(--color-text-muted);
   font-style: italic;
-  font-size: var(--text-lg);
   line-height: var(--line-height-relaxed);
   max-width: 70ch;
-  background: var(--color-bg-subtle);
-  border-radius: var(--radius-sm);
-  padding-right: var(--space-md);
-}
-
-.prose blockquote::before {
-  content: ">";
-  position: absolute;
-  left: var(--space-sm);
-  top: var(--space-sm);
-  color: var(--color-primary);
-  font-family: var(--font-family-mono);
-  font-style: normal;
-  opacity: 0.5;
 }
 
 /* Images */

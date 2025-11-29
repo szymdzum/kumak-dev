@@ -4,6 +4,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import CodeBlock from "@components/CodeBlock.astro";
 import Giscus from "@components/Giscus.astro";
 import CopyPageButton from "@components/CopyPageButton.astro";
+import ShareButton from "@components/ShareButton.astro";
 import SchemaOrg from "@components/SchemaOrg.astro";
 import ArticleMeta from "@components/ArticleMeta.astro";
 import ArticleFooter from "@components/ArticleFooter.astro";
@@ -71,7 +72,10 @@ const readingTime = estimateReadingTime(post.body);
             <dt>Category</dt>
             <dd>{category}</dd>
           </dl>
-          <CopyPageButton markdown={post.body} />
+          <div class="action-buttons">
+            <CopyPageButton markdown={post.body} />
+            <ShareButton title={title} description={description} />
+          </div>
         </div>
       </header>
       <div class="prose">
@@ -150,6 +154,12 @@ const readingTime = estimateReadingTime(post.body);
     color: var(--color-primary);
     text-transform: capitalize;
     font-weight: var(--font-weight-medium);
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: var(--space-md);
+    margin-left: auto;
   }
 
   @media (max-width: 480px) {
