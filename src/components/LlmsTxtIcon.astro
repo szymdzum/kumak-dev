@@ -4,16 +4,16 @@ interface Props {
   class?: string;
 }
 
-const { size = 16, class: className } = Astro.props;
+const { size, class: className } = Astro.props;
+const style = size ? `width: ${size}px; height: ${size}px;` : undefined;
 ---
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width={size}
-  height={size}
   viewBox="0 0 24 24"
   fill="currentColor"
   class={className}
+  style={style}
   aria-hidden="true"
 >
   <!-- Top -->

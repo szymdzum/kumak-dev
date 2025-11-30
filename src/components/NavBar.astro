@@ -22,7 +22,7 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
         );
       })}
       <a href="/llms-full.txt" aria-label="LLMs.txt full content">
-        <LlmsTxtIcon size={24} />
+        <LlmsTxtIcon />
       </a>
     </nav>
   </div>
@@ -72,6 +72,8 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
 
   nav svg {
     display: block;
+    width: 24px;
+    height: 24px;
   }
 
   @media (max-width: 480px) {
