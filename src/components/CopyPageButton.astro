@@ -8,10 +8,10 @@ interface Props {
 const { markdown } = Astro.props;
 ---
 
-<button class="copy-page-button" id="copyPageButton" aria-label="Copy page as Markdown">
+<button class="copy-page-button" id="copyPageButton" aria-label="Copy as Markdown">
   <Icon name="lucide:copy" size={16} class="copy-icon" />
   <Icon name="lucide:check" size={16} class="check-icon" />
-  <span id="buttonText">Copy page</span>
+  <span id="buttonText">Copy</span>
 </button>
 
 <script define:vars={{ markdown }}>
@@ -27,13 +27,13 @@ const { markdown } = Astro.props;
       buttonText.textContent = 'Copied';
       setTimeout(() => {
         button.classList.remove('copied');
-        buttonText.textContent = 'Copy page';
+        buttonText.textContent = 'Copy';
       }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
       buttonText.textContent = 'Failed';
       setTimeout(() => {
-        buttonText.textContent = 'Copy page';
+        buttonText.textContent = 'Copy';
       }, 2000);
     }
   });

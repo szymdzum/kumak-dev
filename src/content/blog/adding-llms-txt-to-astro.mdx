@@ -1,0 +1,296 @@
+---
+title: "Adding llms.txt to Your Astro Blog"
+description: "How to implement the llms.txt standard in Astro without dependencies. Three endpoints, 140 lines of TypeScript, and your content becomes agent-accessible."
+pubDate: 2025-11-30
+category: "tutorial"
+tags: ["astro", "llms-txt", "ai", "developer-tools"]
+keywords:
+  [
+    "llms.txt",
+    "Astro",
+    "AI agents",
+    "content accessibility",
+    "static site",
+    "TypeScript",
+  ]
+author: "Szymon Dzumak"
+showToc: true
+featured: false
+externalLinks:
+  - title: "llms.txt Specification"
+    url: "https://llmstxt.org/"
+  - title: "This site's llms.txt"
+    url: "https://kumak.dev/llms.txt"
+  - title: "Full content version"
+    url: "https://kumak.dev/llms-full.txt"
+---
+
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+llms.txt is a proposed standard for making websites readable by AI agents. For an Astro blog, you need three endpoints: an index (`/llms.txt`), full content (`/llms-full.txt`), and per-post files (`/llms/[slug].txt`). Skip the npm packages. The implementation is ~140 lines of TypeScript with zero dependencies.
+</TldrBox>
+
+The [llms.txt specification](https://llmstxt.org/) proposes a standard location for LLM-readable content, similar to `robots.txt` for crawlers or `sitemap.xml` for search engines. The idea: provide a clean, structured text file that AI agents can fetch to understand your site's content without parsing HTML.
+
+For a blog, this means agents can read your posts directly, without scraping, without dealing with navigation chrome, without parsing markup.
+
+## What You're Building
+
+Three endpoints:
+
+- `/llms.txt` — Index with links to all posts
+- `/llms-full.txt` — Complete content in one file
+- `/llms/[slug].txt` — Individual post content
+
+The index is lightweight. Agents fetch it first, see what's available, then request specific posts or the full dump depending on their needs.
+
+## The Utility Functions
+
+Start with a utility file that handles the text generation. This keeps the endpoint files clean:
+
+```typescript
+// src/utils/llms.ts
+
+interface LlmsItem {
+  title: string;
+  description: string;
+  link: string;
+}
+
+interface LlmsFullItem extends LlmsItem {
+  pubDate: Date;
+  category: string;
+  body: string;
+}
+
+interface LlmsTxtConfig {
+  name: string;
+  description: string;
+  site: string;
+  items: LlmsItem[];
+  optional?: LlmsItem[];
+}
+
+interface LlmsFullTxtConfig {
+  name: string;
+  description: string;
+  author: string;
+  site: string;
+  items: LlmsFullItem[];
+}
+```
+
+The response helper ensures consistent headers:
+
+```typescript
+function textResponse(content: string): Response {
+  return new Response(content, {
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
+}
+```
+
+## Stripping MDX Syntax
+
+If you use MDX, your post bodies contain import statements and JSX components. Agents don't need these:
+
+```typescript
+const MDX_PATTERNS = {
+  imports: /^import\s+.+from\s+['"].+['"];?\s*$/gm,
+  jsxBlocks: /<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g,
+  jsxSelfClosing: /<[A-Z][a-zA-Z]*[^>]*\/>/g,
+} as const;
+
+function stripMdxSyntax(content: string): string {
+  return Object.values(MDX_PATTERNS)
+    .reduce((text, pattern) => text.replace(pattern, ""), content)
+    .trim();
+}
+```
+
+This removes `import` lines and any PascalCase components (the convention for JSX). Standard markdown passes through unchanged.
+
+## The Index Generator
+
+The main `llms.txt` follows a simple format: title, description, then sections with links:
+
+```typescript
+function formatLink(item: LlmsItem, site: string): string {
+  return `- [${item.title}](${site}${item.link}): ${item.description}`;
+}
+
+export function llmsTxt(config: LlmsTxtConfig): Response {
+  const header = [`# ${config.name}`, `> ${config.description}`];
+  const posts = [
+    "## Posts",
+    ...config.items.map((item) => formatLink(item, config.site)),
+  ];
+
+  const sections = [header, posts];
+
+  if (config.optional?.length) {
+    const optional = [
+      "## Optional",
+      ...config.optional.map((item) => formatLink(item, config.site)),
+    ];
+    sections.push(optional);
+  }
+
+  const content = sections.map((lines) => lines.join("\n")).join("\n\n");
+  return textResponse(content + "\n");
+}
+```
+
+## The Full Content Generator
+
+For agents that want everything at once:
+
+```typescript
+function formatDate(date: Date): string {
+  return date.toISOString().split("T")[0];
+}
+
+function formatPostSection(item: LlmsFullItem, site: string): string[] {
+  return [
+    `## ${item.title}`,
+    "",
+    `URL: ${site}${item.link}`,
+    `Published: ${formatDate(item.pubDate)}`,
+    `Category: ${item.category}`,
+    "",
+    `> ${item.description}`,
+    "",
+    stripMdxSyntax(item.body),
+    "",
+    "---",
+  ];
+}
+
+export function llmsFullTxt(config: LlmsFullTxtConfig): Response {
+  const header = [
+    `# ${config.name}`,
+    "",
+    `> ${config.description}`,
+    "",
+    `Author: ${config.author}`,
+    `Site: ${config.site}`,
+    "",
+    "---",
+  ];
+
+  const posts = config.items.flatMap((item) =>
+    formatPostSection(item, config.site)
+  );
+
+  return textResponse([...header, "", ...posts, ""].join("\n"));
+}
+```
+
+## The Endpoints
+
+With utilities in place, the endpoints are minimal. The index:
+
+```typescript
+// src/pages/llms.txt.ts
+import type { APIRoute } from "astro";
+import { siteConfig } from "@/site-config";
+import { llmsTxt, postsToLlmsItems } from "@utils/llms";
+import { getAllPosts } from "@utils/posts";
+
+export const GET: APIRoute = async () => {
+  const posts = await getAllPosts();
+
+  return llmsTxt({
+    name: siteConfig.name,
+    description: siteConfig.description,
+    site: siteConfig.url,
+    items: postsToLlmsItems(posts, (slug) => `/llms/${slug}.txt`),
+    optional: [
+      { title: "About", link: "/about", description: "About the author" },
+      { title: "Full Content", link: "/llms-full.txt", description: "All posts in one file" },
+    ],
+  });
+};
+```
+
+The full content dump:
+
+```typescript
+// src/pages/llms-full.txt.ts
+import type { APIRoute } from "astro";
+import { siteConfig } from "@/site-config";
+import { llmsFullTxt, postsToLlmsFullItems } from "@utils/llms";
+import { getAllPosts } from "@utils/posts";
+
+export const GET: APIRoute = async () => {
+  const posts = await getAllPosts();
+
+  return llmsFullTxt({
+    name: siteConfig.name,
+    description: siteConfig.description,
+    author: siteConfig.author,
+    site: siteConfig.url,
+    items: postsToLlmsFullItems(posts, (slug) => `/${slug}`),
+  });
+};
+```
+
+Per-post endpoints using dynamic routes:
+
+```typescript
+// src/pages/llms/[slug].txt.ts
+import type { GetStaticPaths } from "astro";
+import { siteConfig } from "@/site-config";
+import { llmsPost } from "@utils/llms";
+import { getAllPosts, type BlogPost } from "@utils/posts";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+};
+
+export const GET = ({ props }: { props: { post: BlogPost } }) => {
+  return llmsPost({
+    post: props.post,
+    site: siteConfig.url,
+    link: `/${props.post.slug}`,
+  });
+};
+```
+
+## Discovery
+
+Agents need to find your llms.txt. Add a link tag to your HTML head, similar to RSS discovery:
+
+```html
+<link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
+```
+
+This isn't part of the spec, but it follows web conventions. The spec itself relies on the well-known path (`/llms.txt`) and community directories like [llmstxt.site](https://llmstxt.site).
+
+## Why Not Use a Library?
+
+There are Astro integrations for llms.txt. They auto-generate from all pages at build time. This sounds convenient, but:
+
+1. You get everything, including pages you might not want exposed
+2. No per-post endpoints
+3. No control over the output format
+4. Another dependency to maintain
+
+The implementation above is ~140 lines of TypeScript. You control exactly what's included. You can add per-post endpoints. You can customise the format. And you understand every line.
+
+For something this simple, the DIY approach wins.
+
+## The Result
+
+After deploying:
+
+- `/llms.txt` lists all posts with descriptions
+- `/llms-full.txt` contains everything for agents that want the full context
+- `/llms/post-slug.txt` serves individual posts
+
+Agents can fetch the index, pick what they need, and get clean markdown without parsing your site's HTML. That's the point of the standard: make your content accessible to the tools people are actually using.

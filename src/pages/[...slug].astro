@@ -5,6 +5,7 @@ import CodeBlock from "@components/CodeBlock.astro";
 import Giscus from "@components/Giscus.astro";
 import CopyPageButton from "@components/CopyPageButton.astro";
 import ShareButton from "@components/ShareButton.astro";
+import LlmsTxtButton from "@components/LlmsTxtButton.astro";
 import SchemaOrg from "@components/SchemaOrg.astro";
 import ArticleMeta from "@components/ArticleMeta.astro";
 import ArticleFooter from "@components/ArticleFooter.astro";
@@ -73,6 +74,7 @@ const readingTime = estimateReadingTime(post.body);
             <dd>{category}</dd>
           </dl>
           <div class="action-buttons">
+            <LlmsTxtButton slug={post.slug} />
             <CopyPageButton markdown={post.body} />
             <ShareButton title={title} description={description} />
           </div>

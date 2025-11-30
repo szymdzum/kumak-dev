@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { siteConfig } from "@/site-config";
+import LlmsTxtIcon from "./LlmsTxtIcon.astro";
 ---
 
 <header>
@@ -20,6 +21,9 @@ import { siteConfig } from "@/site-config";
           </a>
         );
       })}
+      <a href="/llms-full.txt" aria-label="LLMs.txt full content">
+        <LlmsTxtIcon size={24} />
+      </a>
     </nav>
   </div>
 </header>

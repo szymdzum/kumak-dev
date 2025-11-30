@@ -1,0 +1,44 @@
+---
+import LlmsTxtIcon from "./LlmsTxtIcon.astro";
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const href = `/llms/${slug}.txt`;
+---
+
+<a href={href} class="llms-button" aria-label="View LLM-friendly version">
+  <LlmsTxtIcon size={16} />
+  <span class="llms-text">LLM</span>
+</a>
+
+<style>
+  .llms-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .llms-button:hover {
+    color: var(--color-primary);
+  }
+
+  .llms-button :global(svg) {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 500px) {
+    .llms-text {
+      display: none;
+    }
+  }
+</style>
