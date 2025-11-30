@@ -47,6 +47,19 @@ Three endpoints:
 
 The index is lightweight. Agents fetch it first, see what's available, then request specific posts or the full dump depending on their needs.
 
+## File Structure
+
+```
+src/
+├── utils/
+│   └── llms.ts            # Utility functions (the gist)
+├── pages/
+│   ├── llms.txt.ts        # Index endpoint
+│   ├── llms-full.txt.ts   # Full content endpoint
+│   └── llms/
+│       └── [slug].txt.ts  # Per-post endpoints
+```
+
 ## Prerequisites
 
 The implementation assumes you have:
@@ -265,6 +278,8 @@ Agents need to find your llms.txt. Add a link tag to your HTML head, similar to 
 ```html
 <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
 ```
+
+Add this to your base layout or head component, wherever you define other `<link>` tags like RSS or favicon.
 
 This isn't part of the spec, but it follows web conventions. The spec itself relies on the well-known path (`/llms.txt`) and community directories like [llmstxt.site](https://llmstxt.site).
 
