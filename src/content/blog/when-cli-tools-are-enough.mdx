@@ -4,14 +4,15 @@ description: "One year after MCP's launch, Anthropic published a solution to con
 pubDate: 2025-11-15
 category: "opinion"
 tags: ["mcp", "cli", "developer-tools", "efficiency"]
-keywords: [
-  "Model Context Protocol",
-  "MCP",
-  "CLI tools",
-  "command line",
-  "developer efficiency",
-  "Anthropic",
-]
+keywords:
+  [
+    "Model Context Protocol",
+    "MCP",
+    "CLI tools",
+    "command line",
+    "developer efficiency",
+    "Anthropic",
+  ]
 author: "Kumak"
 showToc: true
 featured: false
@@ -20,66 +21,37 @@ featured: false
 import TldrBox from '@components/TldrBox.astro';
 
 <TldrBox>
-MCP servers often wrap CLI tools that already output structured data. Before adding another protocol layer, check if the CLI already does what you need.
-
-Progressive disclosure, filesystem-based discovery, JSON output. These patterns aren't new. They're how Unix has worked for decades.
+MCP servers often wrap CLI tools that already output structured data. Before adding another protocol layer, check if the CLI already does what you need. Progressive disclosure, filesystem-based discovery, JSON output: these patterns aren't new. They're how Unix has worked for decades.
 </TldrBox>
 
-A year ago, Anthropic launched the Model Context Protocol. The community built thousands of MCP servers. Two weeks ago, Anthropic published thoughts on making MCP more efficient. Specifically, how to reduce the token overhead when agents connect to many tools. Their approach involves presenting MCP servers as code on a file system, allowing agents to discover tools on demand instead of loading them all up front.
+A year ago, Anthropic launched the Model Context Protocol. The community built thousands of MCP servers. Two weeks ago, Anthropic published [thoughts on making MCP more efficient](https://www.anthropic.com/engineering/code-execution-with-mcp): specifically, how to reduce token overhead when agents connect to many tools.
 
-Reading it, I noticed something interesting: the patterns they're describing (progressive disclosure, on-demand loading, filesystem-based tool discovery) are exactly how CLI tools work. And it made me wonder if we've been overlooking a more straightforward approach that was already available.
+Their solution proposes generating a filesystem structure where each MCP tool becomes a TypeScript file. The agent explores this filesystem to discover tools, reads only the definitions it needs, and writes code to orchestrate them. This reduced their example from 150,000 tokens to 2,000 tokens.
 
-## What Anthropic Identified
+What caught my attention: they're building a system where agents discover executable tools by exploring a file system structure. That's what `/usr/bin` has been since the invention of Unix.
 
-Their [November 2025 post](https://www.anthropic.com/engineering/code-execution-with-mcp) identifies two efficiency problems with MCP at scale. First, when you connect agents to dozens of MCP servers, all those tool definitions load into the context window upfront. That's hundreds of thousands of tokens before the agent even starts working. Second, intermediate results from chained tool calls are repeatedly passed through the model's context, consuming additional tokens.
+## The Wrapper Pattern
 
-Their example: downloading a meeting transcript from Google Drive and attaching it to Salesforce consumed 150,000 tokens. The transcript flowed through the context twice. Once when reading it, again when writing it to Salesforce.
+Many popular MCP servers wrap CLI tools that already output structured data. The pattern is consistent: receive MCP request, parse it, construct CLI command, execute, parse output, serialise back to MCP format.
 
-Their solution proposes generating a filesystem structure where each MCP tool becomes a TypeScript file:
-
-```typescript
-servers/
-├── google-drive/
-│   ├── getDocument.ts
-│   └── index.ts
-└── salesforce/
-    ├── updateRecord.ts
-    └── index.ts
-```
-
-The agent explores this filesystem to discover tools, reads only the definitions it needs, and writes code to orchestrate them. This reduced their example from 150,000 tokens to 2,000 tokens. A 98.7% improvement.
-
-What caught my attention: They're building a system where agents discover executable tools by exploring a file system structure. That's what `/usr/bin` has been since the invention of Unix. CLI tools already work this way.
-
-## The Database Example
-
-This pattern becomes clearest with databases. Popular PostgreSQL and SQLite MCP servers market themselves as providing "read-only access," "schema inspection," and "secure query execution." These sound valuable if you're not familiar with the capabilities of the CLI tools.
-
-SQLite's command-line tool has supported JSON output mode since version 3.33.0 in 2020.
+SQLite's command-line tool has supported JSON output since version 3.33.0 in 2020:
 
 ```bash
 sqlite3 mydb.db 'SELECT * FROM users WHERE active = true' -json
 ```
 
-No configuration files. No MCP server process. The CLI supports multiple output formats natively: CSV, HTML, markdown, and JSON. PostgreSQL works the same way. Run `psql -qAtX -c 'SELECT json_agg(users) FROM users'` to get JSON output directly.
-
-When you install a database MCP server, you're adding a layer that receives requests via the MCP protocol, parses them, constructs CLI commands, executes those commands, parses the output, serialises it back to JSON, and returns it via MCP. The alternative is running the CLI command directly.
-
-The performance difference matters. The Gemini CLI team [documented](https://github.com/google-gemini/gemini-cli/issues/4544) "a significant delay of approximately 8 to 12 seconds before the tool becomes responsive" every time an MCP server launches. Not a one-time setup cost. Every session. Meanwhile, CLI tools are instant.
-
-## The GitHub Wrapper Question
-
-Multiple MCP servers, such as mcp-gitlab and glab-mcp-server, explicitly describe themselves as "wrappers around the glab CLI tool." The GitHub CLI has had native JSON output with the `--json` flag since 2021:
+The GitHub CLI has had native JSON output since 2021:
 
 ```bash
 gh pr list --json number,title,author,state
 gh issue create --title "Bug report" --body "Description"
-gh run view 12345 --json conclusion,status,jobs
 ```
 
-The GitHub CLI even includes a built-in `--jq` flag for filtering JSON directly. The tool was designed from the start to be scriptable.
+Multiple MCP servers explicitly describe themselves as "wrappers around the glab CLI tool" or similar. They add a serialisation layer to something that already outputs structured data.
 
-These MCP wrappers add unnecessary serialisation layers to something that already outputs structured data: receiving MCP requests, parsing them, constructing CLI commands, executing them, parsing output, and serialising back to MCP format. This isn't theoretical overhead. [Twilio's performance testing](https://www.twilio.com/en-us/blog/developers/twilio-alpha-mcp-server-real-world-performance) of their MCP server showed that they reduced API calls by 21.6% but increased cache reads by 28.5% and cache writes by 53.7%. Overall cost per task increased by 23.5%. They wrapped an API they already had access to, added an MCP layer to optimise it, and ended up paying more in tokens.
+This isn't theoretical overhead. Twilio's [performance testing](https://www.twilio.com/en-us/blog/developers/twilio-alpha-mcp-server-real-world-performance) of their MCP server showed concrete results: they reduced API calls by 21.6% but increased cache reads by 28.5% and cache writes by 53.7%. **Overall cost per task increased by 23.5%.** They wrapped an API they already had access to, added an MCP layer to optimise it, and ended up paying more in tokens.
+
+The Gemini CLI team [documented](https://github.com/google-gemini/gemini-cli/issues/4544) "a significant delay of approximately 8 to 12 seconds before the tool becomes responsive" every time an MCP server launches. Not a one-time setup cost. Every session. CLI tools are instant.
 
 ## When MCP Actually Makes Sense
 
@@ -89,36 +61,18 @@ MCP isn't unnecessary. There are legitimate use cases:
 
 **Complex OAuth flows** requiring browser-based authentication with multiple redirects and token management. Some services make programmatic access deliberately difficult.
 
-**Enterprise security requirements** need audit logging, fine-grained permissions, and session management beyond standard Unix permissions.
+**Enterprise security requirements** that need audit logging, fine-grained permissions, and session management beyond standard Unix permissions.
 
 **Remote services** with SDK requirements, stateful connections, or client-side processing that can't be done with simple HTTP requests.
 
-These are real problems MCP solves well. But they're not the typical case. Most database access, version control operations, and documentation fetching already have excellent CLI tooling.
+These are real problems MCP solves well. But they're not the typical case. Most database access, version control operations, and file operations already have excellent CLI tooling.
 
-## The Documentation Case
+## Check the CLI First
 
-Context7 deserves brief mention. It fetches "up-to-date, version-specific documentation" for popular frameworks. The premise makes sense: new frameworks are released, training data becomes stale, and agents need fresh documentation.
+Anthropic's conclusion is telling: they note that "many of the problems here feel novel (context management, tool composition, state persistence), they have known solutions from software engineering." They're right. Shell scripts, pipes, redirects, and the filesystem have solved them for decades.
 
-The challenge is scope. Claude already has deep knowledge of React, Next.js, TypeScript, and major frameworks. When you fetch comprehensive React documentation, you're potentially adding hundreds of kilobytes explaining concepts the model already understands at an expert level. You're paying to re-explain `useState`.
+Twilio concluded that "many builders may start with MCP for convenience, but later transition to custom tool integrations once they know exactly what their agent needs." That transition often means realising the CLI already does what you need.
 
-For genuinely new releases, there's a more straightforward approach. When Next.js 15 launched, instead of fetching the entire docs site, you could fetch:
-
-```bash
-curl https://nextjs.org/blog/next-15#breaking-changes
-```
-
-One page. The changelog. The breaking changes. Not an explanation of routing concepts from 2016. Release notes explain what changed for people who already know the framework. That's precisely what the model needs.
-
-## What This Means
-
-The software industry moves quickly between trends. We saw a new protocol and assumed it was necessary. We observed other developers installing MCP servers and thought that's how you grant agents access to tools. We didn't always stop to ask: "Can the agent already do this with existing tools?"
-
-MCP solved a real problem when it launched. Providing agents with standardised access to proprietary systems that lack robust programmatic interfaces is genuinely helpful. But somewhere in the rapid adoption, it became the default answer for everything, including things that already work well with CLI tools.
-
-Anthropic's recent post acknowledges this. They identified the overhead and proposed solutions. Their conclusion is telling: they note that "many of the problems here feel novel (context management, tool composition, state persistence), they have known solutions from software engineering." They're right. These aren't new problems. Shell scripts, pipes, redirects, and the filesystem have solved them for decades.
-
-[Twilio concluded](https://www.twilio.com/en-us/blog/developers/twilio-alpha-mcp-server-real-world-performance) that "many builders may start with MCP for convenience, but later transition to custom tool integrations once they know exactly what their agent needs." That transition often means realising the CLI already does what you need.
-
-Before adding an MCP server, it's worth checking if a CLI tool exists. If it does, try it. See if it works. Agents like Claude are good at using command-line tools. They understand bash, construct pipelines, and parse structured output. These capabilities have been reliable since launch.
+Before adding an MCP server, check if a CLI tool exists. If it does, try it. Agents like Claude are good at using command-line tools. They understand bash, construct pipelines, and parse structured output. These capabilities have been reliable since launch.
 
 Choose the simplest tool that solves your problem. Sometimes that's MCP. Often, it's the CLI you already have installed.
