@@ -22,29 +22,21 @@ featured: false
 import TldrBox from '@components/TldrBox.astro';
 
 <TldrBox>
-CLI tools used 13x fewer tokens than MCP for identical browser automation tasks. MCP returns full accessibility snapshots; CLI returns targeted queries.
-
-Self-documenting CLI tools let agents learn through introspection. Unix composability beats protocol servers for extensibility.
+CLI tools used 13x fewer tokens than MCP for identical browser automation tasks. MCP returns full accessibility snapshots; CLI returns targeted queries. The gap compounds with complex workflows.
 </TldrBox>
 
-Anthropic published an interesting observation about the [Model Context Protocol and code execution](https://www.anthropic.com/engineering/code-execution-with-mcp). They noted that executable code in the filesystem might be more efficient for AI agents than protocol servers. Isn't that essentially what CLI tools already are?
+Anthropic published an observation about [MCP and code execution](https://www.anthropic.com/engineering/code-execution-with-mcp): executable code in the filesystem might be more efficient for AI agents than protocol servers. Isn't that what CLI tools already are?
 
-I decided to test this hypothesis by comparing two approaches to browser automation with AI agents:
+I tested this by comparing two approaches to browser automation:
 
-- **CLI approach**: [bdg](https://github.com/szymdzum/browser-debugger-cli) - A browser debugger CLI I built
-- **MCP approach**: [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) - The official Chrome DevTools protocol server
+- **CLI**: [bdg](https://github.com/szymdzum/browser-debugger-cli), a browser debugger CLI I built
+- **MCP**: [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp), the official Chrome DevTools protocol server
 
-Both tools interact with the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/), so they have access to the same underlying capabilities. The question is: does the interface matter?
+Both interact with the Chrome DevTools Protocol. Same underlying capabilities. The question: does the interface matter?
 
 ## Methodology
 
-I used a fresh Claude instance (Sonnet 4.5) with zero prior knowledge of either tool. The agent received identical tasks across three real websites:
-
-1. **Hacker News** - Navigate, count stories, extract comments
-2. **CodePen** - Inspect trending pens, capture screenshots
-3. **Amazon** - Extract product information (anti-bot stress test)
-
-The goal was to see how agents discover and use each tool naturally, without human guidance.
+Fresh Claude instance (Sonnet 4.5) with zero prior knowledge of either tool. Identical tasks across three websites: Hacker News (navigation, extraction), CodePen (inspection, screenshots), Amazon (product data, anti-bot stress test). No human guidance.
 
 **Full methodology**: [BENCHMARK_PROMPT.md](https://github.com/szymdzum/browser-debugger-cli/blob/main/docs/benchmarks/BENCHMARK_PROMPT.md)
 
@@ -52,99 +44,80 @@ The goal was to see how agents discover and use each tool naturally, without hum
 
 ### Token Efficiency: 13x Difference
 
-This was the most striking finding:
-
 | Tool           | Total Tokens           | Per Test Average |
 | -------------- | ---------------------- | ---------------- |
 | **bdg (CLI)**  | 6,500                  | ~2,200           |
 | **Chrome MCP** | 85,500                 | ~28,500          |
-| **Difference** | **13x more efficient** | -                |
+| **Difference** | **13x more efficient** |                  |
 
 The gap comes from how each tool returns information:
 
-**MCP's approach**: Full accessibility snapshots
+**MCP**: Full accessibility snapshots. Every page state returns a complete accessibility tree. Amazon product page alone: **52,000 tokens** in one snapshot.
 
-- Every page state = complete accessibility tree
-- Amazon product page alone: **52,000 tokens** in one snapshot
-- Includes every element, nested structure, full context
+**CLI**: Targeted queries. `bdg dom query ".athing"` returns 30 Hacker News stories in 1,200 tokens.
 
-**CLI's approach**: Targeted queries
+### Command Count
 
-- CSS selectors return only matching elements
-- `bdg dom query ".athing"` → 1,200 tokens (30 stories)
-- Progressive disclosure - get what you need, when you need it
+| Test        | bdg Commands | MCP Calls |
+| ----------- | ------------ | --------- |
+| Hacker News | 11           | 8         |
+| CodePen     | 6            | 5         |
+| Amazon      | 4            | 3         |
 
-### Command Count: Roughly Equivalent
-
-| Test        | bdg Commands | MCP Calls | Winner  |
-| ----------- | ------------ | --------- | ------- |
-| Hacker News | 11           | 8         | MCP     |
-| CodePen     | 6            | 5         | MCP     |
-| Amazon      | 4            | 3         | MCP     |
-| **Average** | **7**        | **~5**    | **MCP** |
-
-MCP requires slightly fewer calls for simple tasks. However, when one approach uses 13x more tokens per call, command count becomes less relevant.
+MCP requires slightly fewer calls. But when one approach uses 13x more tokens per call, command count becomes less relevant.
 
 ### Discovery: Zero-Knowledge Learning
 
-One of the most interesting aspects was watching how the agent learned each tool.
+The most interesting result was watching how the agent learned each tool.
 
-**bdg discovery path** (5 commands):
+**bdg discovery path** (5 commands to first successful execution):
 
 ```bash
-# 1. What is this tool?
 bdg --help --json
+# Agent learns: 10 commands, exit codes, task mappings
 
-# 2. What can CDP do?
 bdg cdp --list
-# Result: 53 domains available
+# Agent learns: 53 domains available
 
-# 3. What Network methods exist?
 bdg cdp Network --list
-# Result: 39 methods
+# Agent learns: 39 methods in Network domain
 
-# 4. How do I get cookies?
 bdg cdp --search cookie
 bdg cdp Network.getCookies --describe
+# Agent discovers parameters, return types, examples
 
-# 5. Execute
 bdg cdp Network.getCookies
+# Successful execution
 ```
 
-The agent went from zero knowledge to successful execution without external documentation. It taught itself through the tool's introspection.
+Zero external documentation. The tool taught itself through introspection.
 
-**MCP discovery path**:
-
-- Requires understanding of MCP protocol
-- Uses UID-based element selection from snapshots
-- Must parse 10k+ token accessibility trees to find elements
+**MCP discovery**: Requires understanding MCP protocol, parsing 10k+ token accessibility trees to find element UIDs, using UID-based selection from snapshots.
 
 ### Element Selection
 
 **bdg**: Standard CSS selectors
 
 ```bash
-bdg dom query ".athing"           # Hacker News stories
-bdg dom query "#productTitle"     # Amazon product
+bdg dom query ".athing"              # Hacker News stories
+bdg dom query "#productTitle"        # Amazon product
 bdg dom click "button[type=submit]"
 ```
 
 **MCP**: UID-based from accessibility tree
 
 ```javascript
-take_snapshot({});
-// Returns 10k tokens
-click({ uid: "1_28" });
-// Must find UID in snapshot first
+take_snapshot({}); // Returns 10k+ tokens
+click({ uid: '1_28' }); // Must find UID in snapshot first
 ```
 
-CSS selectors are more familiar to developers, but UID-based selection is more robust for dynamic content. Trade-offs exist on both sides.
+CSS selectors are familiar; UID-based selection is more robust for dynamic content. Trade-offs exist.
 
-## Why CLI Tools Enable Self-Correction
+## Why the Gap Exists
 
-There's a fundamental difference in how CLI tools and protocol servers handle limitations:
+**Return payload size**: MCP's accessibility snapshots include everything. CLI queries return only what you ask for. This is the primary driver of the 13x difference.
 
-**CLI tools expose their constraints explicitly.** When a command fails, you get structured errors with exit codes, suggestions, and full context. This enables agents to self-correct:
+**Error handling**: CLI failures return structured errors with exit codes and suggestions. The agent can self-correct:
 
 ```bash
 $ bdg dom click ".missing-button"
@@ -154,122 +127,32 @@ Exit code: 81 (user error)
 Suggestions:
   - Verify selector: bdg dom query ".missing-button"
   - List all buttons: bdg dom query "button"
-  - Wait for element: sleep 2 && bdg dom click ".missing-button"
 ```
 
-The agent learns what went wrong and how to fix it. Error recovery becomes part of the workflow.
-
-**Protocol servers hide implementation gaps.** If an MCP server doesn't expose a specific CDP method, there's no way to access it. You're limited to the 28 curated tools the server provides. Need something from the Profiler domain? Security domain? WebAuthn domain? You're stuck until someone updates the server.
-
-**Composability means extensibility.** CLI tools integrate with the Unix ecosystem:
+**Composability**: CLI tools integrate with Unix:
 
 ```bash
-# Filter requests by status code
 bdg peek --network | jq '.[] | select(.status >= 400)'
-
-# Chain commands for workflows
 bdg dom query "button" | jq '.[0].nodeId' | xargs bdg dom click
-
-# Combine with other tools
-bdg network getCookies | grep "session" | cut -d: -f2
 ```
 
-If bdg doesn't provide exactly what you need, you can compose it with `jq`, `grep`, `awk`, or any other Unix tool. MCP servers require protocol extensions and server updates.
+If the tool doesn't provide exactly what you need, compose it with `jq`, `grep`, or `awk`. MCP servers require protocol extensions.
 
-**Full protocol access matters.** bdg exposes all 644 CDP methods across 53 domains. If you need `Profiler.startPreciseCoverage` or `Security.setIgnoreCertificateErrors`, it's already there via `bdg cdp Profiler.startPreciseCoverage`. No waiting for server maintainers to add support.
-
-This isn't just about efficiency. It's about not being artificially limited by someone else's API design decisions.
-
-## What This Means
-
-### Token Efficiency Compounds
-
-For a single task, 13x might seem manageable. But consider:
-
-- **Debugging session**: 20+ page states → 200k vs 15k tokens
-- **Multi-step workflow**: Navigate, fill forms, verify → tokens add up fast
-- **Context window limits**: More tokens = less room for reasoning
-
-At scale, this efficiency gap becomes significant.
-
-### Self-Documentation Enables Autonomy
-
-The most interesting finding wasn't the numbers - it was watching the agent learn through introspection:
-
-```bash
-$ bdg --help --json
-# Agent learns: 10 commands, exit codes, task mappings
-
-$ bdg cdp --list
-# Agent learns: 53 domains
-
-$ bdg cdp --search cookie
-# Agent discovers: 14 cookie-related methods
-
-$ bdg cdp Network.getCookies --describe
-# Agent learns: parameters, return types, examples
-```
-
-No external documentation needed. The tool IS the documentation.
-
-### Unix Composability Matters
-
-CLI tools compose naturally with Unix tools:
-
-```bash
-# Filter network requests
-bdg peek --last 20 | jq '.[] | select(.status >= 400)'
-
-# Count specific elements
-bdg dom query ".error" | jq 'length'
-
-# Chain commands
-bdg dom query "button" && bdg dom click "button:first-child"
-```
-
-This flexibility is harder to replicate in protocol-based tools.
+**Protocol access**: bdg exposes all 644 CDP methods across 53 domains. MCP servers expose curated subsets. Need `Profiler.startPreciseCoverage`? It's there via `bdg cdp Profiler.startPreciseCoverage`.
 
 ## Limitations
 
-This benchmark has clear constraints:
+- **Small sample**: 3 websites
+- **Single model**: Claude Sonnet 4.5 only
+- **Specific scenarios**: Information extraction workflows
+- **Bot detection**: Both tools faced blocks on some sites
 
-1. **Small sample size** - Only 3 websites tested
-2. **Single model** - Only Claude Sonnet 4.5
-3. **Specific scenarios** - Information extraction workflows
-4. **Bot detection** - Both tools faced blocks on some sites
+The token efficiency advantage should apply equally to debugging workflows (console streaming, network inspection, profiling), but I didn't benchmark those specifically.
 
-### On Debugging Workflows
+## Takeaway
 
-The most common criticism is that this focused on "information extraction" rather than debugging workflows. However, bdg provides comprehensive debugging abstractions:
+For browser automation with AI agents, CLI tools proved 13x more token-efficient than MCP servers accessing the same underlying protocol. The difference comes from targeted queries vs. full snapshots, plus the ability to compose with Unix tools and access the complete CDP surface.
 
-- **Console debugging**: `bdg console --follow` for real-time error streaming
-- **Network debugging**: `bdg peek --network`, `bdg tail`, `bdg network headers`
-- **Performance profiling**: Full CDP access via `bdg cdp Profiler --list`
-- **HAR export**: `bdg network har` for deep network analysis
+This isn't definitive. It's one data point. Your needs may differ.
 
-The token efficiency advantage applies equally to debugging workflows. A debugging session with 20 page states would consume 200k+ tokens via MCP snapshots vs ~15k via targeted bdg queries.
-
-Both tools access the same Chrome DevTools Protocol - the difference is the interface, not the capabilities.
-
-## Takeaways
-
-This isn't a definitive "CLI beats MCP" statement. It's one data point suggesting:
-
-**Token Efficiency:** With MCP, you pay upfront for every tool definition and capability declaration - whether you use them or not. CLI tools like glab, jq, and grep were already in the model's training data. A skill document showing usage patterns is ~3k tokens. MCP server definitions alone can be 5-10k before you invoke any additional functionality.
-
-**Composability:** Unix philosophy wins here. CLI tools pipe together, each doing one thing well, and you chain them for complex workflows. MCP servers are monolithic endpoints. If it doesn't expose your exact query, you're stuck. With CLI, you can grep, pipe to files, and combine tools. The model already knows these patterns.
-
-**Debuggability:** CLI errors are transparent. You see exactly what failed and why. MCP errors hide behind protocol layers and server logs you can't access. The model can identify CLI errors, understand them, and adapt accordingly.
-
-**Real-Time Evolution:** I can update my skill document while the agent uses it, adding patterns and refining examples. With MCP, you're locked to whatever the server exposes. Want new functionality? Wait for the maintainer to add it, redeploy, hope nothing breaks. With CLI, I just update the markdown.
-
-For my use case (browser automation with AI agents), CLI tools with self-documentation proved more efficient than MCP servers. The ability to compose with Unix tools and access the full CDP surface without waiting for server updates is significant.
-
-Your mileage may vary depending on your needs.
-
-## Resources
-
-- **Full benchmark results**: [BENCHMARK_RESULTS_2025-11-23.md](https://github.com/szymdzum/browser-debugger-cli/blob/main/docs/benchmarks/BENCHMARK_RESULTS_2025-11-23.md)
-- **bdg CLI tool**: [github.com/szymdzum/browser-debugger-cli](https://github.com/szymdzum/browser-debugger-cli)
-- **Chrome DevTools MCP**: [github.com/ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)
-- **Anthropic's MCP article**: [Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp)
+**Full results**: [BENCHMARK_RESULTS_2025-11-23.md](https://github.com/szymdzum/browser-debugger-cli/blob/main/docs/benchmarks/BENCHMARK_RESULTS_2025-11-23.md)
