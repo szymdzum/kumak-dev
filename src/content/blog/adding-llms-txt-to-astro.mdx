@@ -33,56 +33,123 @@ import TldrBox from '@components/TldrBox.astro';
 llms.txt is a proposed standard for making websites readable by AI agents. For an Astro blog, you need three endpoints: an index (`/llms.txt`), full content (`/llms-full.txt`), and per-post files (`/llms/[slug].txt`). Skip the npm packages. The implementation is ~150 lines of TypeScript with zero dependencies.
 </TldrBox>
 
-The [llms.txt specification](https://llmstxt.org/) proposes a standard location for LLM-readable content, similar to `robots.txt` for crawlers or `sitemap.xml` for search engines. The idea: provide a clean, structured text file that AI agents can fetch to understand your site's content without parsing HTML.
+## What is llms.txt?
 
-For a blog, this means agents can read your posts directly, without scraping, without dealing with navigation chrome, without parsing markup.
+The [llms.txt specification](https://llmstxt.org/) proposes a standard location for LLM-readable content. Think of it like `robots.txt` for crawlers or `sitemap.xml` for search engines, but designed for AI agents.
 
-## What You're Building
+The problem it solves: when an AI agent visits your website, it has to parse HTML, navigate around headers, footers, and sidebars, and extract the actual content. This wastes tokens and often produces messy results.
 
-Three endpoints:
+The solution: provide a clean, structured text file at a known location. Agents fetch `/llms.txt`, get a table of contents, and can request individual pieces of content in plain markdown.
 
-- `/llms.txt` — Index with links to all posts
-- `/llms-full.txt` — Complete content in one file
-- `/llms/[slug].txt` — Individual post content
+## The Architecture
 
-The index is lightweight. Agents fetch it first, see what's available, then request specific posts or the full dump depending on their needs.
+We'll build three endpoints that work together:
+
+```
+/llms.txt           → Index: "Here's what I have"
+/llms-full.txt      → Everything: "Here's all of it at once"
+/llms/[slug].txt    → Individual: "Here's just this one post"
+```
+
+**Why three?** Different agents have different needs:
+
+- A quick lookup might only need the index to find one relevant post
+- A RAG system might want everything in one request
+- A focused query might want just one article without the overhead of the full dump
 
 ## File Structure
+
+Here's where everything lives in your Astro project:
 
 ```
 src/
 ├── utils/
-│   └── llms.ts            # Utility functions (the gist)
+│   └── llms.ts            # All the generation logic
 ├── pages/
 │   ├── llms.txt.ts        # Index endpoint
 │   ├── llms-full.txt.ts   # Full content endpoint
 │   └── llms/
-│       └── [slug].txt.ts  # Per-post endpoints
+│       └── [slug].txt.ts  # Per-post endpoints (dynamic route)
 ```
+
+The `utils/llms.ts` file contains all the logic. The page files are thin wrappers that call into it. This separation keeps the endpoints clean and the logic testable.
 
 ## Prerequisites
 
-The implementation assumes you have:
+Before we start, you'll need these project-specific pieces:
 
-- **`siteConfig`** - Object with `name`, `description`, `url`, `author` properties
-- **`getAllPosts()`** - Function returning your content collection posts
-- **`BlogPost`** - Type from Astro's content collections with `slug`, `body`, and `data` (title, description, pubDate, category)
+- **`siteConfig`** - An object with `name`, `description`, `url`, and `author` properties
+- **`getAllPosts()`** - A function that returns your content collection posts
+- **`BlogPost`** - The type from Astro's content collections with `slug`, `body`, and `data`
 
-These are project-specific. The [complete gist](https://gist.github.com/szymdzum/a6db6ff5feb0c566cbd852e10c0ab0af) shows the full implementation with all type definitions.
+The [complete gist](https://gist.github.com/szymdzum/a6db6ff5feb0c566cbd852e10c0ab0af) shows the full implementation with all type definitions.
 
-## The Core Builder
+## Part 1: Type Definitions
 
-The entire implementation shares one document builder. It takes sections, flattens them, normalizes whitespace, and returns a text response:
+Let's start by defining the shapes of our data. Good types make the rest of the code self-documenting.
 
 ```typescript
 // src/utils/llms.ts
 
+// Basic item for the index - just enough to create a link
+interface LlmsItem {
+  title: string;
+  description: string;
+  link: string;
+}
+
+// Extended item for full content - includes the actual post data
+interface LlmsFullItem extends LlmsItem {
+  pubDate: Date;
+  category: string;
+  body: string;
+}
+```
+
+Why two types? The index only needs titles and links. The full content dump needs everything. By extending `LlmsItem`, we ensure consistency while allowing the richer type where needed.
+
+Now the configuration types for each generator:
+
+```typescript
+// Config for the index endpoint
+interface LlmsTxtConfig {
+  name: string;
+  description: string;
+  site: string;
+  items: LlmsItem[];
+  optional?: LlmsItem[];  // Links that agents can skip if context is tight
+}
+
+// Config for the full content endpoint
+interface LlmsFullTxtConfig {
+  name: string;
+  description: string;
+  author: string;
+  site: string;
+  items: LlmsFullItem[];
+}
+
+// Config for individual post endpoints
+interface LlmsPostConfig {
+  post: BlogPost;
+  site: string;
+  link: string;
+}
+```
+
+The `optional` field in `LlmsTxtConfig` is part of the spec. It signals to agents: "these links are nice-to-have, skip them if you're running low on context window."
+
+## Part 2: The Document Builder
+
+Every endpoint needs to return a plain text `Response`. Instead of repeating this logic, we create one builder that handles it all:
+
+```typescript
 function doc(...sections: (string | string[])[]): Response {
   const content = sections
-    .flat()
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+    .flat()                          // Flatten nested arrays
+    .join("\n")                      // Join with newlines
+    .replace(/\n{3,}/g, "\n\n")      // Normalize multiple blank lines to just one
+    .trim();                         // Clean up edges
 
   return new Response(content + "\n", {
     headers: { "Content-Type": "text/plain; charset=utf-8" },
@@ -90,21 +157,44 @@ function doc(...sections: (string | string[])[]): Response {
 }
 ```
 
-Every endpoint uses this. No inconsistent joining patterns.
+**Why rest parameters with arrays?** This lets us compose documents flexibly:
 
-## Shared Helpers
+```typescript
+// These all work:
+doc("# Title", "Some text");
+doc(["# Title", "", "Some text"]);
+doc(headerArray, bodyArray, footerArray);
+```
 
-Three small functions handle the repeating patterns:
+**Why normalize newlines?** When composing from multiple arrays, you might accidentally get three or four blank lines in a row. The regex `/\n{3,}/g` catches any run of 3+ newlines and replaces it with exactly 2 (one blank line). Clean output, no matter how messy the input.
+
+## Part 3: Helper Functions
+
+Small, focused functions that each do one thing:
+
+### Formatting Dates
 
 ```typescript
 function formatDate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
+```
 
+Takes a Date, returns `"2025-11-30"`. The `split("T")[0]` trick extracts just the date part from an ISO string like `"2025-11-30T00:00:00.000Z"`.
+
+### Building Headers
+
+```typescript
 function header(name: string, description: string): string[] {
   return [`# ${name}`, "", `> ${description}`];
 }
+```
 
+Returns an array of lines. The empty string creates a blank line between the title and the blockquote description. This matches the llms.txt spec format.
+
+### Building Link Lists
+
+```typescript
 function linkList(title: string, items: LlmsItem[], site: string): string[] {
   return [
     "",
@@ -112,21 +202,41 @@ function linkList(title: string, items: LlmsItem[], site: string): string[] {
     ...items.map((item) => `- [${item.title}](${site}${item.link}): ${item.description}`),
   ];
 }
+```
 
+Creates a section with an H2 heading and a markdown list of links. Each link includes a description after the colon. The leading empty string ensures a blank line before the section.
+
+### Building Post Metadata
+
+```typescript
 function postMeta(site: string, link: string, pubDate: Date, category: string): string[] {
   return [`URL: ${site}${link}`, `Published: ${formatDate(pubDate)}`, `Category: ${category}`];
 }
 ```
 
-## Stripping MDX Syntax
+Three lines of metadata for each post. This keeps the format consistent across the full dump and individual post endpoints.
 
-If you use MDX, your post bodies contain import statements and JSX components. Agents don't need these:
+## Part 4: Stripping MDX Syntax
+
+If you use MDX, your post bodies contain things agents don't need:
+
+```mdx
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+This is a summary component.
+</TldrBox>
+
+The actual content starts here...
+```
+
+We need to strip the import and the JSX component, but keep the markdown content:
 
 ```typescript
 const MDX_PATTERNS = [
-  /^import\s+.+from\s+['"].+['"];?\s*$/gm,
-  /<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g,
-  /<[A-Z][a-zA-Z]*[^>]*\/>/g,
+  /^import\s+.+from\s+['"].+['"];?\s*$/gm,           // import statements
+  /<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, // JSX blocks like <Component>...</Component>
+  /<[A-Z][a-zA-Z]*[^>]*\/>/g,                         // Self-closing JSX like <Icon />
 ] as const;
 
 function stripMdx(content: string): string {
@@ -134,11 +244,21 @@ function stripMdx(content: string): string {
 }
 ```
 
-This removes `import` lines and any PascalCase components (the convention for JSX). Standard markdown passes through unchanged.
+**How the patterns work:**
 
-## The Three Generators
+1. **Import pattern**: Matches lines starting with `import`, followed by anything, then `from` and a quoted path. The `m` flag makes `^` match line starts.
 
-With the helpers in place, each generator is minimal:
+2. **JSX block pattern**: Matches `<CapitalLetter` (JSX convention), captures everything until the closing tag. The `[\s\S]*?` is a non-greedy match for any character including newlines.
+
+3. **Self-closing pattern**: Matches `<CapitalLetter ... />` for components without children.
+
+**Why PascalCase?** JSX components use PascalCase by convention. HTML elements are lowercase. So `<TldrBox>` gets stripped, but `<div>` or `<a href="...">` passes through. This also means code examples in fenced blocks are safe, since they're not parsed as actual JSX.
+
+## Part 5: The Generators
+
+Now we combine everything into the three main functions:
+
+### Index Generator
 
 ```typescript
 export function llmsTxt(config: LlmsTxtConfig): Response {
@@ -153,7 +273,27 @@ export function llmsTxt(config: LlmsTxtConfig): Response {
 
   return doc(...sections);
 }
+```
 
+Builds an array of sections, conditionally adds the optional section, then passes everything to `doc()`. The spread operator `...sections` unpacks the array into separate arguments.
+
+**Output looks like:**
+
+```markdown
+# Site Name
+
+> Site description
+
+## Posts
+- [Post Title](https://site.com/llms/post-slug.txt): Post description
+
+## Optional
+- [About](https://site.com/about): About the author
+```
+
+### Full Content Generator
+
+```typescript
 export function llmsFullTxt(config: LlmsFullTxtConfig): Response {
   const head = [
     ...header(config.name, config.description),
@@ -179,7 +319,15 @@ export function llmsFullTxt(config: LlmsFullTxtConfig): Response {
 
   return doc(head, posts);
 }
+```
 
+**Why `flatMap`?** Each item produces an array of lines. Using `map` would give us an array of arrays. `flatMap` maps and flattens in one step, giving us a single array of all lines.
+
+The horizontal rules (`---`) separate posts visually and give agents clear boundaries between content pieces.
+
+### Individual Post Generator
+
+```typescript
 export function llmsPost(config: LlmsPostConfig): Response {
   const { post, site, link } = config;
   const { title, description, pubDate, category } = post.data;
@@ -196,9 +344,51 @@ export function llmsPost(config: LlmsPostConfig): Response {
 }
 ```
 
-## The Endpoints
+The simplest generator. Destructures the config and post data, then builds a single document. The `post.body ?? ""` handles the edge case of a post without body content.
 
-With utilities in place, the endpoints are minimal. The index:
+## Part 6: Data Transformers
+
+We need functions to convert Astro's content collection format into our types:
+
+```typescript
+export function postsToLlmsItems(
+  posts: BlogPost[],
+  formatUrl: (slug: string) => string,
+): LlmsItem[] {
+  return posts.map((post) => ({
+    title: post.data.title,
+    description: post.data.description,
+    link: formatUrl(post.slug),
+  }));
+}
+
+export function postsToLlmsFullItems(
+  posts: BlogPost[],
+  formatUrl: (slug: string) => string,
+): LlmsFullItem[] {
+  return posts.map((post) => ({
+    ...postsToLlmsItems([post], formatUrl)[0],
+    pubDate: post.data.pubDate,
+    category: post.data.category,
+    body: post.body ?? "",
+  }));
+}
+```
+
+**Why the callback for URLs?** Different endpoints need different URL formats:
+
+- Index links to `/llms/post-slug.txt` (the plain text version)
+- Full content links to `/post-slug` (the HTML version)
+
+By passing the formatter as a callback, the same transformer works for both cases.
+
+**Why does `postsToLlmsFullItems` call `postsToLlmsItems`?** DRY principle. The full item includes everything from the basic item, plus extra fields. Instead of duplicating the mapping logic, we reuse it and spread the result.
+
+## Part 7: The Endpoints
+
+Now we wire everything up in Astro page files. These are intentionally thin.
+
+### Index Endpoint
 
 ```typescript
 // src/pages/llms.txt.ts
@@ -223,7 +413,9 @@ export const GET: APIRoute = async () => {
 };
 ```
 
-The full content dump:
+The `APIRoute` type tells Astro this is an API endpoint, not an HTML page. The `.txt.ts` filename means it generates `/llms.txt`.
+
+### Full Content Endpoint
 
 ```typescript
 // src/pages/llms-full.txt.ts
@@ -245,7 +437,9 @@ export const GET: APIRoute = async () => {
 };
 ```
 
-Per-post endpoints using dynamic routes:
+Almost identical structure. The URL formatter now points to HTML pages since agents reading the full dump might want to reference the original.
+
+### Dynamic Per-Post Endpoints
 
 ```typescript
 // src/pages/llms/[slug].txt.ts
@@ -271,9 +465,13 @@ export const GET = ({ props }: { props: { post: BlogPost } }) => {
 };
 ```
 
-## Discovery
+**What's `getStaticPaths`?** Astro needs to know at build time which pages to generate. This function returns an array of all valid slugs. Each entry includes `params` (the URL parameters) and `props` (data passed to the page).
 
-Agents need to find your llms.txt. Add a link tag to your HTML head, similar to RSS discovery:
+**Why `[slug]` in the filename?** Square brackets denote a dynamic route in Astro. The file `[slug].txt.ts` generates `/llms/post-one.txt`, `/llms/post-two.txt`, etc.
+
+## Part 8: Discovery
+
+Agents need to find your llms.txt. The spec says to put it at the root (`/llms.txt`), similar to `robots.txt`. But you can also advertise it in HTML:
 
 ```html
 <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
@@ -281,35 +479,37 @@ Agents need to find your llms.txt. Add a link tag to your HTML head, similar to 
 
 Add this to your base layout or head component, wherever you define other `<link>` tags like RSS or favicon.
 
-This isn't part of the spec, but it follows web conventions. The spec itself relies on the well-known path (`/llms.txt`) and community directories like [llmstxt.site](https://llmstxt.site).
+This isn't part of the official spec, but follows web conventions. You can also register your site on directories like [llmstxt.site](https://llmstxt.site).
 
 ## Limitations
 
-This approach works for content collections with markdown or MDX bodies. The implementation reads `post.body` directly, which is raw text.
+This implementation works for **content collections with markdown or MDX bodies**. It reads `post.body` directly, which is raw text.
 
-For component-based pages (React, Vue, Svelte, or plain `.astro` files), there's no markdown body to extract. You'd need a different strategy: render to HTML and strip tags (lossy), maintain separate content files (duplicate effort), or use a headless CMS where content exists independently of components.
+For component-based pages (React, Vue, Svelte, or plain `.astro` files), there's no markdown body to extract. You'd need a different strategy:
 
-For most blogs, content collections are the right choice anyway. If your site is component-heavy, consider whether those pages even belong in llms.txt.
+- Render to HTML and strip tags (lossy, messy)
+- Maintain separate content files (duplicate effort)
+- Use a headless CMS where content exists independently
+
+For most blogs, content collections are the right choice anyway.
 
 ## Why Not Use a Library?
 
-There are Astro integrations for llms.txt. They auto-generate from all pages at build time. This sounds convenient, but:
+There are Astro integrations for llms.txt. They auto-generate from all pages at build time. Sounds convenient, but:
 
 1. You get everything, including pages you might not want exposed
 2. No per-post endpoints
 3. No control over the output format
 4. Another dependency to maintain
 
-The implementation above is ~150 lines of TypeScript. You control exactly what's included. You can add per-post endpoints. You can customise the format. And you understand every line.
-
-For something this simple, the DIY approach wins.
+This implementation is ~150 lines of TypeScript. You control exactly what's included. You understand every line. For something this simple, the DIY approach wins.
 
 ## The Result
 
-After deploying:
+After deploying, you have:
 
-- `/llms.txt` lists all posts with descriptions
-- `/llms-full.txt` contains everything for agents that want the full context
-- `/llms/post-slug.txt` serves individual posts
+- `/llms.txt` - Index listing all posts with descriptions
+- `/llms-full.txt` - Complete content for RAG systems or full context
+- `/llms/post-slug.txt` - Individual posts for focused queries
 
-Agents can fetch the index, pick what they need, and get clean markdown without parsing your site's HTML. That's the point of the standard: make your content accessible to the tools people are actually using.
+Agents fetch the index, pick what they need, and get clean markdown. No HTML parsing, no navigation noise, no wasted tokens. That's the point of the standard.
