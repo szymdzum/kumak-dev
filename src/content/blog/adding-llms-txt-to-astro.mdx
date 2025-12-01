@@ -33,6 +33,34 @@ import TldrBox from '@components/TldrBox.astro';
 llms.txt is a proposed standard for making websites readable by AI agents. For an Astro blog, you need three endpoints: an index (`/llms.txt`), full content (`/llms-full.txt`), and per-post files (`/llms/[slug].txt`). Skip the npm packages. The implementation is ~150 lines of TypeScript with zero dependencies.
 </TldrBox>
 
+## Why Would You Want This?
+
+Here's the actual use case. You're in your terminal with an AI agent:
+
+```
+You: "Hey, can you curl https://kumak.dev/llms-full.txt and tell me
+      if there's anything interesting about Astro?"
+
+Agent: *fetches clean markdown, scans content*
+       "There's a post about content collections and one about
+        adding llms.txt. The content collections one covers..."
+```
+
+Or more practically:
+
+```
+You: "Implement https://kumak.dev/llms/adding-llms-txt-to-astro.txt
+      on my blog"
+
+Agent: *fetches the post as clean markdown*
+       "Got it. I see you need three endpoints. Let me create
+        the utils file first..."
+```
+
+Without llms.txt, the agent has to scrape HTML, strip navigation, parse React components, and hope for the best. With llms.txt, it gets exactly what it needs in a format it can read directly.
+
+The [Astro docs](https://docs.astro.build/llms-full.txt) use this pattern. When you ask an agent to help with Astro, it can fetch their llms.txt and get accurate, current documentation instead of relying on training data.
+
 ## What is llms.txt?
 
 The [llms.txt specification](https://llmstxt.org/) proposes a standard location for LLM-readable content. Think of it like `robots.txt` for crawlers or `sitemap.xml` for search engines, but designed for AI agents.
