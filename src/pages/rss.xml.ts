@@ -4,6 +4,8 @@ import { siteConfig } from "@/site-config";
 import { formatUrl } from "@utils/path";
 import { getAllPosts } from "@utils/posts";
 
+export const prerender = true;
+
 export const GET: APIRoute = async (context) => {
   if (!context.site) {
     throw new Error("site is not defined in astro.config.mjs");

@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import deno from "@deno/astro-adapter";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
@@ -10,7 +11,8 @@ import { externalLinks } from "./src/utils/links.ts";
 // https://astro.build/config
 export default defineConfig({
   site: "https://kumak.dev",
-  output: "static",
+  output: "server",
+  adapter: deno(),
 
   integrations: [
     mdx({

@@ -1,23 +1,25 @@
-import type { GetStaticPaths } from "astro";
+import type { APIRoute } from "astro";
 import { siteConfig } from "@/site-config";
+import { trackLlmsRequest } from "@utils/analytics";
 import { llmsPost } from "@utils/llms";
 import { formatUrl } from "@utils/path";
-import { type BlogPost, getAllPosts } from "@utils/posts";
+import { getAllPosts } from "@utils/posts";
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const prerender = false;
+
+export const GET: APIRoute = async ({ params, request }) => {
   const posts = await getAllPosts();
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
-};
+  const post = posts.find((p) => p.slug === params.slug);
 
-interface Props {
-  post: BlogPost;
-}
+  if (!post) {
+    return new Response("Not found", { status: 404 });
+  }
 
-export const GET = ({ props }: { props: Props }) => {
-  const { post } = props;
+  trackLlmsRequest({
+    url: `/llms/${post.slug}.txt`,
+    userAgent: request.headers.get("user-agent") ?? undefined,
+    referrer: request.headers.get("referer") ?? undefined,
+  });
 
   return llmsPost({
     post,
