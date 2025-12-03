@@ -25,12 +25,7 @@ const { markdown } = Astro.props;
       await navigator.clipboard.writeText(markdown);
       button.classList.add('copied');
       buttonText.textContent = 'Copied';
-
-      // Track article copy
-      if (typeof umami !== 'undefined') {
-        umami.track('article-copy', { path: window.location.pathname });
-      }
-
+      track.articleCopy();
       setTimeout(() => {
         button.classList.remove('copied');
         buttonText.textContent = 'Copy';

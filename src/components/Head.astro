@@ -73,4 +73,14 @@ const imageURL = new URL(image, Astro.site).href;
 
   <!-- Umami Analytics -->
   <script defer src="https://analytics.kumak.dev/script.js" data-website-id="9a78de62-6e9d-4d7b-8e0c-998a85550282"></script>
+  <script is:inline>
+    window.track = {
+      event: (name, data) => typeof umami !== 'undefined' && umami.track(name, data),
+      codeCopy: () => track.event('code-copy', { path: location.pathname }),
+      articleCopy: () => track.event('article-copy', { path: location.pathname }),
+      share: (method) => track.event('share', { method, path: location.pathname }),
+      social: (platform) => track.event('social-click', { platform }),
+      scroll: (depth) => track.event('scroll-depth', { depth, path: location.pathname }),
+    };
+  </script>
 </head>

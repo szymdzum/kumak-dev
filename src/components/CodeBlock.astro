@@ -98,11 +98,7 @@ type Props = HTMLAttributes<'pre'>;
           await navigator.clipboard.writeText(code);
           newButton.classList.add('copied');
           setTimeout(() => newButton.classList.remove('copied'), 2000);
-
-          // Track code copy event
-          if (typeof umami !== 'undefined') {
-            umami.track('code-copy', { path: window.location.pathname });
-          }
+          track.codeCopy();
         } catch (err) {
           console.error('Failed to copy code:', err);
         }

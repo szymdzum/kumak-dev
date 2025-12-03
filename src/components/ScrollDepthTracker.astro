@@ -3,48 +3,32 @@
 ---
 
 <script>
-  function initScrollTracking(): void {
+  document.addEventListener('astro:page-load', () => {
     const milestones = [25, 50, 75, 100];
     const tracked = new Set<number>();
 
     function getScrollPercent(): number {
-      const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (docHeight <= 0) return 100;
-      return Math.round((scrollTop / docHeight) * 100);
+      return docHeight <= 0 ? 100 : Math.round((window.scrollY / docHeight) * 100);
     }
 
     function checkMilestones(): void {
       const percent = getScrollPercent();
-
-      for (const milestone of milestones) {
-        if (percent >= milestone && !tracked.has(milestone)) {
-          tracked.add(milestone);
-          if (typeof umami !== 'undefined') {
-            umami.track('scroll-depth', {
-              depth: milestone,
-              path: window.location.pathname,
-            });
-          }
+      for (const m of milestones) {
+        if (percent >= m && !tracked.has(m)) {
+          tracked.add(m);
+          track.scroll(m);
         }
       }
     }
 
-    // Throttle scroll handler
     let ticking = false;
     window.addEventListener('scroll', () => {
       if (!ticking) {
-        window.requestAnimationFrame(() => {
-          checkMilestones();
-          ticking = false;
-        });
+        requestAnimationFrame(() => { checkMilestones(); ticking = false; });
         ticking = true;
       }
     });
-
-    // Check initial position (in case page loads scrolled)
     checkMilestones();
-  }
-
-  document.addEventListener('astro:page-load', initScrollTracking);
+  });
 </script>

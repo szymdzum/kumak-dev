@@ -88,16 +88,11 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
 </style>
 
 <script>
-  function initSocialTracking(): void {
+  document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLAnchorElement>('a[data-social]').forEach((link) => {
       link.addEventListener('click', () => {
-        const social = link.dataset.social;
-        if (social && typeof umami !== 'undefined') {
-          umami.track('social-click', { platform: social });
-        }
+        if (link.dataset.social) track.social(link.dataset.social);
       });
     });
-  }
-
-  document.addEventListener('astro:page-load', initSocialTracking);
+  });
 </script>
