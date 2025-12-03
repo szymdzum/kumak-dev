@@ -16,6 +16,7 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
             aria-label={isExternal ? `${siteConfig.author} on ${social.name}` : `Subscribe via ${social.name}`}
+            data-social={isExternal ? key : undefined}
           >
             <Icon name={`lucide:${key}`} size={24} />
           </a>
@@ -85,3 +86,18 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
     }
   }
 </style>
+
+<script>
+  function initSocialTracking(): void {
+    document.querySelectorAll<HTMLAnchorElement>('a[data-social]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const social = link.dataset.social;
+        if (social && typeof umami !== 'undefined') {
+          umami.track('social-click', { platform: social });
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initSocialTracking);
+</script>
