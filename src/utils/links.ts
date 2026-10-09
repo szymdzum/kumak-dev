@@ -16,7 +16,9 @@ function isAnchorWithHref(element: Element): boolean {
 }
 
 function isExternalLink(href: string, siteDomain: string): boolean {
-  return href.startsWith("http") && !href.includes(siteDomain);
+  const url = URL.parse(href);
+  if (!url || !/^https?:$/.test(url.protocol)) return false;
+  return url.hostname !== siteDomain && !url.hostname.endsWith(`.${siteDomain}`);
 }
 
 function applyExternalLinkAttributes(element: Element): void {
