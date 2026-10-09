@@ -8,6 +8,7 @@ import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { externalLinks } from "./src/utils/links.ts";
+import { scrollableTables } from "./src/utils/tables.ts";
 
 // Patches for @deno/astro-adapter 0.6.0 server.ts. Remove once fixed upstream
 // (denoland/deno-astro-adapter); the build fails loudly if the adapter code changes.
@@ -139,7 +140,8 @@ export default defineConfig({
             behavior: "prepend",
             properties: {
               className: ["heading-anchor"],
-              ariaLabel: "Link to this section",
+              ariaHidden: "true",
+              tabIndex: -1,
             },
             content: {
               type: "element",
@@ -150,6 +152,7 @@ export default defineConfig({
           },
         ],
         [externalLinks, { domain: "kumak.dev" }],
+        scrollableTables,
       ],
     }),
   },

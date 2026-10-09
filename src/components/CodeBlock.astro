@@ -42,7 +42,8 @@ type Props = HTMLAttributes<'pre'>;
     transition: color var(--transition-fast), opacity var(--transition-fast);
   }
 
-  .codeblock:hover .codeblock-copy {
+  .codeblock:hover .codeblock-copy,
+  .codeblock-copy:focus-visible {
     opacity: 1;
   }
 
@@ -89,6 +90,7 @@ type Props = HTMLAttributes<'pre'>;
 
       const newButton = button.cloneNode(true) as HTMLButtonElement;
       button.replaceWith(newButton);
+      const idleLabel = newButton.getAttribute('aria-label');
 
       newButton.addEventListener('click', async () => {
         const code = pre.textContent?.trim();
@@ -97,7 +99,11 @@ type Props = HTMLAttributes<'pre'>;
         try {
           await navigator.clipboard.writeText(code);
           newButton.dataset.copied = '';
-          setTimeout(() => delete newButton.dataset.copied, 2000);
+          newButton.setAttribute('aria-label', 'Copied to clipboard');
+          setTimeout(() => {
+            delete newButton.dataset.copied;
+            if (idleLabel) newButton.setAttribute('aria-label', idleLabel);
+          }, 2000);
           track.codeCopy();
         } catch (err) {
           console.error('Failed to copy code:', err);

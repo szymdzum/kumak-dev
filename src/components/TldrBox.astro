@@ -6,8 +6,8 @@ interface Props {
 const { title = "TL;DR" } = Astro.props;
 ---
 
-<aside>
-  <span>{title}</span>
+<aside role="note" aria-labelledby="tldr-label">
+  <p id="tldr-label">{title}</p>
   <div>
     <slot />
   </div>
@@ -22,7 +22,7 @@ const { title = "TL;DR" } = Astro.props;
     margin-bottom: var(--space-xl);
   }
 
-  span {
+  p {
     display: inline-block;
     font-size: var(--text-xs);
     font-weight: var(--font-weight-semibold);
