@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
+import PageHeader from "@components/PageHeader.astro";
 import { track404Request } from "@utils/analytics";
 
 track404Request(Astro.request, Astro.url.pathname);
@@ -9,9 +10,7 @@ track404Request(Astro.request, Astro.url.pathname);
 
 <BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist.">
   <article>
-    <header class="post-header">
-      <h1>404</h1>
-    </header>
+    <PageHeader title="404" />
 
     <div class="prose">
       <p>The page you're looking for doesn't exist or has been moved.</p>
@@ -20,18 +19,3 @@ track404Request(Astro.request, Astro.url.pathname);
   </article>
 </BaseLayout>
 
-<style>
-  .post-header {
-    margin-bottom: var(--space-xl);
-    padding-bottom: calc(var(--space-xs) * 0.5);
-    border-bottom: var(--border-width) solid var(--color-border);
-  }
-
-  .post-header h1 {
-    font-family: var(--font-family-display);
-    font-size: var(--text-3xl);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-tighter);
-  }
-</style>

@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
+import PageHeader from "@components/PageHeader.astro";
 ---
 
 <BaseLayout
@@ -9,9 +10,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
   description="Front-end engineer with 13 years of experience building for the web"
 >
   <article>
-    <header class="post-header">
-      <h1>About</h1>
-    </header>
+    <PageHeader title="About" />
 
     <div class="prose">
       <p>
@@ -53,25 +52,3 @@ import BaseLayout from "@layouts/BaseLayout.astro";
   </article>
 </BaseLayout>
 
-<style>
-  .post-header {
-    margin-bottom: var(--space-xl);
-    padding-bottom: calc(var(--space-xs) * 0.5);
-    border-bottom: var(--border-width) solid var(--color-border);
-  }
-
-  .post-header h1 {
-    font-family: var(--font-family-display);
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-tighter);
-    word-spacing: var(--word-spacing-tight);
-  }
-
-  @media (max-width: 480px) {
-    .post-header h1 {
-      font-size: var(--text-xl);
-    }
-  }
-</style>

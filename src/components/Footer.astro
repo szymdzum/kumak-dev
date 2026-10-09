@@ -5,7 +5,7 @@ const currentYear = new Date().getFullYear();
 ---
 
 <footer>
-  <div class="container">
+  <div>
     <p>© {currentYear} <a href="/about">{siteConfig.author.handle}</a>. Built with Astro.</p>
   </div>
 </footer>
@@ -17,7 +17,10 @@ const currentYear = new Date().getFullYear();
     margin-top: var(--space-3xl);
   }
 
-  .container {
+  div {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 var(--space-md);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
     text-align: center;
