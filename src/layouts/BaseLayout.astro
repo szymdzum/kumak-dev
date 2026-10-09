@@ -8,18 +8,13 @@ export interface Props {
   readonly title?: string;
   readonly description?: string;
   readonly image?: string;
+  readonly ogType?: "website" | "article";
 }
-
-const {
-  title,
-  description,
-  image
-} = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-  <Head title={title} description={description} image={image}>
+  <Head {...Astro.props}>
     <slot name="head" slot="head" />
   </Head>
   <body>

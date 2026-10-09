@@ -1,4 +1,4 @@
-import type { BlogPost } from "./posts";
+import { type BlogPost, isoDate } from "./posts";
 
 interface LlmsItem {
   title: string;
@@ -44,10 +44,6 @@ function stripMdx(content: string): string {
   return MDX_PATTERNS.reduce((text, pattern) => text.replace(pattern, ""), content).trim();
 }
 
-function formatDate(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
-
 function doc(...sections: (string | string[])[]): Response {
   const content = sections
     .flat()
@@ -73,7 +69,7 @@ function linkList(title: string, items: LlmsItem[], site: string): string[] {
 }
 
 function postMeta(site: string, link: string, pubDate: Date, category: string): string[] {
-  return [`URL: ${site}${link}`, `Published: ${formatDate(pubDate)}`, `Category: ${category}`];
+  return [`URL: ${site}${link}`, `Published: ${isoDate(pubDate)}`, `Category: ${category}`];
 }
 
 export function llmsTxt(config: LlmsTxtConfig): Response {

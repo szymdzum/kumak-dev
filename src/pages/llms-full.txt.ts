@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ request }) => {
   return llmsFullTxt({
     name: siteConfig.name,
     description: siteConfig.description,
-    author: siteConfig.author,
+    author: siteConfig.author.name,
     site: siteConfig.url,
     items: postsToLlmsFullItems(posts, formatUrl),
   });

@@ -19,6 +19,11 @@ export async function getAllPosts(): Promise<BlogPost[]> {
   return posts.sort(sortByDateDescending);
 }
 
+/** YYYY-MM-DD in UTC (frontmatter dates are UTC midnight). */
+export function isoDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
 export function estimateReadingTime(content: string): number {
   return Math.ceil(countWords(content) / WORDS_PER_MINUTE);
 }

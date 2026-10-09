@@ -1,18 +1,20 @@
 ---
+import { isoDate } from "@utils/posts";
+
 interface Props {
-  date: Date | string;
+  date: Date;
 }
 
 const { date } = Astro.props;
-const dateObj = date instanceof Date ? date : new Date(date);
 ---
 
-<time datetime={dateObj.toISOString()}>
+<time datetime={isoDate(date)}>
   {
-    dateObj.toLocaleDateString("en-GB", {
+    date.toLocaleDateString("en-GB", {
       year: "numeric",
       month: "short",
       day: "numeric",
+      timeZone: "UTC",
     })
   }
 </time>
