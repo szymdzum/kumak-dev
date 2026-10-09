@@ -15,7 +15,7 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
             href={social.url}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            aria-label={isExternal ? `${siteConfig.author} on ${social.name}` : `Subscribe via ${social.name}`}
+            aria-label={isExternal ? `${siteConfig.author.handle} on ${social.name}` : `Subscribe via ${social.name}`}
             data-social={isExternal ? key : undefined}
             data-astro-prefetch="false"
           >

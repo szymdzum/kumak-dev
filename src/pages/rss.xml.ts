@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ site, request }) => {
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,
-      author: siteConfig.author,
+      author: siteConfig.author.name,
       categories: [post.data.category],
       link: formatUrl(post.id),
     })),

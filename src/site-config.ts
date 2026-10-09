@@ -7,7 +7,10 @@ export const siteConfig = {
   tagline: "Front-end, LLM tooling, and what actually works.",
   image: "/social-image.jpg",
   // Author/owner info
-  author: "Kumak",
+  author: {
+    name: "Szymon Dzumak",
+    handle: "Kumak",
+  },
 
   socials: {
     github: {

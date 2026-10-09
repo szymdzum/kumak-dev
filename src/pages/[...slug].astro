@@ -32,19 +32,17 @@ type Props = BlogPost;
 const post = Astro.props;
 const { Content, headings } = await render(post);
 
-const { title, description, pubDate, updatedDate, category, tags, author, heroImage, externalLinks } = post.data;
+const { title, description, pubDate, updatedDate, category, tags, heroImage, externalLinks } = post.data;
 
 const readingTime = estimateReadingTime(post.body);
 ---
 
-<BaseLayout title={title} description={description} image={heroImage}>
+<BaseLayout title={title} description={description} image={heroImage} ogType="article">
   <ArticleMeta
     pubDate={pubDate}
     updatedDate={updatedDate}
-    author={author}
     category={category}
     tags={tags}
-    image={heroImage}
     slot="head"
   />
   <SchemaOrg
@@ -53,7 +51,6 @@ const readingTime = estimateReadingTime(post.body);
     description={description}
     pubDate={pubDate}
     updatedDate={updatedDate}
-    author={author}
     image={heroImage}
     slot="head"
   />
@@ -65,9 +62,7 @@ const readingTime = estimateReadingTime(post.body);
           <dl>
             <dt>Published</dt>
             <dd>
-              <time datetime={pubDate.toISOString().split("T")[0]}>
-                <DateFormatter date={pubDate} />
-              </time>
+              <DateFormatter date={pubDate} />
             </dd>
             <dt>Reading time</dt>
             <dd><data value={readingTime}>{readingTime} min read</data></dd>

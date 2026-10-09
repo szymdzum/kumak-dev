@@ -15,7 +15,6 @@ const blog = defineCollection({
     category: z.enum(["tutorial", "opinion", "project", "philosophy"]),
     tags: z.array(z.string()).default([]),
     keywords: z.array(z.string()).optional(),
-    author: z.string().default("Szymon Dzumak"),
     showToc: z.boolean().default(false),
     featured: z.boolean().default(false),
     relatedPosts: z.array(z.string()).optional(),

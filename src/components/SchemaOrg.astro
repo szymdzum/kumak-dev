@@ -7,9 +7,7 @@ interface Props {
   description?: string;
   pubDate?: Date;
   updatedDate?: Date;
-  author?: string;
   image?: string;
-  url?: string;
 }
 
 const {
@@ -18,13 +16,19 @@ const {
   description,
   pubDate,
   updatedDate,
-  author = siteConfig.author,
   image,
-  url,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const imageURL = image ? new URL(image, Astro.site).href : new URL(siteConfig.image, Astro.site).href;
+const imageURL = new URL(image ?? siteConfig.image, Astro.site).href;
+
+const author = {
+  "@type": "Person",
+  "@id": `${siteConfig.url}#author`,
+  "name": siteConfig.author.name,
+  "alternateName": siteConfig.author.handle,
+  "url": siteConfig.socials.github.url,
+};
 
 const publisher = {
   "@type": "Organization",
@@ -47,18 +51,13 @@ if (type === "BlogPosting") {
     "image": imageURL,
     "datePublished": pubDate?.toISOString(),
     "dateModified": updatedDate?.toISOString() || pubDate?.toISOString(),
-    "author": {
-      "@type": "Person",
-      "@id": `${siteConfig.url}#author`,
-      "name": author,
-      "url": siteConfig.socials.github.url,
-    },
+    author,
     publisher,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": url || canonicalURL.href,
+      "@id": canonicalURL.href,
     },
-    "url": url || canonicalURL.href,
+    "url": canonicalURL.href,
   };
 } else if (type === "WebSite") {
   schema = {
@@ -67,12 +66,7 @@ if (type === "BlogPosting") {
     "name": siteConfig.name,
     "description": siteConfig.description,
     "url": siteConfig.url,
-    "author": {
-      "@type": "Person",
-      "@id": `${siteConfig.url}#author`,
-      "name": siteConfig.author,
-      "url": siteConfig.socials.github.url,
-    },
+    author,
     publisher,
   };
 }
