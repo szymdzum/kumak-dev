@@ -9,11 +9,9 @@ export const prerender = false;
 const formatLlmsUrl = (slug: string) => `/llms/${slug}.txt`;
 
 export const GET: APIRoute = async ({ request }) => {
-  trackLlmsRequest(request, "/llms.txt");
-
+  const tracked = trackLlmsRequest(request, "/llms.txt");
   const posts = await getAllPosts();
-
-  return llmsTxt({
+  const response = llmsTxt({
     name: siteConfig.name,
     description: siteConfig.description,
     site: siteConfig.url,
@@ -28,4 +26,7 @@ export const GET: APIRoute = async ({ request }) => {
       },
     ],
   });
+
+  await tracked;
+  return response;
 };

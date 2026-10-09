@@ -8,15 +8,16 @@ import { getAllPosts } from "@utils/posts";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request }) => {
-  trackLlmsRequest(request, "/llms-full.txt");
-
+  const tracked = trackLlmsRequest(request, "/llms-full.txt");
   const posts = await getAllPosts();
-
-  return llmsFullTxt({
+  const response = llmsFullTxt({
     name: siteConfig.name,
     description: siteConfig.description,
     author: siteConfig.author.name,
     site: siteConfig.url,
     items: postsToLlmsFullItems(posts, formatUrl),
   });
+
+  await tracked;
+  return response;
 };

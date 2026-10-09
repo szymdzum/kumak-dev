@@ -16,15 +16,21 @@ interface TrackEventOptions {
   referrer?: string | undefined;
 }
 
+/** Upper bound on how long a response may wait for Umami. */
+const TRACK_TIMEOUT_MS = 1500;
+
 /**
  * Tracks a custom event in Umami Analytics (server-side).
- * Fire-and-forget: does not block the response.
+ *
+ * Returns a promise that never rejects. Callers start it early and await it
+ * right before returning the response: Deno Deploy may stop the isolate once
+ * the response is sent, so an unawaited fetch is not guaranteed to finish.
  *
  * Note: Umami v3 requires Origin header and browser-like User-Agent
  * to pass bot detection. The actual client User-Agent is stored in
  * event data for analysis.
  */
-function trackEvent(options: TrackEventOptions): void {
+async function trackEvent(options: TrackEventOptions): Promise<void> {
   const { eventName, url, title, userAgent, referrer } = options;
 
   const payload = {
@@ -45,19 +51,22 @@ function trackEvent(options: TrackEventOptions): void {
     },
   };
 
-  fetch(`${UMAMI_URL}/api/send`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Origin": SITE_ORIGIN,
-      "User-Agent": BROWSER_UA,
-    },
-    body: JSON.stringify(payload),
-  }).catch((error: unknown) => {
+  try {
+    await fetch(`${UMAMI_URL}/api/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Origin": SITE_ORIGIN,
+        "User-Agent": BROWSER_UA,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(TRACK_TIMEOUT_MS),
+    });
+  } catch (error: unknown) {
     if (import.meta.env.DEV) {
       console.warn("Analytics error:", error);
     }
-  });
+  }
 }
 
 /**
@@ -69,9 +78,14 @@ function isPrefetch(request: Request): boolean {
   return purpose.includes("prefetch");
 }
 
-function trackRequest(request: Request, eventName: string, title: string, url: string): void {
+async function trackRequest(
+  request: Request,
+  eventName: string,
+  title: string,
+  url: string,
+): Promise<void> {
   if (isPrefetch(request)) return;
-  trackEvent({
+  await trackEvent({
     eventName,
     title,
     url,
@@ -80,12 +94,12 @@ function trackRequest(request: Request, eventName: string, title: string, url: s
   });
 }
 
-export function trackLlmsRequest(request: Request, url: string): void {
-  trackRequest(request, "llms-request", "LLMs.txt", url);
+export function trackLlmsRequest(request: Request, url: string): Promise<void> {
+  return trackRequest(request, "llms-request", "LLMs.txt", url);
 }
 
-export function trackRssRequest(request: Request): void {
-  trackRequest(request, "rss-fetch", "RSS Feed", "/rss.xml");
+export function trackRssRequest(request: Request): Promise<void> {
+  return trackRequest(request, "rss-fetch", "RSS Feed", "/rss.xml");
 }
 
 const MAX_404_PATH_LENGTH = 200;
@@ -93,8 +107,13 @@ const MAX_404_PATH_LENGTH = 200;
 const SCANNER_PATH = /(^|\/)\.|\.php\b|wp-|cgi-bin|phpmyadmin/i;
 const BOT_UA = /bot|crawl|spider|slurp|curl|wget|python|go-http|scan/i;
 
-export function track404Request(request: Request, pathname: string): void {
+export async function track404Request(request: Request, pathname: string): Promise<void> {
   const userAgent = request.headers.get("user-agent") ?? "";
   if (SCANNER_PATH.test(pathname) || BOT_UA.test(userAgent)) return;
-  trackRequest(request, "404-not-found", "404 Not Found", pathname.slice(0, MAX_404_PATH_LENGTH));
+  await trackRequest(
+    request,
+    "404-not-found",
+    "404 Not Found",
+    pathname.slice(0, MAX_404_PATH_LENGTH),
+  );
 }

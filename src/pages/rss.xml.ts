@@ -12,11 +12,9 @@ export const GET: APIRoute = async ({ site, request }) => {
     throw new Error("site is not defined in astro.config.mjs");
   }
 
-  trackRssRequest(request);
-
+  const tracked = trackRssRequest(request);
   const posts = await getAllPosts();
-
-  return rss({
+  const response = await rss({
     title: siteConfig.name,
     description: siteConfig.description,
     site,
@@ -31,4 +29,7 @@ export const GET: APIRoute = async ({ site, request }) => {
       link: formatUrl(post.id),
     })),
   });
+
+  await tracked;
+  return response;
 };
