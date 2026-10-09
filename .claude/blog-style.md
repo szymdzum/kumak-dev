@@ -71,10 +71,8 @@ pubDate: YYYY-MM-DD
 category: "philosophy|tutorial|opinion|project"
 tags: []
 keywords: []
-author: "Szymon Dzumak"
-showToc: true
-featured: false
 draft: true
+# showToc: false  # opt out of the table of contents (default: true)
 externalLinks:
   - title: ""
     url: ""

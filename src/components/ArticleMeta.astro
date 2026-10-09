@@ -6,6 +6,7 @@ interface Props {
   updatedDate?: Date;
   category: string;
   tags?: string[];
+  keywords?: string[];
 }
 
 const {
@@ -13,6 +14,7 @@ const {
   updatedDate,
   category,
   tags = [],
+  keywords = [],
 } = Astro.props;
 ---
 
@@ -22,4 +24,5 @@ const {
 <meta property="article:author" content={siteConfig.author.name} />
 <meta property="article:section" content={category} />
 {tags.map((tag) => <meta property="article:tag" content={tag} />)}
+{keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
 

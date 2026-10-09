@@ -15,9 +15,7 @@ const blog = defineCollection({
     category: z.enum(["tutorial", "opinion", "project", "philosophy"]),
     tags: z.array(z.string()).default([]),
     keywords: z.array(z.string()).optional(),
-    showToc: z.boolean().default(false),
-    featured: z.boolean().default(false),
-    relatedPosts: z.array(z.string()).optional(),
+    showToc: z.boolean().default(true),
     externalLinks: z.array(z.object({
       title: z.string(),
       url: z.string(),

@@ -8,6 +8,7 @@ interface Props {
   pubDate?: Date;
   updatedDate?: Date;
   image?: string;
+  keywords?: string[];
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   pubDate,
   updatedDate,
   image,
+  keywords,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -58,6 +60,7 @@ if (type === "BlogPosting") {
       "@id": canonicalURL.href,
     },
     "url": canonicalURL.href,
+    ...(keywords?.length ? { "keywords": keywords } : {}),
   };
 } else if (type === "WebSite") {
   schema = {
