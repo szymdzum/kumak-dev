@@ -15,7 +15,7 @@
 ```bash
 deno task dev          # Dev server at localhost:4321
 deno task build        # Production build
-deno run -A dist/server/entry.mjs  # Run production server (port 8085)
+deno task preview      # Run the production build (dist/server/entry.mjs, port 8085)
 deno task check-all    # Lint + format check + astro check
 deno task fix          # Auto-fix lint and formatting
 deno task knip         # Unused files/deps
@@ -41,7 +41,7 @@ No test suite.
 - `src/site-config.ts` - Site metadata, `author: { name, handle }`, socials, Umami, Giscus
 - `src/content.config.ts` - Content collection (glob loader) + Zod schema from `astro/zod` (incl. `keywords`, `showToc` default `true`)
 - Path aliases (`deno.json` + `tsconfig.json`): `@components/*`, `@layouts/*`, `@utils/*`, `@styles/*`, `@/*`, `@site-config`
-- Post frontmatter/writing style: `.claude/blog-style.md`
+- Post frontmatter/writing style: `.claude/blog-style.md`; roadmap: `docs/FEATURES.md`
 
 ## CSS Architecture
 ```
@@ -68,8 +68,3 @@ Component <style>      → All component presentation
 - TypeScript strict, no `any` (`no-explicit-any` lint rule + astro check)
 - Use `src/utils/posts.ts` (`getAllPosts`) for content queries
 - Semantic HTML, WCAG AA accessibility
-
-## Documentation
-- `README.md` - Project overview
-- `.claude/blog-style.md` - Post writing style and frontmatter
-- `docs/FEATURES.md` - Feature ideas/roadmap

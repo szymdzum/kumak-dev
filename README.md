@@ -54,7 +54,7 @@ Run `npm install` once (installs Astro and the Husky pre-commit hook). All other
 | `deno task format`    | Format code with Deno                        |
 | `deno task knip`      | Find unused files and dependencies           |
 
-Run the production build locally with `deno run -A dist/server/entry.mjs`.
+Run the production build locally with `deno task preview` (port 8085).
 
 ## 🚀 Deployment
 
