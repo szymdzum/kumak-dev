@@ -1,6 +1,10 @@
-const UMAMI_URL = import.meta.env.UMAMI_URL ?? "https://analytics.kumak.dev";
-const WEBSITE_ID = import.meta.env.UMAMI_WEBSITE_ID ?? "9a78de62-6e9d-4d7b-8e0c-998a85550282";
-const SITE_ORIGIN = "https://kumak.dev";
+import { siteConfig } from "@/site-config";
+
+// UMAMI_URL override lets local builds point events at a test endpoint
+const UMAMI_URL = import.meta.env.UMAMI_URL ?? siteConfig.umami.url;
+const WEBSITE_ID = siteConfig.umami.websiteId;
+const SITE_ORIGIN = siteConfig.url;
+const SITE_HOSTNAME = new URL(siteConfig.url).hostname;
 const BROWSER_UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
@@ -27,7 +31,7 @@ function trackEvent(options: TrackEventOptions): void {
     type: "event",
     payload: {
       website: WEBSITE_ID,
-      hostname: "kumak.dev",
+      hostname: SITE_HOSTNAME,
       url,
       title,
       screen: "1920x1080",

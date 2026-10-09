@@ -9,20 +9,20 @@ interface Props {
 const { title, description } = Astro.props;
 ---
 
-<button class="share-button" data-title={title} data-description={description || ''} aria-label="Share this article">
+<button class="share-button" data-share data-title={title} data-description={description || ''} aria-label="Share this article">
   <Icon name="lucide:share-2" size={16} />
-  <span class="share-text">Share</span>
+  <span class="share-text" data-share-label>Share</span>
 </button>
 
 <script>
   function initShareButtons(): void {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.share-button');
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-share]');
 
     buttons.forEach((button) => {
       const title = button.dataset.title || document.title;
       const description = button.dataset.description || '';
       const url = window.location.href;
-      const textSpan = button.querySelector<HTMLSpanElement>('.share-text');
+      const textSpan = button.querySelector<HTMLSpanElement>('[data-share-label]');
 
       button.addEventListener('click', async () => {
         if (navigator.share) {
