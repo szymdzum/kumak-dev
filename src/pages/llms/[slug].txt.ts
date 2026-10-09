@@ -15,11 +15,13 @@ export const GET: APIRoute = async ({ params, request }) => {
     return new Response("Not found", { status: 404 });
   }
 
-  trackLlmsRequest(request, `/llms/${post.id}.txt`);
-
-  return llmsPost({
+  const tracked = trackLlmsRequest(request, `/llms/${post.id}.txt`);
+  const response = llmsPost({
     post,
     site: siteConfig.url,
     link: formatUrl(post.id),
   });
+
+  await tracked;
+  return response;
 };
