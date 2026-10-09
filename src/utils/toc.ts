@@ -12,7 +12,7 @@ function clearActiveStates(links: NodeListOf<HTMLAnchorElement>): void {
 function activateLink(link: HTMLAnchorElement, links: NodeListOf<HTMLAnchorElement>): void {
   clearActiveStates(links);
   link.classList.add("active");
-  link.setAttribute("aria-current", "true");
+  link.setAttribute("aria-current", "location");
 }
 
 function updateReadingProgress(
@@ -67,6 +67,9 @@ function initTableOfContents(): void {
       const data = id ? linkMap.get(id) : null;
       if (data) updateReadingProgress(data.index, tocList, tocItems);
 
+      if (location.hash !== `#${id}`) history.pushState(null, "", `#${id}`);
+      target.focus({ preventScroll: true });
+
       if (document.startViewTransition) {
         document.startViewTransition(() => {
           target.scrollIntoView({ behavior: "instant" });
@@ -92,7 +95,10 @@ function initTableOfContents(): void {
     { rootMargin: "-10% 0% -70% 0%" },
   );
 
-  headings.forEach((heading) => observer.observe(heading));
+  headings.forEach((heading) => {
+    heading.tabIndex = -1; // focus target for TOC links
+    observer.observe(heading);
+  });
 }
 
 document.addEventListener("astro:page-load", initTableOfContents);

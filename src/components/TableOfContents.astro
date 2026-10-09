@@ -18,7 +18,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
 {tocHeadings.length > 0 && (
   <nav data-toc aria-label="Table of contents">
     <div>
-      <span>On this page</span>
+      <h2>On this page</h2>
       <ul data-toc-list>
         <li>
           <a href="#top">{title}</a>
@@ -49,9 +49,9 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     top: var(--space-xl);
   }
 
-  span {
-    display: block;
+  h2 {
     font-family: var(--font-family-display);
+    font-size: inherit;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-muted);
     margin-bottom: var(--space-xs);
@@ -61,9 +61,6 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-
-  ul {
     position: relative;
   }
 
@@ -112,7 +109,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     color: var(--color-primary);
   }
 
-  @media (max-width: 1400px) {
+  @media (max-width: 1320px) {
     nav {
       display: none;
     }
