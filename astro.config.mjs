@@ -6,6 +6,7 @@ import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { readdirSync, readFileSync } from "node:fs";
 import { externalLinks } from "./src/utils/links.ts";
 
 // Patches for @deno/astro-adapter 0.6.0 server.ts. Remove once fixed upstream
@@ -38,13 +39,43 @@ const patchDenoAdapter = () => ({
   },
 });
 
+// Sitemap <lastmod> for posts. astro:content isn't available here, so read the
+// top-level scalar fields of each post's frontmatter block. Slug = file name.
+const BLOG_DIR = new URL("./src/content/blog/", import.meta.url);
+
+const readFrontmatter = (file) => {
+  const source = readFileSync(new URL(file, BLOG_DIR), "utf8");
+  const block = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? "";
+  return Object.fromEntries(
+    block.split(/\r?\n/).flatMap((line) => {
+      const [, key, value] = line.match(/^(\w+):\s*(.+?)\s*$/) ?? [];
+      return key ? [[key, value.replace(/^(["'])(.*)\1$/, "$2")]] : []; // strip quotes
+    }),
+  );
+};
+
+const postLastmod = new Map(
+  readdirSync(BLOG_DIR)
+    .filter((file) => /\.mdx?$/.test(file))
+    .map((file) => [file.replace(/\.mdx?$/, ""), readFrontmatter(file)])
+    .filter(([, fm]) => fm.draft !== "true")
+    .map(([slug, fm]) => [slug, new Date(fm.updatedDate ?? fm.pubDate)])
+    .filter(([, date]) => !Number.isNaN(date.getTime()))
+    .map(([slug, date]) => [slug, date.toISOString()]),
+);
+
+const withPostLastmod = (item) => {
+  const lastmod = postLastmod.get(new URL(item.url).pathname.replace(/^\/|\/$/g, ""));
+  return lastmod ? { ...item, lastmod } : item;
+};
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://kumak.dev",
   output: "server",
   adapter: deno(),
 
-  integrations: [mdx(), sitemap(), icon()],
+  integrations: [mdx(), sitemap({ serialize: withPostLastmod }), icon()],
 
   markdown: {
     shikiConfig: {
