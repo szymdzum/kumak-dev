@@ -2,10 +2,9 @@
 import { defineConfig } from "astro/config";
 import deno from "@deno/astro-adapter";
 import mdx from "@astrojs/mdx";
-import { unified } from "@astrojs/markdown-remark";
+import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
-import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { externalLinks } from "./src/utils/links.ts";
 
@@ -40,7 +39,7 @@ export default defineConfig({
     },
     processor: unified({
       rehypePlugins: [
-        rehypeSlug,
+        rehypeHeadingIds,
         [
           rehypeAutolinkHeadings,
           {
