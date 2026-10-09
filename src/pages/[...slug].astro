@@ -69,7 +69,7 @@ const readingTime = estimateReadingTime(post.body);
           </dl>
           <div class="action-buttons">
             <LlmsTxtButton slug={post.id} />
-            <CopyPageButton markdown={post.body} />
+            <CopyPageButton slug={post.id} />
             <ShareButton title={title} description={description} />
           </div>
         </div>

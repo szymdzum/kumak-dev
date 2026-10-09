@@ -34,14 +34,42 @@ interface LlmsPostConfig {
   link: string;
 }
 
-const MDX_PATTERNS = [
-  /^import\s+.+from\s+['"].+['"];?\s*$/gm,
-  /<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g,
-  /<[A-Z][a-zA-Z]*[^>]*\/>/g,
-] as const;
+const FENCE = /^\s*(`{3,}|~{3,})/;
+const MDX_IMPORT_EXPORT = /^(import|export)\s/;
+const INLINE_CODE = /(`[^`\n]*`)/;
+const JSX_TAG = /<\/?[A-Z][\w.]*(\s[^<>]*)?\/?>/g;
 
+/** Drops JSX component tags (keeping children) outside inline code spans. */
+function stripJsxTags(line: string): string {
+  return line
+    .split(INLINE_CODE)
+    .map((part, i) => (i % 2 ? part : part.replace(JSX_TAG, "")))
+    .join("");
+}
+
+/**
+ * Turns MDX into plain Markdown: removes top-level import/export lines and
+ * component tags (children are kept). Fenced code blocks are left untouched.
+ */
 function stripMdx(content: string): string {
-  return MDX_PATTERNS.reduce((text, pattern) => text.replace(pattern, ""), content).trim();
+  let fence: string | null = null;
+  const lines: string[] = [];
+
+  for (const line of content.split("\n")) {
+    const marker = line.match(FENCE)?.[1];
+
+    if (fence) {
+      if (marker && marker[0] === fence[0] && marker.length >= fence.length) fence = null;
+      lines.push(line);
+    } else if (marker) {
+      fence = marker;
+      lines.push(line);
+    } else if (!MDX_IMPORT_EXPORT.test(line)) {
+      lines.push(stripJsxTags(line));
+    }
+  }
+
+  return lines.join("\n").trim();
 }
 
 function doc(...sections: (string | string[])[]): Response {
