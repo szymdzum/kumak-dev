@@ -10,6 +10,9 @@ Analysis of potential blog features, prioritized by impact and effort.
 | Accessibility (WCAG AA) | Excellent |
 | Performance (static, prefetch, lazy) | Excellent |
 | Comments (Giscus) | Good |
+| LLM visibility (llms.txt, llms-full.txt, per-post .txt) | Good |
+| Analytics (Umami, client + server-side) | Good |
+| Social sharing (ShareButton, copy page) | Good |
 | Code experience (copy, syntax) | Good |
 | Design system (CSS variables) | Solid |
 
@@ -19,10 +22,8 @@ Analysis of potential blog features, prioritized by impact and effort.
 
 | Feature | Why | Effort |
 |---------|-----|--------|
-| **Reading Progress Bar** | Visual engagement, shows article length | ~1hr |
-| **Related Posts** | Schema field exists, just render it | ~2hr |
+| **Reading Progress Bar** | Visual engagement (TOC already shows progress) | ~1hr |
 | **Category Pages** | `/category/[slug]` archives, improves discoverability | ~3hr |
-| **Social Share Buttons** | Copy link, Twitter, LinkedIn at article footer | ~2hr |
 
 ### Tier 2: High Impact, Medium Effort
 
@@ -30,7 +31,6 @@ Analysis of potential blog features, prioritized by impact and effort.
 |---------|-----|--------|
 | **Search (Pagefind)** | Static search, no backend, great for Astro | ~4hr |
 | **Post Series** | Group related posts (e.g., "AI Agents" series) | ~4hr |
-| **Featured Posts Section** | `featured` field exists, show on homepage | ~2hr |
 | **Tag Pages** | `/tag/[slug]` for topic browsing | ~3hr |
 
 ### Tier 3: Engagement & Growth
@@ -48,19 +48,14 @@ Analysis of potential blog features, prioritized by impact and effort.
 |---------|-----|--------|
 | **BreadcrumbList Schema** | Improves SERP appearance | ~1hr |
 | **FAQ Schema** | If you add FAQ sections to posts | ~2hr |
-| **llms.txt** | AI crawler guidance for LLM visibility | ~1hr |
 | **Category RSS Feeds** | `/category/philosophy/rss.xml` for niche subscribers | ~2hr |
 
-## Top 5 Priorities
+## Top Priorities
 
 ### 1. Reading Progress Bar
 Sticky bar at top showing scroll progress. Minimal JS, high visual impact.
 
-### 2. Related Posts Component
-Schema field `relatedPosts: z.array(z.string()).optional()` already exists.
-Render 2-3 related posts at article end. Keeps readers on site.
-
-### 3. Search with Pagefind
+### 2. Search with Pagefind
 Static search index built at compile time. Zero runtime cost.
 Perfect for static Astro sites. Better UX than browser find.
 
@@ -68,11 +63,11 @@ Perfect for static Astro sites. Better UX than browser find.
 - https://pagefind.app/
 - https://docs.astro.build/en/guides/integrations-guide/pagefind/
 
-### 4. Category Archive Pages
+### 3. Category Archive Pages
 `/category/philosophy` lists all philosophy posts.
 Improves navigation, SEO, and content discoverability.
 
-### 5. Post Series Support
+### 4. Post Series Support
 Add `series: z.string().optional()` to schema.
 Render "Part 2 of AI Agents series" with prev/next navigation.
 
@@ -81,7 +76,6 @@ Render "Part 2 of AI Agents series" with prev/next navigation.
 | Feature | Why Skip |
 |---------|----------|
 | Dark/Light Toggle | Terminal aesthetic is intentional |
-| Analytics | Privacy-respecting blog, keep it simple |
 | Multiple Authors | Solo blog, unnecessary complexity |
 | Heavy Animations | Against minimalist ethos |
 | AI Chat | Gimmicky, not aligned with content focus |
@@ -89,7 +83,7 @@ Render "Part 2 of AI Agents series" with prev/next navigation.
 ## Implementation Plan
 
 ```
-Week 1: Reading progress + Related posts + Featured section
+Week 1: Reading progress bar
 Week 2: Category pages + Tag pages
 Week 3: Pagefind search
 Week 4: Post series + Newsletter signup
@@ -97,11 +91,9 @@ Week 4: Post series + Newsletter signup
 
 ## Technical Notes
 
-### Existing Schema Fields (Unused in UI)
-From `src/content/config.ts`:
-- `featured: z.boolean().default(false)` - not rendered on homepage
-- `relatedPosts: z.array(z.string()).optional()` - not rendered
-- `tags: z.array(z.string()).optional()` - no tag pages exist
+### Existing Schema Fields (Partly Used)
+From `src/content.config.ts`:
+- `tags: z.array(z.string()).default([])` - only emitted as `article:tag` meta; no tag pages exist
 
 ### Pagefind Integration
 ```bash

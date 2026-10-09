@@ -23,28 +23,6 @@
     "reveal": "always"
   },
   {
-    "label": "test: Run all tests",
-    "command": "deno",
-    "args": ["task", "test"],
-    "use_new_terminal": true,
-    "reveal": "always"
-  },
-  {
-    "label": "test:watch: Run tests in watch mode",
-    "command": "deno",
-    "args": ["task", "test:watch"],
-    "use_new_terminal": true,
-    "allow_concurrent_runs": false,
-    "reveal": "always"
-  },
-  {
-    "label": "test:coverage: Run tests with coverage",
-    "command": "deno",
-    "args": ["task", "test:coverage"],
-    "use_new_terminal": true,
-    "reveal": "always"
-  },
-  {
     "label": "lint: Lint code",
     "command": "deno",
     "args": ["task", "lint"],
@@ -59,23 +37,16 @@
     "reveal": "always"
   },
   {
-    "label": "check: Type check",
+    "label": "check: Lint + format check",
     "command": "deno",
     "args": ["task", "check"],
     "use_new_terminal": true,
     "reveal": "always"
   },
   {
-    "label": "check-all: Run all quality checks",
+    "label": "check-all: Lint + format + astro check",
     "command": "deno",
     "args": ["task", "check-all"],
-    "use_new_terminal": true,
-    "reveal": "always"
-  },
-  {
-    "label": "deploy: Deploy to production",
-    "command": "deno",
-    "args": ["task", "deploy"],
     "use_new_terminal": true,
     "reveal": "always"
   },
