@@ -20,18 +20,35 @@
     "noPropertyAccessFromIndexSignature": false,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
-    "baseUrl": ".",
     "paths": {
-      "@components/*": ["src/components/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@utils/*": ["src/utils/*"],
-      "@styles/*": ["src/styles/*"],
-      "@config/*": ["src/config/*"],
-      "@/*": ["src/*"],
-      "@site-config": ["src/site-config.ts"],
-      "@postSorter": ["src/utils/postSorter.ts"]
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@layouts/*": [
+        "./src/layouts/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ],
+      "@config/*": [
+        "./src/config/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "@site-config": [
+        "./src/site-config.ts"
+      ]
     },
-    "lib": ["deno.ns", "deno.window", "dom", "dom.iterable"],
+    "lib": [
+      "deno.ns",
+      "deno.window",
+      "dom",
+      "dom.iterable"
+    ],
     "types": [
       "astro/client"
     ]

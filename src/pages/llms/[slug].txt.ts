@@ -9,14 +9,14 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request }) => {
   const posts = await getAllPosts();
-  const post = posts.find((p) => p.slug === params.slug);
+  const post = posts.find((p) => p.id === params.slug);
 
   if (!post) {
     return new Response("Not found", { status: 404 });
   }
 
   trackLlmsRequest({
-    url: `/llms/${post.slug}.txt`,
+    url: `/llms/${post.id}.txt`,
     userAgent: request.headers.get("user-agent") ?? undefined,
     referrer: request.headers.get("referer") ?? undefined,
   });
@@ -24,6 +24,6 @@ export const GET: APIRoute = async ({ params, request }) => {
   return llmsPost({
     post,
     site: siteConfig.url,
-    link: formatUrl(post.slug),
+    link: formatUrl(post.id),
   });
 };

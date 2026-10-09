@@ -22,7 +22,7 @@ export async function getStaticPaths() {
     return import.meta.env.DEV || !data.draft;
   });
   return posts.map((post: BlogPost) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
     props: post,
   }));
 }
@@ -75,7 +75,7 @@ const readingTime = estimateReadingTime(post.body);
             <dd>{category}</dd>
           </dl>
           <div class="action-buttons">
-            <LlmsTxtButton slug={post.slug} />
+            <LlmsTxtButton slug={post.id} />
             <CopyPageButton markdown={post.body} />
             <ShareButton title={title} description={description} />
           </div>

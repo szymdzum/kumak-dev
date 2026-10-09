@@ -137,7 +137,7 @@ export function postsToLlmsItems(
   return posts.map((post) => ({
     title: post.data.title,
     description: post.data.description,
-    link: formatUrl(post.slug),
+    link: formatUrl(post.id),
   }));
 }
 

@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ site, request }) => {
       pubDate: post.data.pubDate,
       author: siteConfig.author,
       categories: [post.data.category],
-      link: formatUrl(post.slug),
+      link: formatUrl(post.id),
     })),
   });
 };

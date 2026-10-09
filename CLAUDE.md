@@ -2,38 +2,30 @@
 
 > **Context Efficiency Rule**: Keep responses short, precise, and simple. Minimize token usage while maintaining helpfulness. Avoid verbose explanations unless specifically requested.
 
-**Kumak's Blog** - Astro static blog on Deno Deploy Early Access, live at https://kumak.dev
+**Kumak's Blog** - Astro blog on Deno Deploy, live at https://kumak.dev
 
 ## Tech Stack
-- **Astro 5.13.7** static output, MDX integration
-- **Deno 2.x** runtime (JSR packages only)
-- **Deno Deploy EA** - `devblog` project, 6 regions, 9ms latency
-- **GitHub Actions** CI/CD with quality gates
+- **Astro 7** `output: "server"` + `@deno/astro-adapter`; pages prerendered, `rss.xml`/`llms*.txt`/404 on-demand (server-side Umami tracking)
+- **MDX** via `unified()` processor from `@astrojs/markdown-remark` (rehype plugins live in `markdown.processor`)
+- **Node 22.12+** for npm/Astro (`.nvmrc`), **Deno 2.x** for tasks, lint, fmt, runtime
+- **Deno Deploy** `devblog` project, GitHub integration (no Actions workflows)
+- `astro.config.mjs` has a Vite plugin patching an adapter 0.6.0 static-path bug — remove when fixed upstream
 
 ## Essential Commands
 ```bash
-# Development
-deno task dev          # Start dev server at localhost:4321
-deno task build        # Build for production
-deno task preview      # Preview production build
-
-# Quality Assurance  
-deno task check-all    # Astro check + lint + format
-deno task test         # Run tests
-deno task fix          # Auto-fix linting and formatting
-
-# Deployment (EA integrated)
-git push origin main   # Auto-deploy via GitHub Actions
+deno task dev          # Dev server at localhost:4321
+deno task build        # Production build
+deno run -A dist/server/entry.mjs  # Run production server (port 8085)
+deno task check-all    # Lint + format check
+deno task fix          # Auto-fix lint and formatting
+deno task knip         # Unused files/deps
+git push origin main   # Deploys via Deno Deploy GitHub integration
 ```
 
 ## Infrastructure
-
-**Deployment:**
-- **EA Project**: `devblog` on console.deno.com
 - **Domains**: kumak.dev, www.kumak.dev (Cloudflare proxy)
-- **SSL**: Let's Encrypt auto-renewal via EA
-- **Pipeline**: GitHub Actions → EA build → 6 regions
-- **Performance**: 0.00% error rate, <2min total deployment
+- **Analytics**: Umami at analytics.kumak.dev (`src/utils/analytics.ts`)
+- **Comments**: Giscus
 
 ## Architecture
 
@@ -46,7 +38,7 @@ git push origin main   # Auto-deploy via GitHub Actions
 
 **Configuration:**
 - `src/site-config.ts` - Site metadata and navigation
-- `src/content/config.ts` - Content schemas with Zod
+- `src/content.config.ts` - Content collection (glob loader) + Zod schema from `astro/zod`
 - Path aliases: `@components/*`, `@layouts/*`, `@utils/*`
 
 ## CSS Architecture
@@ -84,13 +76,11 @@ BaseLayout <style>         → Page layout + prose styles
 ## Development Requirements
 
 **Pre-commit (automated):**
-- Format check, lint (79 rules), tests (2/2 passing)
-- TypeScript validation, build verification
-- Auto-triggered on commit, blocks if failing
+- Husky: `deno fmt --check` + `deno lint` (no tests)
 
 **Standards:**
 - TypeScript strict, no `any` types
-- Use `PostsManager` for content queries  
+- Use `src/utils/posts.ts` helpers for content queries  
 - Semantic HTML, WCAG AA accessibility
 - Zero legacy dependencies (EA-only)
 
