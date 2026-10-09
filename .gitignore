@@ -94,3 +94,4 @@ Thumbs.db
 
 # Deno Deploy
 .deployctl
+.claude/worktrees/

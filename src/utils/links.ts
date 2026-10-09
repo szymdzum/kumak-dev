@@ -24,7 +24,7 @@ function applyExternalLinkAttributes(element: Element): void {
     element.properties = {};
   }
   element.properties.target = "_blank";
-  element.properties.rel = "noopener noreferrer";
+  element.properties.rel = ["noopener", "noreferrer"];
 }
 
 function walkTree(node: Root | RootContent, callback: NodeCallback): void {

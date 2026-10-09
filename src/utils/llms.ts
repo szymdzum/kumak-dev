@@ -126,15 +126,19 @@ export function llmsPost(config: LlmsPostConfig): Response {
   );
 }
 
+function toLlmsItem(post: BlogPost, formatUrl: (slug: string) => string): LlmsItem {
+  return {
+    title: post.data.title,
+    description: post.data.description,
+    link: formatUrl(post.id),
+  };
+}
+
 export function postsToLlmsItems(
   posts: BlogPost[],
   formatUrl: (slug: string) => string,
 ): LlmsItem[] {
-  return posts.map((post) => ({
-    title: post.data.title,
-    description: post.data.description,
-    link: formatUrl(post.id),
-  }));
+  return posts.map((post) => toLlmsItem(post, formatUrl));
 }
 
 export function postsToLlmsFullItems(
@@ -142,7 +146,7 @@ export function postsToLlmsFullItems(
   formatUrl: (slug: string) => string,
 ): LlmsFullItem[] {
   return posts.map((post) => ({
-    ...postsToLlmsItems([post], formatUrl)[0],
+    ...toLlmsItem(post, formatUrl),
     pubDate: post.data.pubDate,
     category: post.data.category,
     body: post.body ?? "",

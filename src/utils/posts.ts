@@ -13,7 +13,7 @@ function countWords(text: string): number {
 }
 
 export async function getAllPosts(): Promise<BlogPost[]> {
-  const posts = await getCollection("blog", ({ data }) => {
+  const posts = await getCollection("blog", ({ data }: BlogPost) => {
     return import.meta.env.DEV || !data.draft;
   });
   return posts.sort(sortByDateDescending);
