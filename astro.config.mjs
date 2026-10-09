@@ -9,20 +9,33 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { externalLinks } from "./src/utils/links.ts";
 
-// @deno/astro-adapter 0.6.0 + Astro 7: app.removeBase() keeps the leading slash, producing
-// "client//about/" so the prerendered index.html fallback never matches and every static page 404s.
-// Remove once fixed upstream (denoland/deno-astro-adapter).
-const fixDenoAdapterStaticPaths = () => ({
-  name: "fix-deno-adapter-static-paths",
+// Patches for @deno/astro-adapter 0.6.0 server.ts. Remove once fixed upstream
+// (denoland/deno-astro-adapter); the build fails loudly if the adapter code changes.
+const DENO_ADAPTER_PATCHES = [
+  // Astro 7: app.removeBase() keeps the leading slash, producing "client//about/" so the
+  // prerendered index.html fallback never matches and every static page 404s.
+  [
+    '"./" + app.removeBase(url.pathname)',
+    '"./" + app.removeBase(url.pathname).replace(/^\\/+/, "")',
+  ],
+  // Paths longer than the filesystem limit make stat() throw ENAMETOOLONG -> HTTP 500.
+  // Treat any lookup error as "no static file" so the 404 page renders.
+  [
+    "await serveFile(request, fromFileUrl(localPath))",
+    "await serveFile(request, fromFileUrl(localPath)).catch(() => new Response(null, { status: 404 }))",
+  ],
+];
+
+const patchDenoAdapter = () => ({
+  name: "patch-deno-adapter",
   transform(code, id) {
     if (!id.includes("@deno/astro-adapter/src/server.ts")) return;
-    const target = '"./" + app.removeBase(url.pathname)';
-    if (!code.includes(target)) {
-      throw new Error(
-        "fix-deno-adapter-static-paths: adapter changed, re-check if patch is needed",
-      );
-    }
-    return code.replace(target, '"./" + app.removeBase(url.pathname).replace(/^\\/+/, "")');
+    return DENO_ADAPTER_PATCHES.reduce((patched, [target, replacement]) => {
+      if (!patched.includes(target)) {
+        throw new Error(`patch-deno-adapter: "${target}" not found, re-check if patch is needed`);
+      }
+      return patched.replace(target, replacement);
+    }, code);
   },
 });
 
@@ -74,7 +87,7 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [fixDenoAdapterStaticPaths()],
+    plugins: [patchDenoAdapter()],
     build: {
       cssMinify: true,
     },

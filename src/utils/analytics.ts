@@ -20,7 +20,7 @@ interface TrackEventOptions {
  * to pass bot detection. The actual client User-Agent is stored in
  * event data for analysis.
  */
-export function trackEvent(options: TrackEventOptions): void {
+function trackEvent(options: TrackEventOptions): void {
   const { eventName, url, title, userAgent, referrer } = options;
 
   const payload = {
@@ -82,4 +82,15 @@ export function trackLlmsRequest(request: Request, url: string): void {
 
 export function trackRssRequest(request: Request): void {
   trackRequest(request, "rss-fetch", "RSS Feed", "/rss.xml");
+}
+
+const MAX_404_PATH_LENGTH = 200;
+// Vulnerability scanners probing for dotfiles, PHP/WordPress, CGI and admin panels
+const SCANNER_PATH = /(^|\/)\.|\.php\b|wp-|cgi-bin|phpmyadmin/i;
+const BOT_UA = /bot|crawl|spider|slurp|curl|wget|python|go-http|scan/i;
+
+export function track404Request(request: Request, pathname: string): void {
+  const userAgent = request.headers.get("user-agent") ?? "";
+  if (SCANNER_PATH.test(pathname) || BOT_UA.test(userAgent)) return;
+  trackRequest(request, "404-not-found", "404 Not Found", pathname.slice(0, MAX_404_PATH_LENGTH));
 }
