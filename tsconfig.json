@@ -33,9 +33,6 @@
       "@styles/*": [
         "./src/styles/*"
       ],
-      "@config/*": [
-        "./src/config/*"
-      ],
       "@/*": [
         "./src/*"
       ],

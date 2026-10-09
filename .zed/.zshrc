@@ -6,7 +6,6 @@
 # Project-specific Deno tasks
 alias dev='deno task dev'
 alias build='deno task build'
-alias test='deno task test'
 alias lint='deno task lint'
 alias format='deno task format'
 alias check='deno task check-all'

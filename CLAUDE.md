@@ -8,94 +8,68 @@
 - **Astro 7** `output: "server"` + `@deno/astro-adapter`; pages prerendered, `rss.xml`/`llms*.txt`/404 on-demand (server-side Umami tracking)
 - **MDX** via `unified()` processor from `@astrojs/markdown-remark` (rehype plugins live in `markdown.processor`)
 - **Node 22.12+** for npm/Astro (`.nvmrc`), **Deno 2.x** for tasks, lint, fmt, runtime
-- **Deno Deploy** `szymdzum/kumak-dev` project, GitHub integration (no Actions workflows); build status visible via `gh api repos/szymdzum/kumak-dev/commits/<sha>/statuses`
-- `astro.config.mjs` has a Vite plugin patching an adapter 0.6.0 static-path bug — remove when fixed upstream
+- **Deno Deploy** `szymdzum/kumak-dev` project, GitHub integration builds and deploys; build status via `gh api repos/szymdzum/kumak-dev/commits/<sha>/statuses`
+- **GitHub Actions** `.github/workflows/check.yml` runs `check-all` + `build` on PRs and `main` (no deploy step)
 
 ## Essential Commands
 ```bash
 deno task dev          # Dev server at localhost:4321
 deno task build        # Production build
 deno run -A dist/server/entry.mjs  # Run production server (port 8085)
-deno task check-all    # Lint + format check
+deno task check-all    # Lint + format check + astro check
 deno task fix          # Auto-fix lint and formatting
 deno task knip         # Unused files/deps
 git push origin main   # Deploys via Deno Deploy GitHub integration
 ```
+No test suite.
 
 ## Infrastructure
 - **Domains**: kumak.dev, www.kumak.dev (Cloudflare proxy)
-- **Analytics**: Umami at analytics.kumak.dev (`src/utils/analytics.ts`)
-- **Comments**: Giscus
+- **Analytics**: Umami at analytics.kumak.dev (`siteConfig.umami`). Client script + `window.track` in `Head.astro`; server events in `src/utils/analytics.ts` (skip prefetch requests; internal links to tracked endpoints use `data-astro-prefetch="false"`). Optional `UMAMI_URL` env override.
+- **Comments**: Giscus (`siteConfig.giscus`)
 
 ## Architecture
-
-**Structure:**
-- `src/components/` - 6 components (Footer, FormattedDate, Head, Header, Hero, PostCard)
-- `src/layouts/` - BaseLayout only
-- `src/pages/` - 4 pages (index, about, [...slug], rss.xml)
-- `src/content/blog/` - Markdown/MDX blog posts
-- `src/utils/` - path.ts (navigation helpers)
+- `src/components/` - Astro components (NavBar, Footer, Head, SchemaOrg, Hero, BlogPostCard, ArticleMeta, ArticleFooter, TableOfContents, TldrBox, CodeBlock, CopyPageButton, ShareButton, LlmsTxt*, Giscus, ScrollDepthTracker, ...)
+- `src/layouts/BaseLayout.astro` - Only layout
+- `src/pages/` - index, about, `[...slug]`, 404, `rss.xml.ts`, `llms.txt.ts`, `llms-full.txt.ts`, `llms/[slug].txt.ts`
+- `src/content/blog/` - MDX posts (file name = slug)
+- `src/utils/` - analytics, links (external-link rehype plugin), llms, path, posts, toc
+- `src/styles/` - `global.css`, `prose.css`
+- `astro.config.mjs` - Vite plugin patching `@deno/astro-adapter` 0.6.0 (remove when fixed upstream); sitemap `lastmod` from post frontmatter
 
 **Configuration:**
-- `src/site-config.ts` - Site metadata and navigation
-- `src/content.config.ts` - Content collection (glob loader) + Zod schema from `astro/zod`
-- Path aliases: `@components/*`, `@layouts/*`, `@utils/*`
+- `src/site-config.ts` - Site metadata, `author: { name, handle }`, socials, Umami, Giscus
+- `src/content.config.ts` - Content collection (glob loader) + Zod schema from `astro/zod` (incl. `keywords`, `showToc` default `true`)
+- Path aliases (`deno.json` + `tsconfig.json`): `@components/*`, `@layouts/*`, `@utils/*`, `@styles/*`, `@/*`, `@site-config`
+- Post frontmatter/writing style: `.claude/blog-style.md`
 
 ## CSS Architecture
-
-**Clear Responsibility Model:**
 ```
-global.css (248 lines)     → Design tokens + reset + utilities ONLY
-Component <style>          → All component presentation
-BaseLayout <style>         → Page layout + prose styles
+src/styles/global.css  → Design tokens + reset + utilities (imported in Head.astro)
+src/styles/prose.css   → Article/prose styles (imported in BaseLayout)
+Component <style>      → All component presentation
 ```
-
-**Decision Tree:**
-- CSS variable/token? → `global.css`
-- Reset rule? → `global.css`
-- Utility class? → `global.css`
-- Component-specific? → Component `<style>` block
-- Page layout/prose? → `BaseLayout <style is:global>`
 
 **Rules:**
-- ✅ All component styles in scoped `<style>` blocks
-- ✅ Use design tokens from global.css (--space-*, --color-*, --text-*)
-- ✅ Prefer element selectors in scoped styles (no class noise)
-- ✅ Use `data-*` attributes for JS hooks (not classes)
-- ❌ NO component styles in global.css
-- ❌ NO element selectors in global (h1, nav, article)
-- ❌ NO inline styles
-- ❌ NO classes unless required for JS or complex selectors
+- All component styles in scoped `<style>` blocks; no component styles in global.css
+- Use design tokens; no magic numbers, no inline styles
+- Prefer element selectors in scoped styles; classes only when required
+- `data-*` attributes for JS hooks (e.g. `data-share`, `data-toc`, `data-codeblock-copy`), not classes
 
-**Design Tokens:**
-- Spacing: `--space-xs` through `--space-3xl` (harmonic 1.25 scale)
-- Typography: `--text-xs` through `--text-3xl`
-- Colors: `--color-text`, `--color-primary`, `--color-bg` (dark theme support)
-- Rhythm: `--rhythm-quarter`, `--rhythm-half`, `--rhythm-single`
+**Design Tokens (global.css):**
+- Spacing: `--space-3xs` … `--space-3xl`
+- Typography: `--text-xs` … `--text-3xl`
+- Colors: `--color-text*`, `--color-bg*`, `--color-border*`, `--color-primary*`, `--color-accent*` (dark theme support)
+- Rhythm: `--rhythm-quarter` … `--rhythm-2-5x`
 
 ## Development Requirements
-
-**Pre-commit (automated):**
-- Husky: `deno fmt --check` + `deno lint` (no tests)
-
-**Standards:**
-- TypeScript strict, no `any` types
-- Use `src/utils/posts.ts` helpers for content queries  
+- **Pre-commit** (Husky): `deno fmt --check`, `deno lint`, `deno task typecheck` (astro check; uses `.nvmrc` Node if nvm present)
+- **CI**: same checks + build
+- TypeScript strict, no `any` (`no-explicit-any` lint rule + astro check)
+- Use `src/utils/posts.ts` (`getAllPosts`) for content queries
 - Semantic HTML, WCAG AA accessibility
-- Zero legacy dependencies (EA-only)
-
-## Hooks Configuration
-- **Type Safety**: Pre/post-tool hooks reject `any` types
-- **Cleanup**: Automated code cleanup via `.claude/hooks/`
-- **Quality Gates**: Enforced via `.claude/settings.json`
 
 ## Documentation
-
-**Available:**
-- `CURRENT_CONFIG.md` - Complete infrastructure documentation
-- `WARP.md` - Warp terminal integration guide  
 - `README.md` - Project overview
-
-**Code Style:**
-- `.claude/code-guide.md` - TypeScript/Astro patterns
-- Token efficient, minimal comments
+- `.claude/blog-style.md` - Post writing style and frontmatter
+- `docs/FEATURES.md` - Feature ideas/roadmap

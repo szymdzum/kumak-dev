@@ -32,38 +32,5 @@
       "uriFormat": "%s",
       "action": "openExternally"
     }
-  },
-  {
-    "adapter": "pwa-node",
-    "label": "Debug Deno Tests",
-    "mode": "launch",
-    "name": "Debug Deno Tests",
-    "type": "pwa-node",
-    "request": "launch",
-    "program": "deno",
-    "args": [
-      "test",
-      "--inspect-wait=127.0.0.1:9229",
-      "--allow-all",
-      "${workspaceFolder}/tests/"
-    ],
-    "console": "integratedTerminal",
-    "env": {
-      "DENO_DIR": "${env:HOME}/.cache/deno"
-    }
-  },
-  {
-    "adapter": "pwa-node",
-    "label": "Debug Specific Test File",
-    "mode": "launch",
-    "name": "Debug Specific Test File",
-    "type": "pwa-node",
-    "request": "launch",
-    "program": "deno",
-    "args": ["test", "--inspect-wait=127.0.0.1:9229", "--allow-all", "${file}"],
-    "console": "integratedTerminal",
-    "env": {
-      "DENO_DIR": "${env:HOME}/.cache/deno"
-    }
   }
 ]
