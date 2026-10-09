@@ -27,6 +27,12 @@ export const siteConfig = {
     },
   },
 
+  // Umami analytics (client script in Head, server-side events in utils/analytics)
+  umami: {
+    url: "https://analytics.kumak.dev",
+    websiteId: "9a78de62-6e9d-4d7b-8e0c-998a85550282",
+  },
+
   // Giscus comments configuration
   giscus: {
     repo: "szymdzum/kumak-dev",

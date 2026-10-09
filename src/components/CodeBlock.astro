@@ -5,8 +5,8 @@ import type { HTMLAttributes } from 'astro/types';
 type Props = HTMLAttributes<'pre'>;
 ---
 
-<div class="codeblock">
-  <button class="codeblock-copy" type="button" aria-label="Copy code to clipboard">
+<div class="codeblock" data-codeblock>
+  <button class="codeblock-copy" type="button" aria-label="Copy code to clipboard" data-codeblock-copy>
     <Icon name="lucide:copy" class="copy-icon" size={20} />
     <Icon name="lucide:check" class="check-icon" size={20} />
   </button>
@@ -65,15 +65,15 @@ type Props = HTMLAttributes<'pre'>;
     position: absolute;
   }
 
-  .codeblock-copy.copied .copy-icon {
+  .codeblock-copy[data-copied] .copy-icon {
     opacity: 0;
   }
 
-  .codeblock-copy.copied .check-icon {
+  .codeblock-copy[data-copied] .check-icon {
     opacity: 1;
   }
 
-  .codeblock-copy.copied {
+  .codeblock-copy[data-copied] {
     color: var(--color-primary);
     border-color: var(--color-primary);
   }
@@ -81,8 +81,8 @@ type Props = HTMLAttributes<'pre'>;
 
 <script>
   function initCopyButtons(): void {
-    document.querySelectorAll<HTMLElement>('.codeblock').forEach((block) => {
-      const button = block.querySelector<HTMLButtonElement>('.codeblock-copy');
+    document.querySelectorAll<HTMLElement>('[data-codeblock]').forEach((block) => {
+      const button = block.querySelector<HTMLButtonElement>('[data-codeblock-copy]');
       const pre = block.querySelector<HTMLPreElement>('pre');
 
       if (!button || !pre) return;
@@ -96,8 +96,8 @@ type Props = HTMLAttributes<'pre'>;
 
         try {
           await navigator.clipboard.writeText(code);
-          newButton.classList.add('copied');
-          setTimeout(() => newButton.classList.remove('copied'), 2000);
+          newButton.dataset.copied = '';
+          setTimeout(() => delete newButton.dataset.copied, 2000);
           track.codeCopy();
         } catch (err) {
           console.error('Failed to copy code:', err);

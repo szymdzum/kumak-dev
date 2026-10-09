@@ -30,8 +30,7 @@
       "dist/",
       "node_modules/",
       ".astro/",
-      "coverage/",
-      "src/utils/toc.ts"
+      "coverage/"
     ],
     "rules": {
       "tags": [
@@ -46,7 +45,6 @@
         "no-explicit-any",
         "no-sparse-arrays",
         "no-throw-literal",
-        "no-undef",
         "no-unreachable",
         "no-unused-vars",
         "prefer-const"
