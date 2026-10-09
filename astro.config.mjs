@@ -24,6 +24,11 @@ const DENO_ADAPTER_PATCHES = [
     "await serveFile(request, fromFileUrl(localPath))",
     "await serveFile(request, fromFileUrl(localPath)).catch(() => new Response(null, { status: 404 }))",
   ],
+  // serveFile sets no Cache-Control. /_astro/ is content-hashed; /fonts/ files never change.
+  [
+    "return fileResp;",
+    'if (/^\\/(_astro|fonts)\\//.test(url.pathname)) fileResp.headers.set("Cache-Control", "public, max-age=31536000, immutable"); return fileResp;',
+  ],
 ];
 
 const patchDenoAdapter = () => ({
