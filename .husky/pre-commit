@@ -1,23 +1,29 @@
 #!/usr/bin/env sh
 
-# Pre-commit quality gates (< 2 seconds)
-# Full build and type checking deferred to CI
+# Pre-commit quality gates (~6 seconds). Build runs in CI and on Deno Deploy.
+
+# Use the Node pinned in .nvmrc when nvm is installed (astro check needs Node >= 22.12)
+NVM_NODE="$HOME/.nvm/versions/node/v$(cat .nvmrc 2>/dev/null)/bin"
+[ -d "$NVM_NODE" ] && export PATH="$NVM_NODE:$PATH"
 
 echo "🔍 Running pre-commit checks..."
 
-# Format check (~ 70ms)
 echo "  → Checking formatting..."
 deno fmt --check || {
   echo "❌ Formatting check failed. Run 'deno task fix' to auto-fix."
   exit 1
 }
 
-# Lint (~ 23ms)
 echo "  → Running linter..."
 deno lint || {
   echo "❌ Linting failed. Run 'deno task fix' to auto-fix common issues."
   exit 1
 }
 
+echo "  → Type checking..."
+deno task typecheck || {
+  echo "❌ Type check failed."
+  exit 1
+}
+
 echo "✅ Pre-commit checks passed!"
-echo "💡 Build and full type checking will run in CI."

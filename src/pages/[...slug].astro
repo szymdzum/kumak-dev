@@ -12,15 +12,13 @@ import ArticleFooter from "@components/ArticleFooter.astro";
 import FurtherReading from "@components/FurtherReading.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import ScrollDepthTracker from "@components/ScrollDepthTracker.astro";
-import { getCollection, render } from "astro:content";
-import { estimateReadingTime, type BlogPost } from "@utils/posts";
+import { render } from "astro:content";
+import { type BlogPost, estimateReadingTime, getAllPosts } from "@utils/posts";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }: BlogPost) => {
-    return import.meta.env.DEV || !data.draft;
-  });
+  const posts = await getAllPosts();
   return posts.map((post: BlogPost) => ({
     params: { slug: post.id },
     props: post,
