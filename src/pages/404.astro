@@ -2,17 +2,9 @@
 export const prerender = false;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { trackEvent } from "@utils/analytics";
+import { track404Request } from "@utils/analytics";
 
-const referrer = Astro.request.headers.get("referer") ?? "";
-const requestedPath = Astro.url.pathname;
-
-trackEvent({
-  eventName: "404-not-found",
-  url: requestedPath,
-  title: "404 Not Found",
-  referrer,
-});
+track404Request(Astro.request, Astro.url.pathname);
 ---
 
 <BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist.">
