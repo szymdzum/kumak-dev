@@ -50,7 +50,10 @@ const { slug } = Astro.props;
       label.textContent = 'Copy';
     };
 
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+
     button.addEventListener('click', async () => {
+      clearTimeout(resetTimer);
       try {
         await copyFrom(url);
         button.classList.add('copied');
@@ -60,7 +63,7 @@ const { slug } = Astro.props;
         console.error('Failed to copy:', err);
         label.textContent = 'Failed';
       }
-      setTimeout(reset, RESET_DELAY);
+      resetTimer = setTimeout(reset, RESET_DELAY);
     });
   }
 

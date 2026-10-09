@@ -34,8 +34,10 @@ interface LlmsPostConfig {
   link: string;
 }
 
-const FENCE = /^\s*(`{3,}|~{3,})/;
-const MDX_IMPORT_EXPORT = /^(import|export)\s/;
+// CommonMark fences: up to 3 spaces of indent; a closing fence has no info string
+const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/;
+const MDX_IMPORT_EXPORT =
+  /^(import\s.+\sfrom\s+["']|import\s+["']|export\s+(const|let|default|function|\{))/;
 const INLINE_CODE = /(`[^`\n]*`)/;
 const JSX_TAG = /<\/?[A-Z][\w.]*(\s[^<>]*)?\/?>/g;
 
@@ -56,10 +58,12 @@ function stripMdx(content: string): string {
   const lines: string[] = [];
 
   for (const line of content.split("\n")) {
-    const marker = line.match(FENCE)?.[1];
+    const [, marker, info = ""] = line.match(FENCE) ?? [];
 
     if (fence) {
-      if (marker && marker[0] === fence[0] && marker.length >= fence.length) fence = null;
+      const closes = marker !== undefined && marker[0] === fence[0] &&
+        marker.length >= fence.length && !info.trim();
+      if (closes) fence = null;
       lines.push(line);
     } else if (marker) {
       fence = marker;
