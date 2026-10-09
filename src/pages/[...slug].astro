@@ -30,7 +30,7 @@ type Props = BlogPost;
 const post = Astro.props;
 const { Content, headings } = await render(post);
 
-const { title, description, pubDate, updatedDate, category, tags, heroImage, externalLinks } = post.data;
+const { title, description, pubDate, updatedDate, category, tags, heroImage, externalLinks, keywords, showToc } = post.data;
 
 const readingTime = estimateReadingTime(post.body);
 ---
@@ -41,6 +41,7 @@ const readingTime = estimateReadingTime(post.body);
     updatedDate={updatedDate}
     category={category}
     tags={tags}
+    keywords={keywords}
     slot="head"
   />
   <SchemaOrg
@@ -50,6 +51,7 @@ const readingTime = estimateReadingTime(post.body);
     pubDate={pubDate}
     updatedDate={updatedDate}
     image={heroImage}
+    keywords={keywords}
     slot="head"
   />
   <div class="article-layout">
@@ -81,7 +83,7 @@ const readingTime = estimateReadingTime(post.body);
       <ArticleFooter />
       <Giscus />
     </article>
-    <TableOfContents headings={headings} title={title} />
+    {showToc && <TableOfContents headings={headings} title={title} />}
   </div>
   <ScrollDepthTracker />
 </BaseLayout>
