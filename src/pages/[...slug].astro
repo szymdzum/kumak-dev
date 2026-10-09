@@ -9,6 +9,7 @@ import LlmsTxtButton from "@components/LlmsTxtButton.astro";
 import SchemaOrg from "@components/SchemaOrg.astro";
 import ArticleMeta from "@components/ArticleMeta.astro";
 import ArticleFooter from "@components/ArticleFooter.astro";
+import PageHeader from "@components/PageHeader.astro";
 import FurtherReading from "@components/FurtherReading.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import ScrollDepthTracker from "@components/ScrollDepthTracker.astro";
@@ -56,17 +57,16 @@ const readingTime = estimateReadingTime(post.body);
   />
   <div class="article-layout">
     <article>
-      <header>
-        <h1 id="top">{title}</h1>
+      <PageHeader title={title} id="top">
         <div class="meta-row">
           <dl>
-            <dt>Published</dt>
+            <dt class="sr-only">Published</dt>
             <dd>
               <DateFormatter date={pubDate} />
             </dd>
-            <dt>Reading time</dt>
+            <dt class="sr-only">Reading time</dt>
             <dd><data value={readingTime}>{readingTime} min read</data></dd>
-            <dt>Category</dt>
+            <dt class="sr-only">Category</dt>
             <dd>{category}</dd>
           </dl>
           <div class="action-buttons">
@@ -75,7 +75,7 @@ const readingTime = estimateReadingTime(post.body);
             <ShareButton title={title} description={description} />
           </div>
         </div>
-      </header>
+      </PageHeader>
       <div class="prose">
         <Content components={{ pre: CodeBlock }} />
       </div>
@@ -93,31 +93,15 @@ const readingTime = estimateReadingTime(post.body);
     position: relative;
   }
 
-  header {
-    margin-bottom: var(--space-xl);
-    padding-bottom: calc(var(--space-xs) * 0.5);
-    border-bottom: var(--border-width) solid var(--color-border);
-  }
-
-  header h1 {
-    font-family: var(--font-family-display);
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-tighter);
-    word-spacing: var(--word-spacing-tight);
-    text-wrap: balance;
-    margin-bottom: var(--space-md);
-  }
-
   .meta-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-xs);
+    margin-top: var(--space-md);
   }
 
-  header dl {
+  dl {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -127,28 +111,17 @@ const readingTime = estimateReadingTime(post.body);
     margin: 0;
   }
 
-  header dt {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-  }
-
-  header dd {
+  dd {
     margin: 0;
   }
 
-  header dd + dd::before {
+  dd + dd::before {
     content: "·";
     margin-right: var(--space-xs);
     color: var(--color-text-subtle);
   }
 
-  header dd:last-of-type {
+  dd:last-of-type {
     color: var(--color-primary);
     text-transform: capitalize;
     font-weight: var(--font-weight-medium);
@@ -157,11 +130,5 @@ const readingTime = estimateReadingTime(post.body);
   .action-buttons {
     display: flex;
     gap: var(--space-md);
-  }
-
-  @media (max-width: 480px) {
-    header h1 {
-      font-size: var(--text-xl);
-    }
   }
 </style>

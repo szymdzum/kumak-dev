@@ -59,8 +59,8 @@ Component <style>      → All component presentation
 **Design Tokens (global.css):**
 - Spacing: `--space-3xs` … `--space-3xl`
 - Typography: `--text-xs` … `--text-3xl`
-- Colors: `--color-text*`, `--color-bg*`, `--color-border*`, `--color-primary*`, `--color-accent*` (dark theme support)
-- Rhythm: `--rhythm-quarter` … `--rhythm-2-5x`
+- Colors: `--color-text*`, `--color-bg*`, `--color-border*`, `--color-primary*`, `--color-highlight*`
+- Rhythm: `--rhythm-quarter` … `--rhythm-double`
 
 ## Development Requirements
 - **Pre-commit** (Husky): `deno fmt --check`, `deno lint`, `deno task typecheck` (astro check; uses `.nvmrc` Node if nvm present)

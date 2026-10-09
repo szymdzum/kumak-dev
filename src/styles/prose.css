@@ -142,12 +142,12 @@
 }
 
 .prose pre::-webkit-scrollbar-thumb {
-  background: #eedb96;
+  background: var(--color-highlight);
   border-radius: var(--radius-sm);
 }
 
 .prose pre::-webkit-scrollbar-thumb:hover {
-  background: #f5e6b3;
+  background: var(--color-highlight-hover);
 }
 
 /* Override Shiki theme colors for WCAG AA contrast (4.5:1) */
@@ -177,7 +177,7 @@
 
 /* Blockquotes */
 .prose blockquote {
-  border-left: calc(var(--border-width-thick) * 2) solid #eedb96;
+  border-left: calc(var(--border-width-thick) * 2) solid var(--color-highlight);
   padding-left: var(--space-lg);
   padding-top: var(--space-md);
   padding-bottom: var(--space-md);
