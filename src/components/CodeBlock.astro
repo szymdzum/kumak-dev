@@ -88,21 +88,19 @@ type Props = HTMLAttributes<'pre'>;
 
       if (!button || !pre) return;
 
-      const newButton = button.cloneNode(true) as HTMLButtonElement;
-      button.replaceWith(newButton);
-      const idleLabel = newButton.getAttribute('aria-label');
+      const idleLabel = button.getAttribute('aria-label');
 
-      newButton.addEventListener('click', async () => {
+      button.addEventListener('click', async () => {
         const code = pre.textContent?.trim();
         if (!code) return;
 
         try {
           await navigator.clipboard.writeText(code);
-          newButton.dataset.copied = '';
-          newButton.setAttribute('aria-label', 'Copied to clipboard');
+          button.dataset.copied = '';
+          button.setAttribute('aria-label', 'Copied to clipboard');
           setTimeout(() => {
-            delete newButton.dataset.copied;
-            if (idleLabel) newButton.setAttribute('aria-label', idleLabel);
+            delete button.dataset.copied;
+            if (idleLabel) button.setAttribute('aria-label', idleLabel);
           }, 2000);
           track.codeCopy();
         } catch (err) {

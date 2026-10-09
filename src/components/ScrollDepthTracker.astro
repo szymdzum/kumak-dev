@@ -2,33 +2,38 @@
 // Tracks scroll depth milestones (25%, 50%, 75%, 100%) for article engagement
 ---
 
-<script>
-  document.addEventListener('astro:page-load', () => {
-    const milestones = [25, 50, 75, 100];
-    const tracked = new Set<number>();
+<template data-scroll-depth></template>
 
-    function getScrollPercent(): number {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      return docHeight <= 0 ? 100 : Math.round((window.scrollY / docHeight) * 100);
-    }
+<script>
+  const MILESTONES = [25, 50, 75, 100];
+
+  function getScrollPercent(): number {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    return docHeight <= 0 ? 100 : Math.round((window.scrollY / docHeight) * 100);
+  }
+
+  // One tracker per page view. The listener stops once every milestone is hit or
+  // before the ClientRouter swaps in the next page, so nothing leaks across navigations.
+  document.addEventListener('astro:page-load', () => {
+    if (!document.querySelector('[data-scroll-depth]')) return;
+
+    const tracked = new Set<number>();
+    const controller = new AbortController();
 
     function checkMilestones(): void {
       const percent = getScrollPercent();
-      for (const m of milestones) {
+      for (const m of MILESTONES) {
         if (percent >= m && !tracked.has(m)) {
           tracked.add(m);
           track.scroll(m);
         }
       }
+      if (tracked.size === MILESTONES.length) controller.abort();
     }
 
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => { checkMilestones(); ticking = false; });
-        ticking = true;
-      }
-    });
+    window.addEventListener('scroll', checkMilestones, { passive: true, signal: controller.signal });
+    document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
+
     checkMilestones();
   });
 </script>
