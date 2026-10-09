@@ -17,12 +17,13 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
             rel={isExternal ? "noopener noreferrer" : undefined}
             aria-label={isExternal ? `${siteConfig.author} on ${social.name}` : `Subscribe via ${social.name}`}
             data-social={isExternal ? key : undefined}
+            data-astro-prefetch="false"
           >
             <Icon name={`lucide:${key}`} size={24} />
           </a>
         );
       })}
-      <a href="/llms-full.txt" aria-label="LLMs.txt full content">
+      <a href="/llms-full.txt" aria-label="LLMs.txt full content" data-astro-prefetch="false">
         <LlmsTxtIcon />
       </a>
     </nav>

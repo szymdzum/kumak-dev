@@ -9,7 +9,12 @@ const { slug } = Astro.props;
 const href = `/llms/${slug}.txt`;
 ---
 
-<a href={href} class="llms-button" aria-label="View LLM-friendly version">
+<a
+  href={href}
+  class="llms-button"
+  aria-label="View LLM-friendly version"
+  data-astro-prefetch="false"
+>
   <LlmsTxtIcon size={16} />
   <span class="llms-text">LLM</span>
 </a>

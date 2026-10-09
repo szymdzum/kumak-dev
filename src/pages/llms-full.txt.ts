@@ -8,13 +8,9 @@ import { getAllPosts } from "@utils/posts";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request }) => {
-  const posts = await getAllPosts();
+  trackLlmsRequest(request, "/llms-full.txt");
 
-  trackLlmsRequest({
-    url: "/llms-full.txt",
-    userAgent: request.headers.get("user-agent") ?? undefined,
-    referrer: request.headers.get("referer") ?? undefined,
-  });
+  const posts = await getAllPosts();
 
   return llmsFullTxt({
     name: siteConfig.name,

@@ -9,13 +9,9 @@ export const prerender = false;
 const formatLlmsUrl = (slug: string) => `/llms/${slug}.txt`;
 
 export const GET: APIRoute = async ({ request }) => {
-  const posts = await getAllPosts();
+  trackLlmsRequest(request, "/llms.txt");
 
-  trackLlmsRequest({
-    url: "/llms.txt",
-    userAgent: request.headers.get("user-agent") ?? undefined,
-    referrer: request.headers.get("referer") ?? undefined,
-  });
+  const posts = await getAllPosts();
 
   return llmsTxt({
     name: siteConfig.name,
