@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ site, request }) => {
     throw new Error("site is not defined in astro.config.mjs");
   }
 
-  trackRssRequest(request.headers.get("user-agent") ?? undefined);
+  trackRssRequest(request);
 
   const posts = await getAllPosts();
 

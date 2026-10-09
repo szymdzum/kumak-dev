@@ -15,11 +15,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     return new Response("Not found", { status: 404 });
   }
 
-  trackLlmsRequest({
-    url: `/llms/${post.id}.txt`,
-    userAgent: request.headers.get("user-agent") ?? undefined,
-    referrer: request.headers.get("referer") ?? undefined,
-  });
+  trackLlmsRequest(request, `/llms/${post.id}.txt`);
 
   return llmsPost({
     post,

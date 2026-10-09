@@ -8,8 +8,8 @@ interface TrackEventOptions {
   eventName: string;
   url: string;
   title: string;
-  userAgent?: string;
-  referrer?: string;
+  userAgent?: string | undefined;
+  referrer?: string | undefined;
 }
 
 /**
@@ -56,25 +56,30 @@ export function trackEvent(options: TrackEventOptions): void {
   });
 }
 
-interface LlmsTrackOptions {
-  url: string;
-  userAgent?: string;
-  referrer?: string;
+/**
+ * Browser prefetches (e.g. Astro's prefetch) are not real reads.
+ * Chromium sends `Sec-Purpose: prefetch`; older browsers send `Purpose: prefetch`.
+ */
+function isPrefetch(request: Request): boolean {
+  const purpose = request.headers.get("sec-purpose") ?? request.headers.get("purpose") ?? "";
+  return purpose.includes("prefetch");
 }
 
-export function trackLlmsRequest(options: LlmsTrackOptions): void {
+function trackRequest(request: Request, eventName: string, title: string, url: string): void {
+  if (isPrefetch(request)) return;
   trackEvent({
-    eventName: "llms-request",
-    title: "LLMs.txt",
-    ...options,
+    eventName,
+    title,
+    url,
+    userAgent: request.headers.get("user-agent") ?? undefined,
+    referrer: request.headers.get("referer") ?? undefined,
   });
 }
 
-export function trackRssRequest(userAgent?: string): void {
-  trackEvent({
-    eventName: "rss-fetch",
-    url: "/rss.xml",
-    title: "RSS Feed",
-    userAgent,
-  });
+export function trackLlmsRequest(request: Request, url: string): void {
+  trackRequest(request, "llms-request", "LLMs.txt", url);
+}
+
+export function trackRssRequest(request: Request): void {
+  trackRequest(request, "rss-fetch", "RSS Feed", "/rss.xml");
 }
