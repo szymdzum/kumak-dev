@@ -1,8 +1,9 @@
 // @ts-check
+import { readdirSync, readFileSync } from "node:fs";
 import { defineConfig } from "astro/config";
 import deno from "@deno/astro-adapter";
 import mdx from "@astrojs/mdx";
-import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
+import { parseFrontmatter, rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -38,13 +39,35 @@ const patchDenoAdapter = () => ({
   },
 });
 
+// Sitemap <lastmod> for posts. astro:content isn't available here, so parse each post's
+// frontmatter directly (same YAML parser Astro uses). Slug = file name.
+const BLOG_DIR = new URL("./src/content/blog/", import.meta.url);
+
+const postLastmod = new Map(
+  readdirSync(BLOG_DIR)
+    .filter((file) => /\.mdx?$/.test(file))
+    .map((file) => [
+      file.replace(/\.mdx?$/, ""),
+      parseFrontmatter(readFileSync(new URL(file, BLOG_DIR), "utf8")).frontmatter,
+    ])
+    .filter(([, fm]) => !fm.draft)
+    .map(([slug, fm]) => [slug, new Date(fm.updatedDate ?? fm.pubDate)])
+    .filter(([, date]) => !Number.isNaN(date.getTime()))
+    .map(([slug, date]) => [slug, date.toISOString()]),
+);
+
+const withPostLastmod = (item) => {
+  const lastmod = postLastmod.get(new URL(item.url).pathname.replace(/^\/|\/$/g, ""));
+  return lastmod ? { ...item, lastmod } : item;
+};
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://kumak.dev",
   output: "server",
   adapter: deno(),
 
-  integrations: [mdx(), sitemap(), icon()],
+  integrations: [mdx(), sitemap({ serialize: withPostLastmod }), icon()],
 
   markdown: {
     shikiConfig: {
