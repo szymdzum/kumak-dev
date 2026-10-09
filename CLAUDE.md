@@ -8,7 +8,7 @@
 - **Astro 7** `output: "server"` + `@deno/astro-adapter`; pages prerendered, `rss.xml`/`llms*.txt`/404 on-demand (server-side Umami tracking)
 - **MDX** via `unified()` processor from `@astrojs/markdown-remark` (rehype plugins live in `markdown.processor`)
 - **Node 22.12+** for npm/Astro (`.nvmrc`), **Deno 2.x** for tasks, lint, fmt, runtime
-- **Deno Deploy** `devblog` project, GitHub integration (no Actions workflows)
+- **Deno Deploy** `szymdzum/kumak-dev` project, GitHub integration (no Actions workflows); build status visible via `gh api repos/szymdzum/kumak-dev/commits/<sha>/statuses`
 - `astro.config.mjs` has a Vite plugin patching an adapter 0.6.0 static-path bug — remove when fixed upstream
 
 ## Essential Commands
