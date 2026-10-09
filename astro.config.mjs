@@ -1,6 +1,6 @@
 // @ts-check
 import { readdirSync, readFileSync } from "node:fs";
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import deno from "@deno/astro-adapter";
 import mdx from "@astrojs/mdx";
 import { parseFrontmatter, rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
@@ -24,10 +24,10 @@ const DENO_ADAPTER_PATCHES = [
     "await serveFile(request, fromFileUrl(localPath))",
     "await serveFile(request, fromFileUrl(localPath)).catch(() => new Response(null, { status: 404 }))",
   ],
-  // serveFile sets no Cache-Control. /_astro/ is content-hashed; /fonts/ files never change.
+  // serveFile sets no Cache-Control. /_astro/ (incl. Fonts API /_astro/fonts/) is content-hashed.
   [
     "return fileResp;",
-    'if (/^\\/(_astro|fonts)\\//.test(url.pathname)) fileResp.headers.set("Cache-Control", "public, max-age=31536000, immutable"); return fileResp;',
+    'if (/^\\/_astro\\//.test(url.pathname)) fileResp.headers.set("Cache-Control", "public, max-age=31536000, immutable"); return fileResp;',
   ],
 ];
 
@@ -66,11 +66,63 @@ const withPostLastmod = (item) => {
   return lastmod ? { ...item, lastmod } : item;
 };
 
+// Inter latin subset (matches Google Fonts' "latin" unicode-range).
+const INTER_UNICODE_RANGE = [
+  "U+0000-00FF",
+  "U+0131",
+  "U+0152-0153",
+  "U+02BB-02BC",
+  "U+02C6",
+  "U+02DA",
+  "U+02DC",
+  "U+0304",
+  "U+0308",
+  "U+0329",
+  "U+2000-206F",
+  "U+2074",
+  "U+20AC",
+  "U+2122",
+  "U+2191",
+  "U+2193",
+  "U+2212",
+  "U+2215",
+  "U+FEFF",
+  "U+FFFD",
+];
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://kumak.dev",
   output: "server",
   adapter: deno(),
+
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: "Inter",
+      cssVariable: "--font-inter",
+      fallbacks: [
+        "system-ui",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Segoe UI",
+        "Roboto",
+        "Oxygen",
+        "Ubuntu",
+        "Cantarell",
+        "sans-serif",
+      ],
+      options: {
+        variants: [400, 700].map((weight) => ({
+          src: [`./src/assets/fonts/inter-latin-${weight}.woff2`],
+          weight,
+          style: "normal",
+          display: "swap",
+          unicodeRange: INTER_UNICODE_RANGE,
+        })),
+      },
+    },
+  ],
 
   integrations: [mdx(), sitemap({ serialize: withPostLastmod }), icon()],
 

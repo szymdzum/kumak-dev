@@ -118,9 +118,7 @@
     --color-accent-rgb: 255, 107, 107;
 
     /* Typography Properties */
-    --font-family-base:
-      "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-      Cantarell, sans-serif;
+    --font-family-base: var(--font-inter); /* Fonts API (astro.config.mjs): Inter + fallbacks */
     --font-family-mono:
       "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
       Consolas, monospace;
