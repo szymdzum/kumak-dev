@@ -8,18 +8,7 @@
   max-width: var(--content-width);
 }
 
-/* Headings */
-.prose h1 {
-  font-family: var(--font-family-display);
-  font-size: var(--text-3xl);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  word-spacing: var(--word-spacing-tight);
-  margin-top: 0; /* Article header provides spacing */
-  margin-bottom: var(--rhythm-single);
-  letter-spacing: var(--letter-spacing-tight);
-}
-
+/* Headings (the page h1 lives in PageHeader, outside .prose) */
 .prose h2 {
   font-family: var(--font-family-display);
   font-size: var(--text-xl);
@@ -58,16 +47,6 @@
   line-height: var(--line-height-normal);
   margin-bottom: var(--rhythm-single);
   max-width: 70ch; /* Optimal for reading (45-75ch range) */
-}
-
-/* First paragraph after heading - reduce top spacing */
-.prose h1 + p,
-.prose h2 + p,
-.prose h3 + p,
-.prose h4 + p,
-.prose h5 + p,
-.prose h6 + p {
-  margin-top: 0;
 }
 
 /* Links */
@@ -119,7 +98,6 @@
   border-radius: var(--radius-sm);
   border: var(--border-width) solid var(--color-border);
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   margin: var(--rhythm-1-5x) 0;
   white-space: pre;
   box-shadow: inset 0 0 0 1px rgb(var(--color-primary-rgb) / 0.05);
@@ -200,7 +178,6 @@
 .prose [data-table-scroll] {
   margin: var(--rhythm-1-5x) 0;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .prose table {
@@ -239,28 +216,21 @@
   opacity: 0;
   transition: opacity var(--transition-fast);
   padding-right: var(--space-xs);
-}
-
-.prose .heading-anchor,
-.prose .heading-anchor:hover,
-.prose .heading-anchor::after {
   text-decoration: none;
-  border: none;
-  background: none;
-  box-shadow: none;
 }
 
-.prose .anchor-icon {
+.prose .anchor-icon::before {
+  content: "#";
   color: var(--color-primary);
   font-family: var(--font-family-mono);
   font-weight: var(--font-weight-normal);
 }
 
-.prose :where(h1, h2, h3, h4, h5, h6) {
+.prose :where(h2, h3, h4, h5, h6) {
   position: relative;
 }
 
-.prose :where(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+.prose :where(h2, h3, h4, h5, h6):hover .heading-anchor {
   opacity: 1;
 }
 
@@ -268,6 +238,5 @@
   .prose .heading-anchor {
     position: static;
     opacity: 1;
-    padding-right: var(--space-xs);
   }
 }

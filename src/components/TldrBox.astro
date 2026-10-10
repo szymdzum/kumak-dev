@@ -1,13 +1,5 @@
----
-interface Props {
-  title?: string;
-}
-
-const { title = "TL;DR" } = Astro.props;
----
-
 <aside role="note" aria-labelledby="tldr-label">
-  <p id="tldr-label">{title}</p>
+  <p id="tldr-label">TL;DR</p>
   <div>
     <slot />
   </div>

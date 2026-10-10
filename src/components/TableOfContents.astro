@@ -19,13 +19,13 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
   <nav data-toc aria-label="Table of contents">
     <div>
       <h2>On this page</h2>
-      <ul data-toc-list>
+      <ul data-toc-list role="list">
         <li>
           <a href="#top">{title}</a>
         </li>
         {tocHeadings.map((heading) => (
           <li>
-            <a href={`#${heading.slug}`}>{heading.text.replace(/^#\s*/, '')}</a>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
           </li>
         ))}
       </ul>
@@ -58,9 +58,6 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
   }
 
   ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
     position: relative;
   }
 

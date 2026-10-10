@@ -3,13 +3,9 @@ import Head from "@components/Head.astro";
 import NavBar from "@components/NavBar.astro";
 import Footer from "@components/Footer.astro";
 import "@styles/prose.css";
+import type { ComponentProps } from "astro/types";
 
-export interface Props {
-  readonly title?: string;
-  readonly description?: string;
-  readonly image?: string;
-  readonly ogType?: "website" | "article";
-}
+type Props = ComponentProps<typeof Head>;
 ---
 
 <!doctype html>
@@ -33,7 +29,6 @@ export interface Props {
   body {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    min-height: 100vh;
   }
 
   main {

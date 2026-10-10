@@ -5,20 +5,20 @@ import type { HTMLAttributes } from 'astro/types';
 type Props = HTMLAttributes<'pre'>;
 ---
 
-<div class="codeblock" data-codeblock>
-  <button class="codeblock-copy" type="button" aria-label="Copy code to clipboard" data-codeblock-copy>
-    <Icon name="lucide:copy" class="copy-icon" size={20} />
-    <Icon name="lucide:check" class="check-icon" size={20} />
+<div data-codeblock>
+  <button type="button" aria-label="Copy code to clipboard" data-codeblock-copy>
+    <Icon name="lucide:copy" size={20} />
+    <Icon name="lucide:check" size={20} />
   </button>
   <pre {...Astro.props}><slot /></pre>
 </div>
 
 <style>
-  .codeblock {
+  div {
     position: relative;
   }
 
-  .codeblock-copy {
+  button {
     position: absolute;
     top: var(--space-sm);
     right: var(--space-sm);
@@ -36,45 +36,45 @@ type Props = HTMLAttributes<'pre'>;
     z-index: 10;
   }
 
-  .copy-icon,
-  .check-icon {
+  [data-icon="lucide:copy"],
+  [data-icon="lucide:check"] {
     color: var(--color-text-muted);
     transition: color var(--transition-fast), opacity var(--transition-fast);
   }
 
-  .codeblock:hover .codeblock-copy,
-  .codeblock-copy:focus-visible {
+  div:hover button,
+  button:focus-visible {
     opacity: 1;
   }
 
-  .codeblock-copy:hover {
+  button:hover {
     background: rgb(var(--color-bg-rgb) / 0.95);
     border-color: var(--color-border);
   }
 
-  .codeblock-copy:hover .copy-icon,
-  .codeblock-copy:hover .check-icon {
+  button:hover [data-icon="lucide:copy"],
+  button:hover [data-icon="lucide:check"] {
     color: var(--color-text);
   }
 
-  .codeblock-copy:active {
+  button:active {
     transform: scale(0.95);
   }
 
-  .check-icon {
+  [data-icon="lucide:check"] {
     opacity: 0;
     position: absolute;
   }
 
-  .codeblock-copy[data-copied] .copy-icon {
+  button[data-copied] [data-icon="lucide:copy"] {
     opacity: 0;
   }
 
-  .codeblock-copy[data-copied] .check-icon {
+  button[data-copied] [data-icon="lucide:check"] {
     opacity: 1;
   }
 
-  .codeblock-copy[data-copied] {
+  button[data-copied] {
     color: var(--color-primary);
     border-color: var(--color-primary);
   }
