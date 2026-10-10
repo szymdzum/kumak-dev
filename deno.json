@@ -97,5 +97,9 @@
     "jsxImportSource": "astro"
   },
   "nodeModulesDir": "manual",
-  "lock": false
+  "lock": false,
+  "deploy": {
+    "org": "szymdzum",
+    "app": "kumak-dev"
+  }
 }
