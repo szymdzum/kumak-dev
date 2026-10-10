@@ -2,7 +2,7 @@ import rss from "@astrojs/rss";
 import type { APIRoute } from "astro";
 import { siteConfig } from "@/site-config";
 import { trackRssRequest } from "@utils/analytics";
-import { formatUrl } from "@utils/path";
+import { postUrl } from "@utils/path";
 import { getAllPosts } from "@utils/posts";
 
 export const prerender = false;
@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ site, request }) => {
       pubDate: post.data.pubDate,
       author: siteConfig.author.name,
       categories: [post.data.category],
-      link: formatUrl(post.id),
+      link: postUrl(post.id),
     })),
   });
 

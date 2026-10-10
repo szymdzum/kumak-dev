@@ -1,6 +1,6 @@
 ---
 import DateFormatter from "@components/DateFormatter.astro";
-import { formatUrl } from "@utils/path";
+import { postUrl } from "@utils/path";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -8,12 +8,12 @@ interface Props {
 }
 
 const { post } = Astro.props
-const postUrl = formatUrl(post.id);
+const href = postUrl(post.id);
 ---
 
 <article>
   <h3>
-    <a href={postUrl}>
+    <a href={href}>
       {post.data.title}
     </a>
   </h3>
@@ -21,7 +21,7 @@ const postUrl = formatUrl(post.id);
   <div class="meta">
     <DateFormatter date={post.data.pubDate} />
     <span aria-hidden="true">•</span>
-    <a href={postUrl} class="read-more" aria-hidden="true" tabindex="-1">Read</a>
+    <a href={href} class="read-more" aria-hidden="true" tabindex="-1">Read</a>
   </div>
 </article>
 

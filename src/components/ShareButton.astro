@@ -21,6 +21,8 @@ const { title, description = "" } = Astro.props;
 </ActionButton>
 
 <script>
+  import { track } from "@utils/track";
+
   function initShareButton(): void {
     const button = document.querySelector<HTMLButtonElement>("[data-share]");
     const label = button?.querySelector<HTMLElement>("[data-label]");

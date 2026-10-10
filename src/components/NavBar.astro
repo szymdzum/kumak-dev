@@ -81,6 +81,8 @@ const { rss, ...externalSocials } = siteConfig.socials;
 </style>
 
 <script>
+  import { track } from "@utils/track";
+
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLAnchorElement>('a[data-social]').forEach((link) => {
       link.addEventListener('click', () => {

@@ -1,31 +1,13 @@
 import type { APIRoute } from "astro";
-import { siteConfig } from "@/site-config";
 import { trackLlmsRequest } from "@utils/analytics";
-import { llmsTxt, postsToLlmsItems } from "@utils/llms";
+import { llmsTxt } from "@utils/llms";
 import { getAllPosts } from "@utils/posts";
 
 export const prerender = false;
 
-const formatLlmsUrl = (slug: string) => `/llms/${slug}.txt`;
-
 export const GET: APIRoute = async ({ request }) => {
   const tracked = trackLlmsRequest(request, "/llms.txt");
-  const posts = await getAllPosts();
-  const response = llmsTxt({
-    name: siteConfig.name,
-    description: siteConfig.description,
-    site: siteConfig.url,
-    items: postsToLlmsItems(posts, formatLlmsUrl),
-    optional: [
-      { title: "About", link: "/about", description: "About the author" },
-      { title: "RSS Feed", link: "/rss.xml", description: "Subscribe to updates" },
-      {
-        title: "Full Content",
-        link: "/llms-full.txt",
-        description: "Complete post content for deeper context",
-      },
-    ],
-  });
+  const response = llmsTxt(await getAllPosts());
 
   await tracked;
   return response;

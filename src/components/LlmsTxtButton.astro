@@ -1,6 +1,7 @@
 ---
 import ActionButton from "./ActionButton.astro";
 import LlmsTxtIcon from "./LlmsTxtIcon.astro";
+import { llmsUrl } from "@utils/path";
 
 interface Props {
   slug: string;
@@ -10,7 +11,7 @@ const { slug } = Astro.props;
 ---
 
 <ActionButton
-  href={`/llms/${slug}.txt`}
+  href={llmsUrl(slug)}
   label="LLM"
   aria-label="View LLM-friendly version"
   data-astro-prefetch="false"
