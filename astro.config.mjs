@@ -117,13 +117,16 @@ export default defineConfig({
         "sans-serif",
       ],
       options: {
-        variants: [400, 700].map((weight) => ({
-          src: [`./src/assets/fonts/inter-latin-${weight}.woff2`],
-          weight,
-          style: "normal",
-          display: "swap",
-          unicodeRange: INTER_UNICODE_RANGE,
-        })),
+        // One variable file covering the weights the site uses (400, 500, 600, 700).
+        variants: [
+          {
+            src: ["./src/assets/fonts/inter-latin.woff2"],
+            weight: "400 700",
+            style: "normal",
+            display: "swap",
+            unicodeRange: INTER_UNICODE_RANGE,
+          },
+        ],
       },
     },
   ],
@@ -164,7 +167,7 @@ export default defineConfig({
   compressHTML: true,
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: "viewport",
+    defaultStrategy: "hover",
   },
 
   build: {
