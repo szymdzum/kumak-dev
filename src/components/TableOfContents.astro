@@ -98,11 +98,11 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     color: var(--color-primary);
   }
 
-  li:has(a.active) {
+  li:has(a[aria-current]) {
     border-left-color: var(--color-primary);
   }
 
-  a.active {
+  a[aria-current] {
     color: var(--color-primary);
   }
 

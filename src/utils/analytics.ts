@@ -1,23 +1,24 @@
 import { siteConfig } from "@/site-config";
 
+const SITE_HOSTNAME = new URL(siteConfig.url).hostname;
+
 // UMAMI_URL override lets local builds point events at a test endpoint
 const UMAMI_URL = import.meta.env.UMAMI_URL ?? siteConfig.umami.url;
 const WEBSITE_ID = siteConfig.umami.websiteId;
-const SITE_ORIGIN = siteConfig.url;
-const SITE_HOSTNAME = new URL(siteConfig.url).hostname;
 const BROWSER_UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-interface TrackEventOptions {
-  eventName: string;
-  url: string;
-  title: string;
-  userAgent?: string | undefined;
-  referrer?: string | undefined;
-}
-
 /** Upper bound on how long a response may wait for Umami. */
 const TRACK_TIMEOUT_MS = 1500;
+
+/**
+ * Browser prefetches (e.g. Astro's prefetch) are not real reads.
+ * Chromium sends `Sec-Purpose: prefetch`; older browsers send `Purpose: prefetch`.
+ */
+function isPrefetch(request: Request): boolean {
+  const purpose = request.headers.get("sec-purpose") ?? request.headers.get("purpose") ?? "";
+  return purpose.includes("prefetch");
+}
 
 /**
  * Tracks a custom event in Umami Analytics (server-side).
@@ -30,8 +31,13 @@ const TRACK_TIMEOUT_MS = 1500;
  * to pass bot detection. The actual client User-Agent is stored in
  * event data for analysis.
  */
-async function trackEvent(options: TrackEventOptions): Promise<void> {
-  const { eventName, url, title, userAgent, referrer } = options;
+async function trackRequest(
+  request: Request,
+  eventName: string,
+  title: string,
+  url: string,
+): Promise<void> {
+  if (isPrefetch(request)) return;
 
   const payload = {
     type: "event",
@@ -45,8 +51,8 @@ async function trackEvent(options: TrackEventOptions): Promise<void> {
       referrer: "",
       name: eventName,
       data: {
-        agent: userAgent ?? "unknown",
-        source: referrer ?? "direct",
+        agent: request.headers.get("user-agent") ?? "unknown",
+        source: request.headers.get("referer") ?? "direct",
       },
     },
   };
@@ -56,7 +62,7 @@ async function trackEvent(options: TrackEventOptions): Promise<void> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Origin": SITE_ORIGIN,
+        "Origin": siteConfig.url,
         "User-Agent": BROWSER_UA,
       },
       body: JSON.stringify(payload),
@@ -67,31 +73,6 @@ async function trackEvent(options: TrackEventOptions): Promise<void> {
       console.warn("Analytics error:", error);
     }
   }
-}
-
-/**
- * Browser prefetches (e.g. Astro's prefetch) are not real reads.
- * Chromium sends `Sec-Purpose: prefetch`; older browsers send `Purpose: prefetch`.
- */
-function isPrefetch(request: Request): boolean {
-  const purpose = request.headers.get("sec-purpose") ?? request.headers.get("purpose") ?? "";
-  return purpose.includes("prefetch");
-}
-
-async function trackRequest(
-  request: Request,
-  eventName: string,
-  title: string,
-  url: string,
-): Promise<void> {
-  if (isPrefetch(request)) return;
-  await trackEvent({
-    eventName,
-    title,
-    url,
-    userAgent: request.headers.get("user-agent") ?? undefined,
-    referrer: request.headers.get("referer") ?? undefined,
-  });
 }
 
 export function trackLlmsRequest(request: Request, url: string): Promise<void> {

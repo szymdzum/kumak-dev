@@ -1,8 +1,7 @@
 import type { APIRoute } from "astro";
-import { siteConfig } from "@/site-config";
 import { trackLlmsRequest } from "@utils/analytics";
 import { llmsPost } from "@utils/llms";
-import { formatUrl } from "@utils/path";
+import { llmsUrl } from "@utils/path";
 import { getAllPosts } from "@utils/posts";
 
 export const prerender = false;
@@ -15,12 +14,8 @@ export const GET: APIRoute = async ({ params, request }) => {
     return new Response("Not found", { status: 404 });
   }
 
-  const tracked = trackLlmsRequest(request, `/llms/${post.id}.txt`);
-  const response = llmsPost({
-    post,
-    site: siteConfig.url,
-    link: formatUrl(post.id),
-  });
+  const tracked = trackLlmsRequest(request, llmsUrl(post.id));
+  const response = llmsPost(post);
 
   await tracked;
   return response;

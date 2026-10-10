@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import ActionButton from "./ActionButton.astro";
+import { llmsUrl } from "@utils/path";
 
 interface Props {
   slug: string;
@@ -9,12 +10,14 @@ interface Props {
 const { slug } = Astro.props;
 ---
 
-<ActionButton label="Copy" data-copy-page={`/llms/${slug}.txt`} aria-label="Copy as Markdown">
+<ActionButton label="Copy" data-copy-page={llmsUrl(slug)} aria-label="Copy as Markdown">
   <Icon name="lucide:copy" size={16} />
   <Icon name="lucide:check" size={16} />
 </ActionButton>
 
 <script>
+  import { track } from "@utils/track";
+
   const RESET_DELAY = 2000;
 
   async function fetchMarkdown(url: string): Promise<string> {

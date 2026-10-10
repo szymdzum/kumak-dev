@@ -81,6 +81,8 @@ type Props = HTMLAttributes<'pre'>;
 </style>
 
 <script>
+  import { track } from "@utils/track";
+
   function initCopyButtons(): void {
     document.querySelectorAll<HTMLElement>('[data-codeblock]').forEach((block) => {
       const button = block.querySelector<HTMLButtonElement>('[data-codeblock-copy]');

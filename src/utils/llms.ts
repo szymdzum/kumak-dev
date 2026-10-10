@@ -1,38 +1,22 @@
+import { siteConfig } from "@/site-config";
+import { llmsUrl, postUrl } from "./path";
 import { type BlogPost, isoDate } from "./posts";
 
-interface LlmsItem {
+interface Link {
   title: string;
   description: string;
-  link: string;
+  href: string;
 }
 
-interface LlmsFullItem extends LlmsItem {
-  pubDate: Date;
-  category: string;
-  body: string;
-}
-
-interface LlmsTxtConfig {
-  name: string;
-  description: string;
-  site: string;
-  items: LlmsItem[];
-  optional?: LlmsItem[];
-}
-
-interface LlmsFullTxtConfig {
-  name: string;
-  description: string;
-  author: string;
-  site: string;
-  items: LlmsFullItem[];
-}
-
-interface LlmsPostConfig {
-  post: BlogPost;
-  site: string;
-  link: string;
-}
+const OPTIONAL_LINKS: Link[] = [
+  { title: "About", href: "/about", description: "About the author" },
+  { title: "RSS Feed", href: "/rss.xml", description: "Subscribe to updates" },
+  {
+    title: "Full Content",
+    href: "/llms-full.txt",
+    description: "Complete post content for deeper context",
+  },
+];
 
 // CommonMark fences: up to 3 spaces of indent; a closing fence has no info string
 const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/;
@@ -88,99 +72,70 @@ function doc(...sections: (string | string[])[]): Response {
   });
 }
 
-function header(name: string, description: string): string[] {
-  return [`# ${name}`, "", `> ${description}`];
-}
+const header = [`# ${siteConfig.name}`, "", `> ${siteConfig.description}`];
 
-function linkList(title: string, items: LlmsItem[], site: string): string[] {
+function linkList(title: string, links: Link[]): string[] {
   return [
     "",
     `## ${title}`,
-    ...items.map((item) => `- [${item.title}](${site}${item.link}): ${item.description}`),
+    ...links.map((link) => `- [${link.title}](${siteConfig.url}${link.href}): ${link.description}`),
   ];
 }
 
-function postMeta(site: string, link: string, pubDate: Date, category: string): string[] {
-  return [`URL: ${site}${link}`, `Published: ${isoDate(pubDate)}`, `Category: ${category}`];
-}
-
-export function llmsTxt(config: LlmsTxtConfig): Response {
-  const sections = [
-    header(config.name, config.description),
-    linkList("Posts", config.items, config.site),
+function postMeta(post: BlogPost): string[] {
+  return [
+    `URL: ${siteConfig.url}${postUrl(post.id)}`,
+    `Published: ${isoDate(post.data.pubDate)}`,
+    `Category: ${post.data.category}`,
   ];
-
-  if (config.optional?.length) {
-    sections.push(linkList("Optional", config.optional, config.site));
-  }
-
-  return doc(...sections);
 }
 
-export function llmsFullTxt(config: LlmsFullTxtConfig): Response {
+/** llms.txt: index of posts as links to their plain-text versions. */
+export function llmsTxt(posts: BlogPost[]): Response {
+  const postLinks = posts.map((post) => ({
+    title: post.data.title,
+    description: post.data.description,
+    href: llmsUrl(post.id),
+  }));
+  return doc(header, linkList("Posts", postLinks), linkList("Optional", OPTIONAL_LINKS));
+}
+
+/** llms-full.txt: every post's content in one document. */
+export function llmsFullTxt(posts: BlogPost[]): Response {
   const head = [
-    ...header(config.name, config.description),
+    ...header,
     "",
-    `Author: ${config.author}`,
-    `Site: ${config.site}`,
+    `Author: ${siteConfig.author.name}`,
+    `Site: ${siteConfig.url}`,
     "",
     "---",
   ];
 
-  const posts = config.items.flatMap((item) => [
+  const sections = posts.flatMap((post) => [
     "",
-    `## ${item.title}`,
+    `## ${post.data.title}`,
     "",
-    ...postMeta(config.site, item.link, item.pubDate, item.category),
+    ...postMeta(post),
     "",
-    `> ${item.description}`,
+    `> ${post.data.description}`,
     "",
-    stripMdx(item.body),
+    stripMdx(post.body ?? ""),
     "",
     "---",
   ]);
 
-  return doc(head, posts);
+  return doc(head, sections);
 }
 
-export function llmsPost(config: LlmsPostConfig): Response {
-  const { post, site, link } = config;
-  const { title, description, pubDate, category } = post.data;
-
+/** /llms/[slug].txt: a single post as plain Markdown. */
+export function llmsPost(post: BlogPost): Response {
   return doc(
-    `# ${title}`,
+    `# ${post.data.title}`,
     "",
-    `> ${description}`,
+    `> ${post.data.description}`,
     "",
-    ...postMeta(site, link, pubDate, category),
+    ...postMeta(post),
     "",
     stripMdx(post.body ?? ""),
   );
-}
-
-function toLlmsItem(post: BlogPost, formatUrl: (slug: string) => string): LlmsItem {
-  return {
-    title: post.data.title,
-    description: post.data.description,
-    link: formatUrl(post.id),
-  };
-}
-
-export function postsToLlmsItems(
-  posts: BlogPost[],
-  formatUrl: (slug: string) => string,
-): LlmsItem[] {
-  return posts.map((post) => toLlmsItem(post, formatUrl));
-}
-
-export function postsToLlmsFullItems(
-  posts: BlogPost[],
-  formatUrl: (slug: string) => string,
-): LlmsFullItem[] {
-  return posts.map((post) => ({
-    ...toLlmsItem(post, formatUrl),
-    pubDate: post.data.pubDate,
-    category: post.data.category,
-    body: post.body ?? "",
-  }));
 }

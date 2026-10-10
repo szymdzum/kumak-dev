@@ -1,18 +1,8 @@
 import type { RehypePlugin } from "@astrojs/markdown-remark";
-import type { Element, Root, RootContent } from "hast";
+import { visitElements } from "./hast";
 
 interface ExternalLinksOptions {
   domain: string;
-}
-
-type NodeCallback = (node: RootContent) => void;
-
-function isElement(node: RootContent): node is Element {
-  return node.type === "element";
-}
-
-function isAnchorWithHref(element: Element): boolean {
-  return element.tagName === "a" && Boolean(element.properties?.href);
 }
 
 function isExternalLink(href: string, siteDomain: string): boolean {
@@ -21,36 +11,12 @@ function isExternalLink(href: string, siteDomain: string): boolean {
   return url.hostname !== siteDomain && !url.hostname.endsWith(`.${siteDomain}`);
 }
 
-function applyExternalLinkAttributes(element: Element): void {
-  if (!element.properties) {
-    element.properties = {};
-  }
-  element.properties.target = "_blank";
-  element.properties.rel = ["noopener", "noreferrer"];
-}
-
-function walkTree(node: Root | RootContent, callback: NodeCallback): void {
-  if ("children" in node) {
-    for (const child of node.children) {
-      callback(child);
-      walkTree(child, callback);
-    }
-  }
-}
-
-export const externalLinks: RehypePlugin<[ExternalLinksOptions?]> = (options) => {
-  const siteDomain = options?.domain ?? "";
-
-  return (tree: Root) => {
-    walkTree(tree, (node) => {
-      if (!isElement(node)) return;
-      if (!isAnchorWithHref(node)) return;
-
-      const href = String(node.properties?.href ?? "");
-
-      if (isExternalLink(href, siteDomain)) {
-        applyExternalLinkAttributes(node);
-      }
-    });
-  };
+/** Opens links to other sites in a new tab with rel="noopener noreferrer". */
+export const externalLinks: RehypePlugin<[ExternalLinksOptions]> = ({ domain }) => (tree) => {
+  visitElements(tree, (node) => {
+    if (node.tagName !== "a") return;
+    if (!isExternalLink(String(node.properties.href ?? ""), domain)) return;
+    node.properties.target = "_blank";
+    node.properties.rel = ["noopener", "noreferrer"];
+  });
 };
