@@ -26,9 +26,12 @@ const DENO_ADAPTER_PATCHES = [
     "await serveFile(request, fromFileUrl(localPath)).catch(() => new Response(null, { status: 404 }))",
   ],
   // serveFile sets no Cache-Control. /_astro/ (incl. Fonts API /_astro/fonts/) is content-hashed.
+  // The Giscus iframe (origin giscus.app) loads our theme stylesheet cross-origin, so it needs CORS.
   [
     "return fileResp;",
-    'if (/^\\/_astro\\//.test(url.pathname)) fileResp.headers.set("Cache-Control", "public, max-age=31536000, immutable"); return fileResp;',
+    'if (/^\\/_astro\\//.test(url.pathname)) fileResp.headers.set("Cache-Control", "public, max-age=31536000, immutable"); ' +
+    'if (url.pathname === "/giscus-theme.css") fileResp.headers.set("Access-Control-Allow-Origin", "https://giscus.app"); ' +
+    "return fileResp;",
   ],
 ];
 
