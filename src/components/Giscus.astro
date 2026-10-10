@@ -4,46 +4,74 @@ import { siteConfig } from "@/site-config";
 const themeUrl = import.meta.env.DEV
   ? `${Astro.url.origin}/giscus-theme.css`
   : `${siteConfig.url}/giscus-theme.css`;
+
+const discussionsUrl = `https://github.com/${siteConfig.giscus.repo}/discussions`;
 ---
 
-<div>
-  <script
-    is:inline
-    src="https://giscus.app/client.js"
-    data-repo={siteConfig.giscus.repo}
-    data-repo-id={siteConfig.giscus.repoId}
-    data-category={siteConfig.giscus.category}
-    data-category-id={siteConfig.giscus.categoryId}
-    data-mapping="pathname"
-    data-strict="0"
-    data-reactions-enabled="1"
-    data-emit-metadata="0"
-    data-input-position="bottom"
-    data-theme={themeUrl}
-    data-lang="en"
-    data-loading="lazy"
-    crossorigin="anonymous"
-    async
-  ></script>
-  <noscript>
-    <p>
-      Comments require JavaScript. View the discussion on{" "}
-      <a
-        href={`https://github.com/${siteConfig.giscus.repo}/discussions`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        GitHub Discussions
-      </a>.
-    </p>
-  </noscript>
+<div
+  data-giscus
+  data-repo={siteConfig.giscus.repo}
+  data-repo-id={siteConfig.giscus.repoId}
+  data-category={siteConfig.giscus.category}
+  data-category-id={siteConfig.giscus.categoryId}
+  data-theme={themeUrl}
+>
+  <p data-giscus-fallback>
+    Comments are powered by GitHub Discussions and load when you scroll here. You can also
+    read or join the discussion on{" "}
+    <a href={discussionsUrl} target="_blank" rel="noopener noreferrer">GitHub</a>.
+  </p>
 </div>
+
+<script>
+  // The Giscus client script (and its connection to giscus.app) is only fetched
+  // once the comments section is about to scroll into view.
+  function loadGiscus(container: HTMLElement): void {
+    const { repo, repoId, category, categoryId, theme } = container.dataset;
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    Object.assign(script.dataset, {
+      repo,
+      repoId,
+      category,
+      categoryId,
+      theme,
+      mapping: "pathname",
+      strict: "0",
+      reactionsEnabled: "1",
+      emitMetadata: "0",
+      inputPosition: "bottom",
+      lang: "en",
+    });
+    container.querySelector("[data-giscus-fallback]")?.remove();
+    container.append(script);
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    const container = document.querySelector<HTMLElement>("[data-giscus]");
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        loadGiscus(container);
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(container);
+    document.addEventListener("astro:before-swap", () => observer.disconnect(), { once: true });
+  });
+</script>
 
 <style>
   div {
     margin-top: var(--space-3xl);
     padding-top: var(--space-2xl);
     border-top: var(--border-width) solid var(--color-border);
+    min-height: 8rem;
   }
 
   p {
