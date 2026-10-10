@@ -96,7 +96,6 @@
     /* Colors - Terminal Dark Theme */
     --color-text: #e8e8e0;
     --color-text-muted: #8b8b8b;
-    --color-text-subtle: #858585;
     --color-bg: #101113;
     --color-bg-subtle: #16151d;
     --color-border: #2a2a2a;
@@ -172,11 +171,6 @@
     letter-spacing: 0.01em;
     color: var(--color-text);
     background-color: var(--color-bg);
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
   }
 
   /* Grain texture overlay */

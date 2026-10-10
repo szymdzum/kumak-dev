@@ -1,0 +1,72 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+// Renders a link when href is given, otherwise a button. Remaining attributes
+// (aria-label, data-*) are passed through to that element.
+type Props = Omit<HTMLAttributes<"a">, "type"> & {
+  label: string;
+  href?: string;
+};
+
+const { label, href, ...rest } = Astro.props;
+---
+
+{
+  href ? (
+    <a href={href} {...rest}>
+      <slot />
+      <span data-label>{label}</span>
+    </a>
+  ) : (
+    <button type="button" {...rest}>
+      <slot />
+      <span data-label>{label}</span>
+    </button>
+  )
+}
+
+<style>
+  a,
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+
+  a:hover,
+  button:hover {
+    color: var(--color-text);
+  }
+
+  :is(a, button) :global(svg) {
+    flex-shrink: 0;
+  }
+
+  /* Copy feedback: swap the copy icon for the check icon while data-copied is set */
+  :is(a, button) :global([data-icon="lucide:check"]) {
+    display: none;
+  }
+
+  [data-copied] :global([data-icon="lucide:copy"]) {
+    display: none;
+  }
+
+  [data-copied] :global([data-icon="lucide:check"]) {
+    display: block;
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 500px) {
+    span {
+      display: none;
+    }
+  }
+</style>

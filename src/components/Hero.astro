@@ -1,73 +1,44 @@
 ---
 import { siteConfig } from "@/site-config";
 
+// A torus seen edge-on: each loop around the tube projects to an axis-aligned
+// ellipse whose width shrinks as the loop turns away from the viewer.
 const loopCount = 28;
-const segments = 120;
 const majorRadius = 115;
 const tubeRadius = 44;
-const baseCx = 250;
-const baseCy = 110;
-const sideAngle = Math.PI / 2; // rotate torus so we view it from the side
-const tiltAngle = Math.PI / 14; // keep a slight downward tilt for depth
-const cosSide = Math.cos(sideAngle);
-const sinSide = Math.sin(sideAngle);
-const cosTilt = Math.cos(tiltAngle);
-const sinTilt = Math.sin(tiltAngle);
-const zRotation = Math.PI / 2; // rotate final projection to lay the torus horizontally
-const cosZ = Math.cos(zRotation);
-const sinZ = Math.sin(zRotation);
+const cx = 250;
+const cy = 110;
+const tilt = Math.PI / 14;
 
-const projectPoint = (theta: number, phi: number) => {
-  const x = (majorRadius + tubeRadius * Math.cos(theta)) * Math.cos(phi);
-  const y = (majorRadius + tubeRadius * Math.cos(theta)) * Math.sin(phi);
-  const z = tubeRadius * Math.sin(theta);
-
-  const x1 = x * cosSide + z * sinSide;
-  const z1 = -x * sinSide + z * cosSide;
-  const y1 = y;
-
-  const y2 = y1 * cosTilt - z1 * sinTilt;
-  const x2 = x1 * cosZ - y2 * sinZ;
-  const y3 = x1 * sinZ + y2 * cosZ;
-
+const loops = Array.from({ length: loopCount }, (_, index) => {
+  const phi = -Math.PI / 2 + (index / (loopCount - 1)) * Math.PI;
+  const depth = Math.sin(phi + tilt);
+  const emphasis = Math.abs(Math.cos(phi));
   return {
-    x: baseCx + x2,
-    y: baseCy + y3,
+    cx: (cx - majorRadius * depth).toFixed(2),
+    rx: (tubeRadius * Math.abs(depth)).toFixed(2),
+    strokeWidth: (0.4 + emphasis * 0.55).toFixed(3),
+    opacity: (0.25 + emphasis * 0.6).toFixed(3),
   };
-};
-// Generate projected torus loops: phi sweeps around the ring, theta walks each loop.
+});
 ---
 
 <section>
   <svg viewBox="90 55 330 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g class="torus-loops">
-      {Array.from({ length: loopCount }, (_, index) => {
-        const phi = -Math.PI / 2 + (index / (loopCount - 1)) * Math.PI;
-        const commands = Array.from({ length: segments + 1 }, (_, segmentIndex) => {
-          const theta = (segmentIndex / segments) * Math.PI * 2;
-          const { x, y } = projectPoint(theta, phi);
-          return `${segmentIndex === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-        });
-
-        const emphasis = Math.abs(Math.cos(phi));
-        const strokeWidth = 0.4 + emphasis * 0.55;
-        const opacity = 0.25 + emphasis * 0.6;
-
-        return (
-          <path
-            d={`${commands.join(" ")} Z`}
-            fill="none"
-            stroke="white"
-            stroke-width={strokeWidth}
-            stroke-linejoin="round"
-            stroke-linecap="round"
-            opacity={opacity}
-          />
-        );
-      })}
+    <g fill="none" stroke="white">
+      {loops.map((loop) => (
+        <ellipse
+          cx={loop.cx}
+          cy={cy}
+          rx={loop.rx}
+          ry={tubeRadius}
+          stroke-width={loop.strokeWidth}
+          opacity={loop.opacity}
+        />
+      ))}
     </g>
   </svg>
-  <h1>{siteConfig.tagline}</h1>
+  <h1>{siteConfig.description}</h1>
 </section>
 
 <style>

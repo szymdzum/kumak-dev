@@ -14,7 +14,7 @@ const { links = [] } = Astro.props;
 {links.length > 0 && (
   <aside>
     <h2>Further Reading</h2>
-    <ul>
+    <ul role="list">
       {links.map((link) => (
         <li>
           <a href={link.url} target="_blank" rel="noopener noreferrer" data-astro-prefetch="false">
@@ -39,12 +39,6 @@ const { links = [] } = Astro.props;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-muted);
     margin-bottom: var(--space-xs);
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
   }
 
   li {

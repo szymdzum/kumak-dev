@@ -1,86 +1,55 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from "astro-icon/components";
+import ActionButton from "./ActionButton.astro";
 
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description = "" } = Astro.props;
 ---
 
-<button type="button" class="share-button" data-share data-title={title} data-description={description || ''} aria-label="Share this article">
+<ActionButton
+  label="Share"
+  data-share
+  data-title={title}
+  data-description={description}
+  aria-label="Share this article"
+>
   <Icon name="lucide:share-2" size={16} />
-  <span class="share-text" data-share-label>Share</span>
-</button>
+</ActionButton>
 
 <script>
-  function initShareButtons(): void {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-share]');
+  function initShareButton(): void {
+    const button = document.querySelector<HTMLButtonElement>("[data-share]");
+    const label = button?.querySelector<HTMLElement>("[data-label]");
+    if (!button || !label) return;
 
-    buttons.forEach((button) => {
-      const title = button.dataset.title || document.title;
-      const description = button.dataset.description || '';
-      const url = window.location.href;
-      const textSpan = button.querySelector<HTMLSpanElement>('[data-share-label]');
+    const { title = "", description = "" } = button.dataset;
+    const url = window.location.href;
 
-      button.addEventListener('click', async () => {
-        if (navigator.share) {
-          try {
-            await navigator.share({ title, text: description, url });
-            track.share('native');
-          } catch (err) {
-            const isAbort = err instanceof Error && err.name === 'AbortError';
-            if (!isAbort) console.error('Share failed:', err);
-          }
-        } else {
-          try {
-            await navigator.clipboard.writeText(url);
-            if (textSpan) {
-              textSpan.textContent = 'Link copied';
-              setTimeout(() => { textSpan.textContent = 'Share'; }, 2000);
-            }
-            track.share('clipboard');
-          } catch (err) {
-            console.error('Fallback copy failed:', err);
-          }
+    button.addEventListener("click", async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text: description, url });
+          track.share("native");
+        } catch (err) {
+          const isAbort = err instanceof Error && err.name === "AbortError";
+          if (!isAbort) console.error("Share failed:", err);
         }
-      });
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        label.textContent = "Link copied";
+        setTimeout(() => (label.textContent = "Share"), 2000);
+        track.share("clipboard");
+      } catch (err) {
+        console.error("Fallback copy failed:", err);
+      }
     });
   }
 
-  document.addEventListener('astro:page-load', initShareButtons);
+  document.addEventListener("astro:page-load", initShareButton);
 </script>
-
-<style>
-  .share-button {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    padding: 0;
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s ease;
-  }
-
-  .share-button:hover {
-    color: var(--color-text);
-  }
-
-  .share-button :global(svg) {
-    flex-shrink: 0;
-  }
-
-  .share-text {
-    display: inline-block;
-  }
-
-  @media (max-width: 500px) {
-    .share-text {
-      display: none;
-    }
-  }
-</style>

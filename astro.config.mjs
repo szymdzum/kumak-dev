@@ -146,8 +146,8 @@ export default defineConfig({
             content: {
               type: "element",
               tagName: "span",
-              properties: { className: ["anchor-icon"], ariaHidden: "true" },
-              children: [{ type: "text", value: "#" }],
+              properties: { className: ["anchor-icon"] },
+              children: [],
             },
           },
         ],

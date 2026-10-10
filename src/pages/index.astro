@@ -6,20 +6,18 @@ import BlogPostCard from "@components/BlogPostCard.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import SchemaOrg from "@components/SchemaOrg.astro";
 import { getAllPosts } from "@utils/posts";
+import { siteConfig } from "@/site-config";
 
 const posts = await getAllPosts();
 ---
 
-<BaseLayout
-  title="Kumak.dev - The Null Hypothesis"
-  description="Front-end, LLM tooling, and what actually works."
->
+<BaseLayout title={`Kumak.dev - ${siteConfig.name}`} description={siteConfig.description}>
   <SchemaOrg type="WebSite" slot="head" />
   <Hero />
 
-  <section class="posts">
-    <h2><span class="prompt">Recent Posts</span></h2>
-    <div class="posts-list">
+  <section>
+    <h2>Recent Posts</h2>
+    <div>
       {posts.map((post) => (
         <BlogPostCard post={post} />
       ))}
@@ -28,23 +26,20 @@ const posts = await getAllPosts();
 </BaseLayout>
 
 <style>
-  .posts {
+  section {
     margin-top: var(--space-2xl);
   }
 
-  .posts h2 {
+  h2 {
     font-family: var(--font-family-display);
     font-size: var(--text-base);
     font-weight: var(--font-weight-bold);
     letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-primary);
     margin-bottom: var(--space-lg);
   }
 
-  .posts h2 .prompt {
-    color: var(--color-primary);
-  }
-
-  .posts-list {
+  section > div {
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);

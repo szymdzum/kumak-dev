@@ -1,18 +1,12 @@
 ---
 import { siteConfig } from "@/site-config";
 
-interface Props {
-  class?: string;
-}
-
-const { class: className } = Astro.props;
-
 const themeUrl = import.meta.env.DEV
   ? `${Astro.url.origin}/giscus-theme.css`
   : `${siteConfig.url}/giscus-theme.css`;
 ---
 
-<div class:list={["giscus-wrapper", className]}>
+<div>
   <script
     is:inline
     src="https://giscus.app/client.js"
@@ -32,7 +26,7 @@ const themeUrl = import.meta.env.DEV
     async
   ></script>
   <noscript>
-    <p class="noscript-fallback">
+    <p>
       Comments require JavaScript. View the discussion on{" "}
       <a
         href={`https://github.com/${siteConfig.giscus.repo}/discussions`}
@@ -46,18 +40,18 @@ const themeUrl = import.meta.env.DEV
 </div>
 
 <style>
-  .giscus-wrapper {
+  div {
     margin-top: var(--space-3xl);
     padding-top: var(--space-2xl);
     border-top: var(--border-width) solid var(--color-border);
   }
 
-  .noscript-fallback {
+  p {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
   }
 
-  .noscript-fallback a {
+  a {
     color: var(--color-primary);
   }
 </style>

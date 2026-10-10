@@ -4,7 +4,6 @@ export const siteConfig = {
   name: "The Null Hypothesis",
   url: "https://kumak.dev",
   description: "Front-end, LLM tooling, and what actually works.",
-  tagline: "Front-end, LLM tooling, and what actually works.",
   image: "/social-image.jpg",
   // Author/owner info
   author: {

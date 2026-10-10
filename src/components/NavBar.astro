@@ -2,27 +2,28 @@
 import { Icon } from 'astro-icon/components';
 import { siteConfig } from "@/site-config";
 import LlmsTxtIcon from "./LlmsTxtIcon.astro";
+
+const { rss, ...externalSocials } = siteConfig.socials;
 ---
 
 <header>
   <div>
-    <a href="/" aria-label="The Null Hypothesis home">[The Null Hypothesis]</a>
+    <a href="/" aria-label={`${siteConfig.name} home`}>[{siteConfig.name}]</a>
     <nav aria-label="Social links">
-      {Object.entries(siteConfig.socials).map(([key, social]) => {
-        const isExternal = social.url.startsWith("http");
-        return (
-          <a
-            href={social.url}
-            target={isExternal ? "_blank" : undefined}
-            rel={isExternal ? "noopener noreferrer" : undefined}
-            aria-label={isExternal ? `${siteConfig.author.handle} on ${social.name}` : `Subscribe via ${social.name}`}
-            data-social={isExternal ? key : undefined}
-            data-astro-prefetch="false"
-          >
-            <Icon name={`lucide:${key}`} size={24} />
-          </a>
-        );
-      })}
+      {Object.entries(externalSocials).map(([key, social]) => (
+        <a
+          href={social.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${siteConfig.author.handle} on ${social.name}`}
+          data-social={key}
+        >
+          <Icon name={`lucide:${key}`} size={24} />
+        </a>
+      ))}
+      <a href={rss.url} aria-label={`Subscribe via ${rss.name}`} data-astro-prefetch="false">
+        <Icon name="lucide:rss" size={24} />
+      </a>
       <a href="/llms-full.txt" aria-label="LLMs.txt full content" data-astro-prefetch="false">
         <LlmsTxtIcon />
       </a>
@@ -51,11 +52,6 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
     font-weight: var(--font-weight-bold);
     font-size: var(--text-lg);
     letter-spacing: var(--letter-spacing-tight);
-    transition: color var(--transition-fast);
-  }
-
-  header > div > a:hover {
-    color: var(--color-primary);
   }
 
   nav {
@@ -70,10 +66,6 @@ import LlmsTxtIcon from "./LlmsTxtIcon.astro";
 
   nav a:hover {
     color: var(--color-primary);
-  }
-
-  nav svg {
-    display: block;
   }
 
   @media (max-width: 480px) {
