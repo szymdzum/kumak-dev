@@ -85,7 +85,7 @@ When the debugging server starts, Chrome writes a file named `DevToolsActivePort
 
 Glue them together and you have `ws://127.0.0.1:63475/devtools/browser/<id>`. No HTTP call needed. From there it is pure CDP over the browser socket: `Target.getTargets` lists every tab with its URL and title, and `Target.attachToTarget({ targetId, flatten: true })` gives you a session id for the tab you want. Every later command carries that session id.
 
-![Your tool reads DevToolsActivePort, connects to the browser socket after the user allows it, lists tabs with Target.getTargets and attaches to one. /json/version answers 404 and the page socket 403.](/images/connect-to-existing-chrome-session/toggle-mode.svg)
+![Your tool reads DevToolsActivePort, connects to the browser socket after the user allows it, lists tabs with Target.getTargets and attaches to one. /json/version answers 404 and the page socket 403.](/images/connect-to-existing-chrome-session/toggle-mode.svg?v=2)
 
 One caveat: the file outlives the server. Turn the toggle off or quit Chrome and the file stays, pointing at a port nobody listens on. Treat it as a hint, then check that something answers.
 
