@@ -79,8 +79,8 @@ export function trackLlmsRequest(request: Request, url: string): Promise<void> {
   return trackRequest(request, "llms-request", "LLMs.txt", url);
 }
 
-export function trackRssRequest(request: Request): Promise<void> {
-  return trackRequest(request, "rss-fetch", "RSS Feed", "/rss.xml");
+export function trackRssRequest(request: Request, path: string): Promise<void> {
+  return trackRequest(request, "rss-fetch", "RSS Feed", path);
 }
 
 const MAX_404_PATH_LENGTH = 200;

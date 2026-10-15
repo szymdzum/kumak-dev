@@ -2,7 +2,7 @@
 import { Font, fontData } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 import { siteConfig } from "@/site-config";
-import { DEFAULT_LOCALE, i18n, LOCALE_META, pageVersions, type Translations } from "@/i18n/ui";
+import { hreflangLinks, i18n, LOCALE_META, localePath, pageVersions, type Translations } from "@/i18n/ui";
 import "../styles/global.css";
 
 interface Props {
@@ -24,14 +24,11 @@ const {
   translations = {},
 } = Astro.props;
 
-// hreflang: every language version including this one, plus x-default (English). Only when
-// a translation exists; a page in one language needs no alternates.
 const versions = pageVersions(translations, locale, Astro.url.pathname);
-const defaultPath = versions.find(([lang]) => lang === DEFAULT_LOCALE)?.[1];
-const hreflangs: [string, string][] = defaultPath ? [...versions, ["x-default", defaultPath]] : versions;
-const alternates = versions.length > 1
-  ? hreflangs.map(([hreflang, path]) => ({ hreflang, href: new URL(path, Astro.site).href }))
-  : [];
+const alternates = hreflangLinks(versions).map(([hreflang, path]) => ({
+  hreflang,
+  href: new URL(path, Astro.site).href,
+}));
 const ogLocale = (lang: keyof typeof LOCALE_META) => LOCALE_META[lang].intl.replace("-", "_");
 const ogAlternateLocales = versions.filter(([lang]) => lang !== locale).map(([lang]) => ogLocale(lang));
 const imageURL = new URL(image, Astro.site).href;
@@ -79,7 +76,7 @@ const preloadFonts = FONT_VARIABLES.flatMap((cssVariable) =>
   {FONT_VARIABLES.map((cssVariable) => <Font cssVariable={cssVariable} />)}
   {preloadFonts.map(({ href, type }) => <link rel="preload" href={href} as="font" type={type} crossorigin />)}
 
-  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={title} />
+  <link rel="alternate" type="application/rss+xml" href={localePath(locale, "/rss.xml")} title={title} />
   <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
 
   <ClientRouter />

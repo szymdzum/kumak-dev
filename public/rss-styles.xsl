@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:atom="http://www.w3.org/2005/Atom">
   <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
+  <!-- Feeds set <language>; Polish feeds get Polish labels. -->
+  <xsl:variable name="pl" select="/rss/channel/language = 'pl'"/>
   <xsl:template match="/">
-    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="{/rss/channel/language}">
       <head>
         <title><xsl:value-of select="/rss/channel/title"/> - RSS Feed</title>
         <meta charset="utf-8"/>
@@ -96,7 +98,13 @@
       <body>
         <div class="banner">
           <h2>RSS Feed</h2>
-          <p>Subscribe by copying this URL into your feed reader: <code><xsl:value-of select="/rss/channel/link"/>rss.xml</code></p>
+          <p>
+            <xsl:choose>
+              <xsl:when test="$pl">Subskrybuj, wklejając ten adres do czytnika RSS: </xsl:when>
+              <xsl:otherwise>Subscribe by copying this URL into your feed reader: </xsl:otherwise>
+            </xsl:choose>
+            <code><xsl:value-of select="/rss/channel/link"/>rss.xml</code>
+          </p>
         </div>
         <h1><xsl:value-of select="/rss/channel/title"/></h1>
         <p class="description"><xsl:value-of select="/rss/channel/description"/></p>

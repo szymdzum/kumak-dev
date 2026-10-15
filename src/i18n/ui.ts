@@ -19,6 +19,19 @@ export function toLocale(value: string | undefined): Locale {
 /** A page's path in each language it exists in, e.g. `{ en: "/", pl: "/pl/" }`. */
 export type Translations = Partial<Record<Locale, string>>;
 
+/** Pages that exist in every language at the same path (sitemap alternates read this). */
+export const PAGES_IN_ALL_LOCALES = ["/", "/about/"] as const;
+
+/**
+ * hreflang entries for a page's language versions: each version plus x-default (English).
+ * Empty when there is only one version, since a page in one language needs no alternates.
+ */
+export function hreflangLinks(versions: [string, string][]): [string, string][] {
+  if (versions.length < 2) return [];
+  const defaultVersion = versions.find(([lang]) => lang === DEFAULT_LOCALE);
+  return defaultVersion ? [...versions, ["x-default", defaultVersion[1]]] : versions;
+}
+
 /** The same path in every language, for pages that always exist in all of them. */
 export function pathInAllLocales(path: string): Translations {
   return Object.fromEntries(LOCALES.map((locale) => [locale, localePath(locale, path)]));
