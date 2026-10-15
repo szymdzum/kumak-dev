@@ -130,7 +130,7 @@ export function llmsFullTxt(posts: BlogPost[]): Response {
 }
 
 /** /llms/[slug].txt: a single post as plain Markdown. */
-export function llmsPost(post: BlogPost): Response {
+function llmsPost(post: BlogPost): Response {
   return doc(
     `# ${post.data.title}`,
     "",

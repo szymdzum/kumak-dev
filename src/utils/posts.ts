@@ -91,7 +91,7 @@ export async function postStaticPaths(locale: Locale) {
 }
 
 /** Paths of every language version of a post (itself included), paired by folder. */
-export function postTranslations(post: BlogPost, allPosts: BlogPost[]): Translations {
+function postTranslations(post: BlogPost, allPosts: BlogPost[]): Translations {
   return Object.fromEntries(
     allPosts
       .filter((other) => postFolder(other) === postFolder(post))
