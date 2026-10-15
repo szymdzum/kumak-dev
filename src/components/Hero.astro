@@ -1,45 +1,103 @@
 ---
 import { siteConfig } from "@/site-config";
+import { centerY, loopCount, torusLoop, tubeRadius } from "@utils/torus";
 
-// A torus seen edge-on: each loop around the tube projects to an axis-aligned
-// ellipse whose width shrinks as the loop turns away from the viewer.
-const loopCount = 28;
-const majorRadius = 115;
-const tubeRadius = 44;
-const cx = 250;
-const cy = 110;
-const tilt = Math.PI / 14;
-
-const loops = Array.from({ length: loopCount }, (_, index) => {
-  const phi = -Math.PI / 2 + (index / (loopCount - 1)) * Math.PI;
-  const depth = Math.sin(phi + tilt);
-  const emphasis = Math.abs(Math.cos(phi));
-  return {
-    cx: (cx - majorRadius * depth).toFixed(2),
-    rx: (tubeRadius * Math.abs(depth)).toFixed(2),
-    strokeWidth: (0.4 + emphasis * 0.55).toFixed(3),
-    opacity: (0.25 + emphasis * 0.6).toFixed(3),
-  };
-});
+const loops = Array.from({ length: loopCount }, (_, index) => torusLoop(index));
+const middle = (loopCount - 1) / 2;
 ---
 
 <section>
-  <svg viewBox="90 55 330 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g fill="none" stroke="white">
-      {loops.map((loop) => (
+  <svg viewBox="90 55 330 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" data-hero-torus>
+    <g fill="none" stroke="currentColor">
+      {loops.map((loop, index) => (
         <ellipse
           cx={loop.cx}
-          cy={cy}
+          cy={centerY}
           rx={loop.rx}
           ry={tubeRadius}
           stroke-width={loop.strokeWidth}
           opacity={loop.opacity}
+          pathLength="1"
+          style={`--draw-order: ${Math.abs(index - middle).toFixed(1)}`}
         />
       ))}
     </g>
   </svg>
   <h1>{siteConfig.description}</h1>
 </section>
+
+<script>
+  import { loopCount, torusLoop } from "@utils/torus";
+
+  // Seconds for each loop to advance one slot; a full turn is loopCount times this.
+  const secondsPerSlot = 3;
+  // A green pulse sweeps left to right through the loops every few seconds.
+  const pulseEvery = 8;
+  const pulseDuration = 2;
+  const pulseWidth = 2.5;
+
+  /** Pulse strength in [0, 1] for a loop at `slot`, `elapsed` seconds in. */
+  function pulseAt(slot: number, elapsed: number): number {
+    const progress = ((elapsed + pulseEvery - 3) % pulseEvery) / pulseDuration;
+    if (progress > 1) return 0;
+    // Slot 0 sits on the right, so the front travels from high slots to low.
+    const front = loopCount + pulseWidth - progress * (loopCount + 2 * pulseWidth);
+    const strength = Math.max(0, 1 - Math.abs(slot - front) / pulseWidth);
+    return strength * strength * (3 - 2 * strength);
+  }
+
+  function spin(svg: SVGSVGElement): () => void {
+    const ellipses = [...svg.querySelectorAll("ellipse")];
+    let offset = 0;
+    let elapsed = 0;
+    let frame = 0;
+    let last = 0;
+
+    const tick = (now: number) => {
+      // Clamp the delta so a backgrounded tab doesn't jump on return.
+      const delta = last ? Math.min(now - last, 100) : 0;
+      last = now;
+      elapsed += delta / 1000;
+      offset = (offset + delta / 1000 / secondsPerSlot) % loopCount;
+      ellipses.forEach((ellipse, index) => {
+        const slot = (index + offset) % loopCount;
+        const loop = torusLoop(slot);
+        const pulse = pulseAt(slot, elapsed);
+        const opacity = Number(loop.opacity);
+        ellipse.setAttribute("cx", loop.cx);
+        ellipse.setAttribute("rx", loop.rx);
+        ellipse.setAttribute("stroke-width", loop.strokeWidth);
+        ellipse.setAttribute("opacity", (opacity + (1 - opacity) * pulse * 0.6).toFixed(3));
+        ellipse.style.setProperty("--pulse", `${(pulse * 100).toFixed(1)}%`);
+      });
+      frame = requestAnimationFrame(tick);
+    };
+
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      last = 0;
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      stop();
+      if (entry?.isIntersecting) frame = requestAnimationFrame(tick);
+    });
+    observer.observe(svg);
+
+    return () => {
+      observer.disconnect();
+      stop();
+    };
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    const svg = document.querySelector<SVGSVGElement>("[data-hero-torus]");
+    if (!svg || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const cleanup = spin(svg);
+    document.addEventListener("astro:before-swap", cleanup, { once: true });
+  });
+</script>
 
 <style>
   section {
@@ -61,5 +119,25 @@ const loops = Array.from({ length: loopCount }, (_, index) => {
   svg {
     width: 100%;
     height: auto;
+    color: var(--color-text);
+  }
+
+  /* Loops draw in from the middle outward on first paint. */
+  ellipse {
+    stroke: color-mix(in srgb, var(--color-primary) var(--pulse, 0%), currentColor);
+    animation: draw 0.9s cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    animation-delay: calc(var(--draw-order) * 40ms);
+  }
+
+  /* Dashes only exist while drawing; left on, they leave a seam at the path start. */
+  @keyframes draw {
+    from {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+    }
   }
 </style>
