@@ -40,6 +40,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     right: 0;
     transform: translateX(calc(100% + var(--space-xl)));
     width: max-content;
+    max-width: 16rem;
     height: 100%;
     font-size: var(--text-xs);
   }
@@ -106,7 +107,9 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
     color: var(--color-primary);
   }
 
-  @media (max-width: 1320px) {
+  /* Shown once the margin beside the column fits the capped width; below that,
+     TableOfContentsInline takes over (keep the breakpoints in sync). */
+  @media (max-width: 1199px) {
     nav {
       display: none;
     }

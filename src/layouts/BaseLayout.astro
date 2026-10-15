@@ -29,12 +29,14 @@ type Props = ComponentProps<typeof Head>;
   body {
     display: grid;
     grid-template-rows: auto 1fr auto;
+    /* minmax(0, …) so a long code line can't widen the page past the viewport. */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   main {
-    max-width: var(--content-width);
+    max-width: var(--page-width);
     margin: 0 auto;
-    padding: var(--space-lg) var(--space-md) var(--space-xl);
+    padding: var(--space-lg) var(--gutter) var(--space-xl);
     width: 100%;
   }
 
