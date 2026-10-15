@@ -30,6 +30,7 @@ externalLinks:
     url: "https://github.com/microsoft/playwright/issues/40027"
 ---
 
+import AutoplayVideo from '@components/AutoplayVideo.astro';
 import TldrBox from '@components/TldrBox.astro';
 
 <TldrBox>
@@ -149,18 +150,13 @@ bdg stop                # detach; the tab stays as it was
 
 For Edge or Chrome Canary, point it at the profile with `--user-data-dir`. No restart, no flags, no reload. Chrome asks once, you click Allow, and the tab you were staring at is now something an agent can read.
 
-<video
-  controls
-  muted
-  playsinline
-  preload="none"
-  width="1070"
-  height="760"
+<AutoplayVideo
+  src="/images/connect-to-existing-chrome-session/bdg-attach.mp4"
   poster="/images/connect-to-existing-chrome-session/bdg-attach-poster.png"
-  aria-label="Terminal recording: bdg attach lists two tabs, attaches to the checkout tab without reloading it, and bdg console shows four errors the page logged before the attach."
->
-  <source src="/images/connect-to-existing-chrome-session/bdg-attach.mp4" type="video/mp4" />
-</video>
+  width={1070}
+  height={760}
+  label="Terminal recording: bdg attach lists two tabs, attaches to the checkout tab without reloading it, and bdg console shows four errors the page logged before the attach."
+/>
 
 ## Takeaways
 
