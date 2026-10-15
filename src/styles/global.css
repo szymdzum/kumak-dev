@@ -172,6 +172,7 @@
   /* Font size lives on body, not html: rem stays the user's default, so tokens resolve the same
      everywhere (on html it rescaled rem and made --text-base 20px in components vs 18px body). */
   html {
+    color-scheme: dark;
     font-family: var(--font-family-base);
     line-height: var(--line-height-normal);
     color: var(--color-text);
@@ -181,6 +182,17 @@
   body {
     font-size: var(--text-base);
     line-height: var(--line-height-normal);
+    /* Light-on-dark text renders heavy with macOS subpixel smoothing. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* JetBrains Mono's coding ligatures turn != into ≠ and -> into an arrow; readers copy this text. */
+  code,
+  pre,
+  kbd,
+  samp {
+    font-variant-ligatures: none;
   }
 
   /* Grain texture overlay */

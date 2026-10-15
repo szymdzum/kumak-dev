@@ -20,7 +20,7 @@ const href = postUrl(post.id);
   <p>{post.data.description}</p>
   <div class="meta">
     <DateFormatter date={post.data.pubDate} />
-    <span aria-hidden="true">•</span>
+    <span aria-hidden="true">·</span>
     <a href={href} class="read-more" aria-hidden="true" tabindex="-1">Read</a>
   </div>
 </article>
@@ -34,6 +34,7 @@ const href = postUrl(post.id);
     word-spacing: var(--word-spacing-tight);
     letter-spacing: var(--letter-spacing-tighter);
     margin-bottom: var(--rhythm-quarter);
+    text-wrap: balance;
   }
 
   article h3 a {
