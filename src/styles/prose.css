@@ -169,7 +169,9 @@
 }
 
 /* Images */
-.prose img {
+.prose img,
+.prose video {
+  height: auto;
   border-radius: var(--radius);
   margin: var(--rhythm-single) 0;
 }

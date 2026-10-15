@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace">
+  <title>How a tool attaches to a running Chrome tab when remote debugging is enabled at chrome://inspect</title>
+  <defs>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#00ff41"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#ff6b6b"/>
+    </marker>
+    <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#eedb96"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="630" fill="#101113"/>
+
+  <text x="60" y="72" fill="#e8e8e0" font-size="34" font-weight="700">Attach to your running Chrome tab</text>
+  <text x="60" y="108" fill="#8b8b8b" font-size="18">chrome://inspect/#remote-debugging · Chrome 144+ · Edge · no restart</text>
+
+  <rect x="60" y="200" width="230" height="90" rx="8" fill="#16151d" stroke="#00ff41" stroke-width="2"/>
+  <text x="175" y="241" fill="#00ff41" font-size="22" font-weight="700" text-anchor="middle">your tool</text>
+  <text x="175" y="268" fill="#8b8b8b" font-size="15" text-anchor="middle">bdg, Puppeteer, …</text>
+
+  <line x1="175" y1="290" x2="175" y2="372" stroke="#eedb96" stroke-width="2" marker-end="url(#arrow-yellow)"/>
+  <text x="188" y="337" fill="#eedb96" font-size="15">1. read</text>
+
+  <rect x="60" y="378" width="280" height="112" rx="8" fill="#16151d" stroke="#eedb96" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="80" y="410" fill="#eedb96" font-size="18" font-weight="700">DevToolsActivePort</text>
+  <text x="80" y="442" fill="#e8e8e0" font-size="16">63475</text>
+  <text x="80" y="468" fill="#e8e8e0" font-size="16">/devtools/browser/&lt;id&gt;</text>
+  <text x="60" y="520" fill="#8b8b8b" font-size="14">in the profile directory</text>
+
+  <rect x="440" y="160" width="700" height="420" rx="12" fill="#16151d" stroke="#2a2a2a" stroke-width="2"/>
+  <text x="470" y="198" fill="#8b8b8b" font-size="16">Chrome · your real profile, logged in</text>
+
+  <line x1="290" y1="232" x2="466" y2="252" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-red)"/>
+  <text x="480" y="258" fill="#8b8b8b" font-size="18" text-decoration="line-through">GET /json/version</text>
+  <text x="1110" y="258" fill="#ff6b6b" font-size="20" font-weight="700" text-anchor="end">404</text>
+
+  <line x1="290" y1="258" x2="466" y2="316" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-red)"/>
+  <text x="480" y="322" fill="#8b8b8b" font-size="18" text-decoration="line-through">ws /devtools/page/&lt;id&gt;</text>
+  <text x="1110" y="322" fill="#ff6b6b" font-size="20" font-weight="700" text-anchor="end">403</text>
+
+  <line x1="340" y1="420" x2="466" y2="386" stroke="#00ff41" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="352" y="388" fill="#00ff41" font-size="15">2. connect</text>
+  <text x="480" y="392" fill="#e8e8e0" font-size="18" font-weight="700">ws /devtools/browser/&lt;id&gt;</text>
+  <rect x="890" y="368" width="220" height="34" rx="17" fill="#101113" stroke="#00ff41" stroke-width="1.5"/>
+  <text x="1000" y="391" fill="#00ff41" font-size="16" text-anchor="middle">Allow? → ✓</text>
+
+  <text x="480" y="444" fill="#8b8b8b" font-size="15">Target.getTargets</text>
+  <rect x="480" y="460" width="280" height="50" rx="8" fill="#101113" stroke="#2a2a2a" stroke-width="1.5"/>
+  <text x="500" y="491" fill="#8b8b8b" font-size="17">[0] Docs</text>
+  <rect x="790" y="460" width="320" height="50" rx="8" fill="#101113" stroke="#00ff41" stroke-width="2"/>
+  <text x="810" y="491" fill="#e8e8e0" font-size="17">[1] Checkout · errors</text>
+  <text x="790" y="545" fill="#00ff41" font-size="15">3. attachToTarget({ flatten: true })</text>
+</svg>

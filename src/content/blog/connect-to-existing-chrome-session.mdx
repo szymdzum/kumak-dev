@@ -1,0 +1,172 @@
+---
+title: "Attach to Your Running Chrome Tab"
+description: "Since Chrome 136, --remote-debugging-port is ignored on your real profile. Chrome 144 added a toggle instead. It answers 404 on /json, 403 on page sockets, and asks permission per connection. Here is how it works."
+pubDate: 2026-10-15
+category: "tutorial"
+tags: ["chrome-devtools-protocol", "browser-automation", "debugging", "chrome", "cli"]
+keywords:
+  [
+    "connect to existing Chrome session",
+    "attach to running Chrome",
+    "remote-debugging-port not working",
+    "Chrome 136 remote debugging",
+    "chrome://inspect remote debugging",
+    "DevToolsActivePort",
+    "json/version 404",
+    "Puppeteer connect existing browser",
+    "Playwright connectOverCDP existing Chrome",
+    "Edge remote debugging existing session",
+    "Chrome DevTools Protocol",
+  ]
+heroImage: "/images/connect-to-existing-chrome-session/toggle-mode.png"
+externalLinks:
+  - title: "bdg - Browser Debugger CLI"
+    url: "https://github.com/szymdzum/browser-debugger-cli"
+  - title: "Changes to remote debugging switches to improve security (Chrome blog)"
+    url: "https://developer.chrome.com/blog/remote-debugging-port"
+  - title: "Let your coding agent debug your browser session (Chrome blog)"
+    url: "https://developer.chrome.com/blog/chrome-devtools-mcp-debug-your-browser-session"
+  - title: "Playwright: support chrome://inspect remote debugging (#40027)"
+    url: "https://github.com/microsoft/playwright/issues/40027"
+---
+
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+Since Chrome 136, `--remote-debugging-port` does nothing on your everyday profile. Chrome 144 added a toggle at `chrome://inspect/#remote-debugging` that opens a debugging server in the browser you already run, with no restart. It is a different protocol surface: `/json` answers 404, page sockets answer 403, and every connection needs a click on "Allow". Attach late and Chrome still replays the errors you missed.
+</TldrBox>
+
+The bug is in tab number eleven. The browser has been open for three days. You are logged in, the cart has four items, and the checkout page just threw something in the console.
+
+How do I point a debugger, or an agent, at that tab, as it is right now?
+
+Every tutorial says the same thing: restart Chrome with `--remote-debugging-port=9222`. That answer is wrong twice. A restart throws away the state you wanted to inspect. And since Chrome 136, the flag doesn't work on your real profile anyway.
+
+I hit this while building [bdg](https://github.com/szymdzum/browser-debugger-cli), a CLI that gives agents the Chrome DevTools Protocol from the terminal. Making `bdg attach` work against a real, logged-in browser taught me more about Chrome's debugging server than the previous year of automation.
+
+## Why `--remote-debugging-port` stopped working
+
+In March 2025 the Chrome team [changed the rules](https://developer.chrome.com/blog/remote-debugging-port). From Chrome 136, `--remote-debugging-port` and `--remote-debugging-pipe` are ignored when Chrome runs on its default data directory. They only work together with a non-default `--user-data-dir`.
+
+The reason is infostealers. Malware was launching Chrome with a debugging port and reading cookies straight out of the user's profile, which bypassed App-Bound Encryption. A separate data directory has a separate encryption key, so the port no longer opens your real cookie jar.
+
+Good for security. Bad for "debug the tab I have open". A fresh `--user-data-dir` is a fresh browser: no logins, no extensions, no tab eleven. Chrome doesn't print a warning either. The flag is silently ignored, which is why "remote-debugging-port not working" is such a popular search.
+
+## The toggle in chrome://inspect
+
+Chrome 144 added the sanctioned replacement. Open `chrome://inspect/#remote-debugging`, enable it, and Chrome starts a debugging server inside the browser that is already running, on your real profile. This is what `chrome-devtools-mcp --autoConnect` uses.
+
+It looks like the old port. It is not. I probed it on Chrome 154 (macOS) with the toggle enabled:
+
+| Check | Port from the flag | Toggle |
+|---|---|---|
+| `GET /json/version`, `/json/list` | works | **404** |
+| Page socket `/devtools/page/<id>` | works | **403** |
+| Browser socket `/devtools/browser/<id>` | works | works after the user clicks Allow |
+| Port | the one you chose | random |
+
+Three assumptions that every CDP client makes are gone at once.
+
+**No HTTP discovery.** Most tools find the WebSocket URL by fetching `/json/version`. Here it answers 404, so they report "not a DevTools endpoint" and give up. Playwright's `connectOverCDP` had to be fixed for this mode ([Playwright issue #40027](https://github.com/microsoft/playwright/issues/40027)).
+
+**No page sockets.** The classic way to drive one tab is to connect to `/devtools/page/<id>`. Here it answers 403. The only door is the browser socket.
+
+**A random port.** No 9222 to guess.
+
+## Finding the port: DevToolsActivePort
+
+When the debugging server starts, Chrome writes a file named `DevToolsActivePort` into the profile directory (`~/Library/Application Support/Google/Chrome` on macOS, `~/.config/google-chrome` on Linux, `%LOCALAPPDATA%\Google\Chrome\User Data` on Windows). Two lines: the port, then the browser path.
+
+```text
+63475
+/devtools/browser/0b6c1c1e-…
+```
+
+Glue them together and you have `ws://127.0.0.1:63475/devtools/browser/<id>`. No HTTP call needed. From there it is pure CDP over the browser socket: `Target.getTargets` lists every tab with its URL and title, and `Target.attachToTarget({ targetId, flatten: true })` gives you a session id for the tab you want. Every later command carries that session id.
+
+![Your tool reads DevToolsActivePort, connects to the browser socket after the user allows it, lists tabs with Target.getTargets and attaches to one. /json/version answers 404 and the page socket 403.](/images/connect-to-existing-chrome-session/toggle-mode.svg)
+
+One caveat: the file outlives the server. Turn the toggle off or quit Chrome and the file stays, pointing at a port nobody listens on. Treat it as a hint, then check that something answers.
+
+## "Allow remote debugging?" on every connection
+
+The first connection pops a dialog in Chrome. Click Allow and a banner appears: "Chrome is being controlled by automated test software".
+
+The second connection pops the dialog again. Chrome doesn't remember the answer. The permission belongs to one WebSocket, not to the tool, not to the session.
+
+That changes how you design a client. bdg had a second, hidden browser socket that it opened to follow downloads. Harmless with the old port. With the toggle it would have meant two dialogs for one command, with no way for the user to know why. So the rule became: one command, one WebSocket. Listing tabs is one connection. A whole session, from attach to stop, is one connection. The smoke test runs Chrome behind a TCP proxy that counts WebSocket upgrades, and fails on the second one.
+
+In practice you click once per session. The commands you run after attaching go through the socket the session already holds, so they don't ask again.
+
+How Chrome answers is worth knowing too. Chromium's `devtools_http_handler.cc` accepts the upgrade only after Allow. If the user declines, the client gets `403 Connection rejected`. While the dialog is open, the upgrade gets no answer at all. Your client waits forever unless it has its own timeout. bdg waits 30 seconds, never retries (a retry is another dialog), and reports declined and unanswered as two different errors.
+
+## Attaching late still catches the error
+
+This was the part I didn't expect. The error happened ten minutes ago. Is it lost?
+
+I tested it with a page that logs, throws and fails two requests, then attached 2.5 seconds later and enabled the usual domains:
+
+```text
+console.log: early log
+console.error: early error
+exception: Error: early rejection
+exception: Error: early uncaught
+log[network/error]: Failed to load resource: … 404 (Not Found) /missing.png
+log[network/error]: Failed to load resource: … 500 (Internal Server Error) /api/fail
+issue: QuirksModeIssue
+```
+
+Everything came back. `Runtime.enable` replays stored console messages and uncaught exceptions. `Log.enable` replays network errors with URL and status, plus violations and interventions. `Audits.enable` replays the Issues panel.
+
+What doesn't come back is the network history: headers, bodies, timings of requests made before you attached. `performance.getEntriesByType('resource')` still gives you URLs, durations and `responseStatus`, which is often enough to spot the failing call.
+
+## Microsoft Edge works the same way
+
+Edge is Chromium underneath, and the toggle came with it. I tried Edge 155 on macOS: `edge://inspect/#remote-debugging`, enable, and Edge writes `DevToolsActivePort` into `~/Library/Application Support/Microsoft Edge`. `/json/version` and `/json/list` answer 404, every connection asks for permission, and a late attach replays console errors, uncaught exceptions, rejected promises and failed requests, exactly like Chrome.
+
+One difference: Edge picked port 9222, where Chrome picked a random one. Don't count on either. Read the file.
+
+## Smaller traps
+
+**Background tabs don't render.** `Page.captureScreenshot` on a background tab can hang forever (headless Chrome on Linux never answers). Checking `document.visibilityState` first doesn't help if you also enable focus emulation: the tab then reports `visible`. bdg asks the tab for one `requestAnimationFrame` with a 2-second limit instead, and tells you to bring the tab to the front.
+
+**Auto-attach on the wrong level.** `Target.setAutoAttach` sent to the browser auto-attaches every tab you have open. Send it to the page session to get only the tab's iframes and workers.
+
+**Your WebSocket client matters.** In my test, Node's built-in `WebSocket` failed the handshake against the toggle. The `ws` package worked.
+
+**Detach, don't close.** You are a guest in someone's browser. Stopping the session must leave the tab and Chrome exactly as they were.
+
+## What it looks like in bdg
+
+All of the above became one command:
+
+```bash
+bdg attach              # list tabs: [0] title — url
+bdg attach checkout     # attach to the tab whose URL or title contains "checkout"
+bdg console             # errors from before the attach are already there
+bdg stop                # detach; the tab stays as it was
+```
+
+For Edge or Chrome Canary, point it at the profile with `--user-data-dir`. No restart, no flags, no reload. Chrome asks once, you click Allow, and the tab you were staring at is now something an agent can read.
+
+<video
+  controls
+  muted
+  playsinline
+  preload="none"
+  width="1070"
+  height="760"
+  poster="/images/connect-to-existing-chrome-session/bdg-attach-poster.png"
+  aria-label="Terminal recording: bdg attach lists two tabs, attaches to the checkout tab without reloading it, and bdg console shows four errors the page logged before the attach."
+>
+  <source src="/images/connect-to-existing-chrome-session/bdg-attach.mp4" type="video/mp4" />
+</video>
+
+## Takeaways
+
+- `--remote-debugging-port` on the default profile is dead since Chrome 136. It fails silently.
+- The `chrome://inspect` toggle is the way into a real profile: browser socket only, no `/json`, random port in `DevToolsActivePort`.
+- Every WebSocket is a permission dialog. Design for exactly one.
+- Late attach is not blind. Console, exceptions, network errors and Issues are replayed.
+
+The best time to attach a debugger was before the bug. The second best is now, without a restart.
