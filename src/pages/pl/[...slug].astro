@@ -1,0 +1,13 @@
+---
+import PostPage from "@components/PostPage.astro";
+import type { ComponentProps } from "astro/types";
+import { postStaticPaths } from "@utils/posts";
+
+export const prerender = true;
+
+export const getStaticPaths = () => postStaticPaths("pl");
+
+type Props = ComponentProps<typeof PostPage>;
+---
+
+<PostPage {...Astro.props} />

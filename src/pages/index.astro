@@ -1,47 +1,7 @@
 ---
+import HomePage from "@components/HomePage.astro";
+
 export const prerender = true;
-
-import Hero from "@components/Hero.astro";
-import BlogPostCard from "@components/BlogPostCard.astro";
-import BaseLayout from "@layouts/BaseLayout.astro";
-import SchemaOrg from "@components/SchemaOrg.astro";
-import { getAllPosts } from "@utils/posts";
-import { siteConfig } from "@/site-config";
-
-const posts = await getAllPosts();
 ---
 
-<BaseLayout title={`Kumak.dev - ${siteConfig.name}`} description={siteConfig.description}>
-  <SchemaOrg type="WebSite" slot="head" />
-  <Hero />
-
-  <section>
-    <h2>Recent Posts</h2>
-    <div>
-      {posts.map((post) => (
-        <BlogPostCard post={post} />
-      ))}
-    </div>
-  </section>
-</BaseLayout>
-
-<style>
-  section {
-    margin-top: var(--space-2xl);
-  }
-
-  h2 {
-    font-family: var(--font-family-display);
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--letter-spacing-tighter);
-    color: var(--color-primary);
-    margin-bottom: var(--space-lg);
-  }
-
-  section > div {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-  }
-</style>
+<HomePage />

@@ -1,0 +1,59 @@
+---
+import Hero from "@components/Hero.astro";
+import BlogPostCard from "@components/BlogPostCard.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SchemaOrg from "@components/SchemaOrg.astro";
+import { getPostsInAllLocales, inLocale, untranslatedPosts } from "@utils/posts";
+import { siteConfig } from "@/site-config";
+import { i18n, pathInAllLocales } from "@/i18n/ui";
+
+// Home page for the current language: its posts, then posts not translated into it yet.
+const { locale, t } = i18n(Astro.currentLocale);
+const allPosts = await getPostsInAllLocales();
+const posts = inLocale(allPosts, locale);
+const otherPosts = untranslatedPosts(locale, allPosts);
+---
+
+<BaseLayout title={`Kumak.dev - ${siteConfig.name}`} translations={pathInAllLocales("/")}>
+  <SchemaOrg type="WebSite" slot="head" />
+  <Hero />
+
+  {posts.length > 0 && (
+    <section>
+      <h2>{t.recentPosts}</h2>
+      <div>
+        {posts.map((post) => <BlogPostCard post={post} />)}
+      </div>
+    </section>
+  )}
+
+  {otherPosts.length > 0 && (
+    <section>
+      <h2>{t.otherLanguagePosts}</h2>
+      <div>
+        {otherPosts.map((post) => <BlogPostCard post={post} />)}
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  section {
+    margin-top: var(--space-2xl);
+  }
+
+  h2 {
+    font-family: var(--font-family-display);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-primary);
+    margin-bottom: var(--space-lg);
+  }
+
+  section > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+</style>

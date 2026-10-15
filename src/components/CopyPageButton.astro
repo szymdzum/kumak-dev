@@ -1,16 +1,24 @@
 ---
 import { Icon } from "astro-icon/components";
 import ActionButton from "./ActionButton.astro";
-import { llmsUrl } from "@utils/path";
+import { i18n } from "@/i18n/ui";
 
 interface Props {
-  slug: string;
+  /** The post's plain-text (llms.txt) path. */
+  href: string;
 }
 
-const { slug } = Astro.props;
+const { href } = Astro.props;
+const { t } = i18n(Astro.currentLocale);
 ---
 
-<ActionButton label="Copy" data-copy-page={llmsUrl(slug)} aria-label="Copy as Markdown">
+<ActionButton
+  label={t.copy}
+  data-copy-page={href}
+  data-copied-label={t.copied}
+  data-failed-label={t.copyFailed}
+  aria-label={t.copyAsMarkdown}
+>
   <Icon name="lucide:copy" size={16} />
   <Icon name="lucide:check" size={16} />
 </ActionButton>
@@ -43,9 +51,11 @@ const { slug } = Astro.props;
     const url = button?.dataset.copyPage;
     if (!button || !label || !url) return;
 
+    const idleLabel = label.textContent;
+    const { copiedLabel = "", failedLabel = "" } = button.dataset;
     const reset = () => {
       delete button.dataset.copied;
-      label.textContent = "Copy";
+      label.textContent = idleLabel;
     };
 
     let resetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -55,11 +65,11 @@ const { slug } = Astro.props;
       try {
         await copyFrom(url);
         button.dataset.copied = "";
-        label.textContent = "Copied";
+        label.textContent = copiedLabel;
         track.articleCopy();
       } catch (err) {
         console.error("Failed to copy:", err);
-        label.textContent = "Failed";
+        label.textContent = failedLabel;
       }
       resetTimer = setTimeout(reset, RESET_DELAY);
     });

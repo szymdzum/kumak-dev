@@ -1,30 +1,48 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { siteConfig } from "@/site-config";
+import { i18n, LOCALE_META, localePath, pageVersions, type Translations } from "@/i18n/ui";
 import LlmsTxtIcon from "./LlmsTxtIcon.astro";
 
+interface Props {
+  /** This page in other languages; the switcher links to them and hides when there are none. */
+  translations?: Translations | undefined;
+}
+
+const { translations = {} } = Astro.props;
+const { locale, t } = i18n(Astro.currentLocale);
 const { rss, ...externalSocials } = siteConfig.socials;
+const otherVersions = pageVersions(translations, locale, Astro.url.pathname).filter(([lang]) => lang !== locale);
 ---
 
 <header>
   <div>
-    <a href="/" aria-label={`${siteConfig.name} home`}>[{siteConfig.name}]</a>
-    <nav aria-label="Social links">
+    <a href={localePath(locale, "/")} aria-label={t.home(siteConfig.name)}>[{siteConfig.name}]</a>
+    {otherVersions.length > 0 && (
+      <nav aria-label={t.languageSwitch}>
+        {otherVersions.map(([lang, path]) => (
+          <a href={path} hreflang={lang} lang={lang} aria-label={`${lang.toUpperCase()} ${LOCALE_META[lang].name}`}>
+            {lang.toUpperCase()}
+          </a>
+        ))}
+      </nav>
+    )}
+    <nav aria-label={t.socialLinks}>
       {Object.entries(externalSocials).map(([key, social]) => (
         <a
           href={social.url}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`${siteConfig.author.handle} on ${social.name}`}
+          aria-label={t.profileOn(siteConfig.author.handle, social.name)}
           data-social={key}
         >
           <Icon name={`lucide:${key}`} size={24} />
         </a>
       ))}
-      <a href={rss.url} aria-label={`Subscribe via ${rss.name}`} data-astro-prefetch="false">
+      <a href={localePath(locale, rss.url)} aria-label={t.subscribeVia(rss.name)} data-astro-prefetch="false">
         <Icon name="lucide:rss" size={24} />
       </a>
-      <a href="/llms-full.txt" aria-label="LLMs.txt full content" data-astro-prefetch="false">
+      <a href="/llms-full.txt" aria-label={t.llmsFull} data-astro-prefetch="false">
         <LlmsTxtIcon />
       </a>
     </nav>
@@ -40,13 +58,16 @@ const { rss, ...externalSocials } = siteConfig.socials;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--space-md);
+    /* Small: the logo's auto margin already spaces it from the navs; this is the language-to-social gap. */
+    gap: var(--space-xs);
     max-width: var(--page-width);
     margin: 0 auto;
     padding: 0 var(--gutter);
   }
 
+  /* The logo takes the free space, so the language and social navs sit together on the right. */
   header > div > a {
+    margin-right: auto;
     font-family: var(--font-family-display);
     color: var(--color-primary);
     text-decoration: none;
@@ -71,6 +92,14 @@ const { rss, ...externalSocials } = siteConfig.socials;
 
   nav a:hover {
     color: var(--color-primary);
+  }
+
+  nav a[hreflang] {
+    align-self: center;
+    font-family: var(--font-family-display);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
   }
 
   @media (max-width: 480px) {

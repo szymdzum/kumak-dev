@@ -1,12 +1,15 @@
 ---
 import { Icon } from 'astro-icon/components';
 import type { HTMLAttributes } from 'astro/types';
+import { i18n } from "@/i18n/ui";
 
 type Props = HTMLAttributes<'pre'>;
+
+const { t } = i18n(Astro.currentLocale);
 ---
 
 <div data-codeblock>
-  <button type="button" aria-label="Copy code to clipboard" data-codeblock-copy>
+  <button type="button" aria-label={t.copyCode} data-copied-label={t.codeCopied} data-codeblock-copy>
     <Icon name="lucide:copy" size={20} />
     <Icon name="lucide:check" size={20} />
   </button>
@@ -99,7 +102,7 @@ type Props = HTMLAttributes<'pre'>;
         try {
           await navigator.clipboard.writeText(code);
           button.dataset.copied = '';
-          button.setAttribute('aria-label', 'Copied to clipboard');
+          button.setAttribute('aria-label', button.dataset.copiedLabel ?? '');
           setTimeout(() => {
             delete button.dataset.copied;
             if (idleLabel) button.setAttribute('aria-label', idleLabel);

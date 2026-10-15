@@ -61,6 +61,12 @@
 - `opinion`: Takes a stance, backs it with evidence
 - `project`: Building something, showing the process
 
+## Files and Translations
+
+Each post is a folder: `src/content/blog/<english-slug>/en.mdx`. The folder name is the English URL.
+
+A Polish version goes next to it as `pl.mdx` with the same frontmatter fields plus `slug` (the Polish URL, lowercase and hyphenated, e.g. `kiedy-cli-wystarcza`). Translate `title`, `description` and `keywords`; keep `pubDate`, `category` and `tags`. Polish uses „…” quotes and the same no-em-dash rule. Images stay in `public/images/<english-slug>/`.
+
 ## Frontmatter Template
 
 ```yaml
