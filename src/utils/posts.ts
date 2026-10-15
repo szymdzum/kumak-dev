@@ -12,6 +12,11 @@ function countWords(text: string): number {
   return text.trim().split(/\s+/).length;
 }
 
+/** URL slug: the post's folder name (ids are "<slug>/<lang>"). */
+export function postSlug(post: BlogPost): string {
+  return post.id.split("/")[0];
+}
+
 export async function getAllPosts(): Promise<BlogPost[]> {
   const posts = await getCollection("blog", ({ data }: BlogPost) => {
     return import.meta.env.DEV || !data.draft;

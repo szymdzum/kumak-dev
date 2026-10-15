@@ -15,14 +15,14 @@ import TableOfContents from "@components/TableOfContents.astro";
 import TableOfContentsInline from "@components/TableOfContentsInline.astro";
 import ScrollDepthTracker from "@components/ScrollDepthTracker.astro";
 import { render } from "astro:content";
-import { type BlogPost, estimateReadingTime, getAllPosts } from "@utils/posts";
+import { type BlogPost, estimateReadingTime, getAllPosts, postSlug } from "@utils/posts";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
   return posts.map((post: BlogPost) => ({
-    params: { slug: post.id },
+    params: { slug: postSlug(post) },
     props: post,
   }));
 }
@@ -35,6 +35,7 @@ const { Content, headings } = await render(post);
 const { title, description, pubDate, updatedDate, category, tags, heroImage, externalLinks, keywords, showToc } = post.data;
 
 const readingTime = estimateReadingTime(post.body);
+const slug = postSlug(post);
 ---
 
 <BaseLayout title={title} description={description} image={heroImage} ogType="article">
@@ -71,8 +72,8 @@ const readingTime = estimateReadingTime(post.body);
             <dd>{category}</dd>
           </dl>
           <div class="action-buttons">
-            <LlmsTxtButton slug={post.id} />
-            <CopyPageButton slug={post.id} />
+            <LlmsTxtButton slug={slug} />
+            <CopyPageButton slug={slug} />
             <ShareButton title={title} description={description} />
           </div>
         </div>

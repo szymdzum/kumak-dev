@@ -1,6 +1,6 @@
 import { siteConfig } from "@/site-config";
 import { llmsUrl, postUrl } from "./path";
-import { type BlogPost, isoDate } from "./posts";
+import { type BlogPost, isoDate, postSlug } from "./posts";
 
 interface Link {
   title: string;
@@ -84,7 +84,7 @@ function linkList(title: string, links: Link[]): string[] {
 
 function postMeta(post: BlogPost): string[] {
   return [
-    `URL: ${siteConfig.url}${postUrl(post.id)}`,
+    `URL: ${siteConfig.url}${postUrl(postSlug(post))}`,
     `Published: ${isoDate(post.data.pubDate)}`,
     `Category: ${post.data.category}`,
   ];
@@ -95,7 +95,7 @@ export function llmsTxt(posts: BlogPost[]): Response {
   const postLinks = posts.map((post) => ({
     title: post.data.title,
     description: post.data.description,
-    href: llmsUrl(post.id),
+    href: llmsUrl(postSlug(post)),
   }));
   return doc(header, linkList("Posts", postLinks), linkList("Optional", OPTIONAL_LINKS));
 }
