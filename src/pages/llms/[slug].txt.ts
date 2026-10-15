@@ -1,22 +1,5 @@
-import type { APIRoute } from "astro";
-import { trackLlmsRequest } from "@utils/analytics";
-import { llmsPost } from "@utils/llms";
-import { llmsUrl } from "@utils/path";
-import { getAllPosts, postSlug } from "@utils/posts";
+import { llmsPostRoute } from "@utils/llms";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, request }) => {
-  const posts = await getAllPosts();
-  const post = posts.find((p) => postSlug(p) === params.slug);
-
-  if (!post) {
-    return new Response("Not found", { status: 404 });
-  }
-
-  const tracked = trackLlmsRequest(request, llmsUrl(postSlug(post)));
-  const response = llmsPost(post);
-
-  await tracked;
-  return response;
-};
+export const GET = llmsPostRoute("en");

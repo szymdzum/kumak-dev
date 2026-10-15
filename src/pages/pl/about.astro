@@ -1,0 +1,56 @@
+---
+export const prerender = true;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import PageHeader from "@components/PageHeader.astro";
+import { siteConfig } from "@/site-config";
+import { pathInAllLocales } from "@/i18n/ui";
+---
+
+<BaseLayout
+  title={`O mnie - ${siteConfig.name}`}
+  description="Front-end developer z 13-letnim doświadczeniem w budowaniu stron i aplikacji"
+  translations={pathInAllLocales("/about/")}
+>
+  <article>
+    <PageHeader title="O mnie" />
+
+    <div class="prose">
+      <p>
+        Jestem Kumak, front-end developer, który od 13 lat pisze HTML, CSS i JavaScript.
+        Mam słabość do prostych rzeczy, które po prostu działają.
+      </p>
+
+      <h2>Skąd „The Null Hypothesis”</h2>
+      <p>
+        W statystyce zaczyna się bez założeń i sprawdza, co mówią dane.
+        Tak podchodzę do rzeczy. Bez z góry przyjętych przekonań o tym, co powinno działać.
+        Liczy się to, co działa naprawdę.
+      </p>
+
+      <h2>Na czym mi zależy</h2>
+      <p>
+        Standardy sieciowe, dostępność i semantyczny HTML. Śledzę najnowsze trendy, ale przy
+        wdrażaniu wolę być krok za nimi.
+      </p>
+
+      <p>
+        Wierzę w <strong>prostotę zamiast złożoności</strong>. Eleganckie rozwiązania zamiast
+        sprytnych hacków. Systemy, które rosną spokojnie, zamiast zapadać się pod własnym ciężarem.
+      </p>
+
+      <h2>Projekty poboczne</h2>
+      <p>
+        W wolnym czasie piszę narzędzia CLI dla agentów AI. Obecny projekt:
+        <a href="https://github.com/szymdzum/browser-debugger-cli" lang="en">browser-debugger-cli</a>,
+        narzędzie do debugowania przeglądarki przez Chrome DevTools Protocol.
+      </p>
+
+      <h2>Co tu znajdziesz</h2>
+      <p>
+        Front-end, narzędzia deweloperskie i pracę z agentami AI. Praktyczne wzorce zamiast teorii.
+        Rzeczy sprawdzone w praktyce i uznane za przydatne.
+      </p>
+    </div>
+  </article>
+</BaseLayout>

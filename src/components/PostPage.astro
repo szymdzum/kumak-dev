@@ -1,0 +1,136 @@
+---
+import DateFormatter from "@components/DateFormatter.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import CodeBlock from "@components/CodeBlock.astro";
+import Giscus from "@components/Giscus.astro";
+import CopyPageButton from "@components/CopyPageButton.astro";
+import ShareButton from "@components/ShareButton.astro";
+import LlmsTxtButton from "@components/LlmsTxtButton.astro";
+import SchemaOrg from "@components/SchemaOrg.astro";
+import ArticleMeta from "@components/ArticleMeta.astro";
+import ArticleFooter from "@components/ArticleFooter.astro";
+import PageHeader from "@components/PageHeader.astro";
+import FurtherReading from "@components/FurtherReading.astro";
+import TableOfContents from "@components/TableOfContents.astro";
+import TableOfContentsInline from "@components/TableOfContentsInline.astro";
+import ScrollDepthTracker from "@components/ScrollDepthTracker.astro";
+import { render } from "astro:content";
+import { type Category, i18n, type Translations } from "@/i18n/ui";
+import { type BlogPost, estimateReadingTime, postLlmsPath } from "@utils/posts";
+
+interface Props {
+  post: BlogPost;
+  /** Every language version of this post (itself included). */
+  translations: Translations;
+}
+
+const { post, translations } = Astro.props;
+const { Content, headings } = await render(post);
+
+const { title, description, pubDate, updatedDate, category, tags, heroImage, externalLinks, keywords, showToc } = post.data;
+
+const readingTime = estimateReadingTime(post.body);
+const llmsPath = postLlmsPath(post);
+const { t } = i18n(Astro.currentLocale);
+// post.data is typed `any` by the generated collection types, so name the type explicitly.
+const categoryLabel = t.categories[category as Category];
+---
+
+<BaseLayout title={title} description={description} image={heroImage} ogType="article" translations={translations}>
+  <ArticleMeta
+    pubDate={pubDate}
+    updatedDate={updatedDate}
+    category={category}
+    tags={tags}
+    keywords={keywords}
+    slot="head"
+  />
+  <SchemaOrg
+    type="BlogPosting"
+    title={title}
+    description={description}
+    pubDate={pubDate}
+    updatedDate={updatedDate}
+    image={heroImage}
+    keywords={keywords}
+    slot="head"
+  />
+  <div class="article-layout">
+    <article>
+      <PageHeader title={title} id="top">
+        <div class="meta-row">
+          <dl>
+            <dt class="sr-only">{t.published}</dt>
+            <dd>
+              <DateFormatter date={pubDate} />
+            </dd>
+            <dt class="sr-only">{t.readingTime}</dt>
+            <dd><data value={readingTime}>{t.minRead(readingTime)}</data></dd>
+            <dt class="sr-only">{t.category}</dt>
+            <dd>{categoryLabel}</dd>
+          </dl>
+          <div class="action-buttons">
+            <LlmsTxtButton href={llmsPath} />
+            <CopyPageButton href={llmsPath} />
+            <ShareButton title={title} description={description} />
+          </div>
+        </div>
+      </PageHeader>
+      {showToc && <TableOfContentsInline headings={headings} />}
+      <div class="prose">
+        <Content components={{ pre: CodeBlock }} />
+      </div>
+      <FurtherReading links={externalLinks} />
+      <ArticleFooter />
+      <Giscus />
+    </article>
+    {showToc && <TableOfContents headings={headings} title={title} />}
+  </div>
+  <ScrollDepthTracker />
+</BaseLayout>
+
+<style>
+  .article-layout {
+    position: relative;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    margin-top: var(--space-md);
+  }
+
+  dl {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  dd + dd::before {
+    content: "·";
+    margin-right: var(--space-xs);
+    color: var(--color-text-muted);
+  }
+
+  dd:last-of-type {
+    color: var(--color-primary);
+    text-transform: capitalize;
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* Buttons carry their own padding as spacing; pull the row back to the content edge. */
+  .action-buttons {
+    display: flex;
+    margin-right: calc(-1 * var(--space-xs));
+  }
+</style>

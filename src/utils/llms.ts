@@ -1,6 +1,8 @@
+import type { APIRoute } from "astro";
 import { siteConfig } from "@/site-config";
-import { llmsUrl, postUrl } from "./path";
-import { type BlogPost, isoDate, postSlug } from "./posts";
+import type { Locale } from "@/i18n/ui";
+import { trackLlmsRequest } from "./analytics";
+import { type BlogPost, getAllPosts, isoDate, postLlmsPath, postPath, postSlug } from "./posts";
 
 interface Link {
   title: string;
@@ -84,7 +86,7 @@ function linkList(title: string, links: Link[]): string[] {
 
 function postMeta(post: BlogPost): string[] {
   return [
-    `URL: ${siteConfig.url}${postUrl(postSlug(post))}`,
+    `URL: ${siteConfig.url}${postPath(post)}`,
     `Published: ${isoDate(post.data.pubDate)}`,
     `Category: ${post.data.category}`,
   ];
@@ -95,7 +97,7 @@ export function llmsTxt(posts: BlogPost[]): Response {
   const postLinks = posts.map((post) => ({
     title: post.data.title,
     description: post.data.description,
-    href: llmsUrl(postSlug(post)),
+    href: postLlmsPath(post),
   }));
   return doc(header, linkList("Posts", postLinks), linkList("Optional", OPTIONAL_LINKS));
 }
@@ -138,4 +140,21 @@ export function llmsPost(post: BlogPost): Response {
     "",
     stripMdx(post.body ?? ""),
   );
+}
+
+/** GET handler for one post as plain text in a language: /llms/<slug>.txt, /pl/llms/<slug>.txt. */
+export function llmsPostRoute(locale: Locale): APIRoute {
+  return async ({ params, request }) => {
+    const post = (await getAllPosts(locale)).find((p) => postSlug(p) === params.slug);
+
+    if (!post) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    const tracked = trackLlmsRequest(request, postLlmsPath(post));
+    const response = llmsPost(post);
+
+    await tracked;
+    return response;
+  };
 }

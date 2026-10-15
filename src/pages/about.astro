@@ -4,11 +4,13 @@ export const prerender = true;
 import BaseLayout from "@layouts/BaseLayout.astro";
 import PageHeader from "@components/PageHeader.astro";
 import { siteConfig } from "@/site-config";
+import { pathInAllLocales } from "@/i18n/ui";
 ---
 
 <BaseLayout
   title={`About - ${siteConfig.name}`}
   description="Front-end engineer with 13 years of experience building for the web"
+  translations={pathInAllLocales("/about/")}
 >
   <article>
     <PageHeader title="About" />

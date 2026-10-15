@@ -1,7 +1,6 @@
 ---
 import DateFormatter from "@components/DateFormatter.astro";
-import { postUrl } from "@utils/path";
-import { type BlogPost, postSlug } from "@utils/posts";
+import { type BlogPost, postLocale, postPath } from "@utils/posts";
 import { i18n } from "@/i18n/ui";
 
 interface Props {
@@ -9,13 +8,16 @@ interface Props {
 }
 
 const { post } = Astro.props
-const href = postUrl(postSlug(post));
-const { t } = i18n(Astro.currentLocale);
+const href = postPath(post);
+const { locale, t } = i18n(Astro.currentLocale);
+// A post listed in another language than the page's (e.g. English posts on the Polish home).
+const postLang = postLocale(post);
+const otherLang = postLang === locale ? undefined : postLang;
 ---
 
-<article>
+<article lang={otherLang}>
   <h3>
-    <a href={href}>
+    <a href={href} hreflang={otherLang}>
       {post.data.title}
     </a>
   </h3>

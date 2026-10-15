@@ -19,6 +19,11 @@ export function toLocale(value: string | undefined): Locale {
 /** A page's path in each language it exists in, e.g. `{ en: "/", pl: "/pl/" }`. */
 export type Translations = Partial<Record<Locale, string>>;
 
+/** The same path in every language, for pages that always exist in all of them. */
+export function pathInAllLocales(path: string): Translations {
+  return Object.fromEntries(LOCALES.map((locale) => [locale, localePath(locale, path)]));
+}
+
 /**
  * Language versions of a page as [locale, path] pairs, the current page included
  * (its own path wins over a `translations` entry for the same locale).
@@ -51,6 +56,7 @@ const en = {
   languageSwitch: "Language",
   builtWith: "Built with Astro.",
   recentPosts: "Recent Posts",
+  otherLanguagePosts: "In Polish",
   read: "Read",
   published: "Published",
   readingTime: "Reading time",
@@ -99,6 +105,7 @@ const pl: Messages = {
   languageSwitch: "Język",
   builtWith: "Zbudowane w Astro.",
   recentPosts: "Najnowsze wpisy",
+  otherLanguagePosts: "Po angielsku",
   read: "Czytaj",
   published: "Opublikowano",
   readingTime: "Czas czytania",

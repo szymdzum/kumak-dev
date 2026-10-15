@@ -1,20 +1,20 @@
 ---
 import { Icon } from "astro-icon/components";
 import ActionButton from "./ActionButton.astro";
-import { llmsUrl } from "@utils/path";
 import { i18n } from "@/i18n/ui";
 
 interface Props {
-  slug: string;
+  /** The post's plain-text (llms.txt) path. */
+  href: string;
 }
 
-const { slug } = Astro.props;
+const { href } = Astro.props;
 const { t } = i18n(Astro.currentLocale);
 ---
 
 <ActionButton
   label={t.copy}
-  data-copy-page={llmsUrl(slug)}
+  data-copy-page={href}
   data-copied-label={t.copied}
   data-failed-label={t.copyFailed}
   aria-label={t.copyAsMarkdown}
