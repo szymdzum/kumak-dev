@@ -7,3 +7,9 @@ export function postUrl(slug: string): string {
 export function llmsUrl(slug: string): string {
   return `/llms/${slug}.txt`;
 }
+
+/**
+ * Post source file, relative to src/content/blog: one folder per post, one file per
+ * language (`<slug>/en.mdx`). Groups: 1 = slug (folder name), 2 = language.
+ */
+export const POST_FILE = /^([^/]+)\/(en)\.mdx?$/;
