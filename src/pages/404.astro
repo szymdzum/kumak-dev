@@ -4,17 +4,20 @@ export const prerender = false;
 import BaseLayout from "@layouts/BaseLayout.astro";
 import PageHeader from "@components/PageHeader.astro";
 import { track404Request } from "@utils/analytics";
+import { i18n, localePath } from "@/i18n/ui";
 
 await track404Request(Astro.request, Astro.url.pathname);
+
+const { locale, t } = i18n(Astro.currentLocale);
 ---
 
-<BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist.">
+<BaseLayout title={t.notFoundTitle} description={t.notFoundDescription}>
   <article>
     <PageHeader title="404" />
 
     <div class="prose">
-      <p>The page you're looking for doesn't exist or has been moved.</p>
-      <p><a href="/">Go back home</a></p>
+      <p>{t.notFoundText}</p>
+      <p><a href={localePath(locale, "/")}>{t.backHome}</a></p>
     </div>
   </article>
 </BaseLayout>

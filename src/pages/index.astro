@@ -7,16 +7,18 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import SchemaOrg from "@components/SchemaOrg.astro";
 import { getAllPosts } from "@utils/posts";
 import { siteConfig } from "@/site-config";
+import { i18n } from "@/i18n/ui";
 
 const posts = await getAllPosts();
+const { t } = i18n(Astro.currentLocale);
 ---
 
-<BaseLayout title={`Kumak.dev - ${siteConfig.name}`} description={siteConfig.description}>
+<BaseLayout title={`Kumak.dev - ${siteConfig.name}`}>
   <SchemaOrg type="WebSite" slot="head" />
   <Hero />
 
   <section>
-    <h2>Recent Posts</h2>
+    <h2>{t.recentPosts}</h2>
     <div>
       {posts.map((post) => (
         <BlogPostCard post={post} />

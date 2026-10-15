@@ -2,6 +2,7 @@
 import { Font, fontData } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 import { siteConfig } from "@/site-config";
+import { DEFAULT_LOCALE, i18n, LOCALE_META, pageVersions, type Translations } from "@/i18n/ui";
 import "../styles/global.css";
 
 interface Props {
@@ -9,23 +10,42 @@ interface Props {
   description?: string | undefined;
   image?: string | undefined;
   ogType?: "website" | "article" | undefined;
+  /** Paths of this page in other languages, for hreflang links and the language switcher. */
+  translations?: Translations | undefined;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const { locale, t } = i18n(Astro.currentLocale);
 const {
   title = siteConfig.name,
-  description = siteConfig.description,
+  description = t.tagline,
   image = siteConfig.image,
   ogType = "website",
+  translations = {},
 } = Astro.props;
+
+// hreflang: every language version including this one, plus x-default (English). Only when
+// a translation exists; a page in one language needs no alternates.
+const versions = pageVersions(translations, locale, Astro.url.pathname);
+const defaultPath = versions.find(([lang]) => lang === DEFAULT_LOCALE)?.[1];
+const hreflangs: [string, string][] = defaultPath ? [...versions, ["x-default", defaultPath]] : versions;
+const alternates = versions.length > 1
+  ? hreflangs.map(([hreflang, path]) => ({ hreflang, href: new URL(path, Astro.site).href }))
+  : [];
+const ogLocale = (lang: keyof typeof LOCALE_META) => LOCALE_META[lang].intl.replace("-", "_");
+const ogAlternateLocales = versions.filter(([lang]) => lang !== locale).map(([lang]) => ogLocale(lang));
 const imageURL = new URL(image, Astro.site).href;
 
 const FONT_VARIABLES = ["--font-inter", "--font-jetbrains-mono"] as const;
 
-// Preload only each font's latin file: the first variant (see subsetVariants in astro.config.mjs).
-// The Polish subset loads on demand through its unicode-range; `<Font preload>` can't tell the
-// two apart because the local provider sets no subset.
-const preloadFonts = FONT_VARIABLES.map((cssVariable) => fontData[cssVariable]?.[0]?.src[0])
+// Preload each font's latin file: the first variant (see subsetVariants in astro.config.mjs).
+// The Polish subset (second variant) is preloaded only on Polish pages; elsewhere it loads on
+// demand through its unicode-range. `<Font preload>` can't tell the two apart because the
+// local provider sets no subset.
+const preloadVariants = locale === "pl" ? [0, 1] : [0];
+const preloadFonts = FONT_VARIABLES.flatMap((cssVariable) =>
+  preloadVariants.map((index) => fontData[cssVariable]?.[index]?.src[0])
+)
   .filter((src) => src !== undefined)
   .map(({ url, format = "woff2" }) => ({ href: url, type: `font/${format}` }));
 ---
@@ -39,8 +59,11 @@ const preloadFonts = FONT_VARIABLES.map((cssVariable) => fontData[cssVariable]?.
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonicalURL} />
+  {alternates.map(({ hreflang, href }) => <link rel="alternate" hreflang={hreflang} href={href} />)}
 
   <meta property="og:type" content={ogType} />
+  <meta property="og:locale" content={ogLocale(locale)} />
+  {ogAlternateLocales.map((og) => <meta property="og:locale:alternate" content={og} />)}
   <meta property="og:url" content={Astro.url} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />

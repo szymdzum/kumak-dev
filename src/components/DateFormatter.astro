@@ -1,16 +1,18 @@
 ---
 import { isoDate } from "@utils/posts";
+import { i18n, LOCALE_META } from "@/i18n/ui";
 
 interface Props {
   date: Date;
 }
 
 const { date } = Astro.props;
+const { intl } = LOCALE_META[i18n(Astro.currentLocale).locale];
 ---
 
 <time datetime={isoDate(date)}>
   {
-    date.toLocaleDateString("en-GB", {
+    date.toLocaleDateString(intl, {
       year: "numeric",
       month: "short",
       day: "numeric",

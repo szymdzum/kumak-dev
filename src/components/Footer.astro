@@ -1,12 +1,15 @@
 ---
 import { siteConfig } from "@/site-config";
+import { i18n, localePath } from "@/i18n/ui";
+
+const { locale, t } = i18n(Astro.currentLocale);
 
 const currentYear = new Date().getFullYear();
 ---
 
 <footer>
   <div>
-    <p>© {currentYear} <a href="/about">{siteConfig.author.handle}</a>. Built with Astro.</p>
+    <p>© {currentYear} <a href={localePath(locale, "/about")}>{siteConfig.author.handle}</a>. {t.builtWith}</p>
   </div>
 </footer>
 

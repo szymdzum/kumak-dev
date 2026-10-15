@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import ActionButton from "./ActionButton.astro";
+import { i18n } from "@/i18n/ui";
 
 interface Props {
   title: string;
@@ -8,14 +9,16 @@ interface Props {
 }
 
 const { title, description = "" } = Astro.props;
+const { t } = i18n(Astro.currentLocale);
 ---
 
 <ActionButton
-  label="Share"
+  label={t.share}
   data-share
   data-title={title}
   data-description={description}
-  aria-label="Share this article"
+  data-copied-label={t.linkCopied}
+  aria-label={t.shareArticle}
 >
   <Icon name="lucide:share-2" size={16} />
 </ActionButton>
@@ -28,7 +31,8 @@ const { title, description = "" } = Astro.props;
     const label = button?.querySelector<HTMLElement>("[data-label]");
     if (!button || !label) return;
 
-    const { title = "", description = "" } = button.dataset;
+    const { title = "", description = "", copiedLabel = "" } = button.dataset;
+    const idleLabel = label.textContent;
     const url = window.location.href;
 
     button.addEventListener("click", async () => {
@@ -44,8 +48,8 @@ const { title, description = "" } = Astro.props;
       }
       try {
         await navigator.clipboard.writeText(url);
-        label.textContent = "Link copied";
-        setTimeout(() => (label.textContent = "Share"), 2000);
+        label.textContent = copiedLabel;
+        setTimeout(() => (label.textContent = idleLabel), 2000);
         track.share("clipboard");
       } catch (err) {
         console.error("Fallback copy failed:", err);

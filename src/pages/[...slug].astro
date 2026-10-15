@@ -15,6 +15,7 @@ import TableOfContents from "@components/TableOfContents.astro";
 import TableOfContentsInline from "@components/TableOfContentsInline.astro";
 import ScrollDepthTracker from "@components/ScrollDepthTracker.astro";
 import { render } from "astro:content";
+import { type Category, i18n } from "@/i18n/ui";
 import { type BlogPost, estimateReadingTime, getAllPosts, postSlug } from "@utils/posts";
 
 export const prerender = true;
@@ -36,6 +37,9 @@ const { title, description, pubDate, updatedDate, category, tags, heroImage, ext
 
 const readingTime = estimateReadingTime(post.body);
 const slug = postSlug(post);
+const { t } = i18n(Astro.currentLocale);
+// post.data is typed `any` by the generated collection types, so name the type explicitly.
+const categoryLabel = t.categories[category as Category];
 ---
 
 <BaseLayout title={title} description={description} image={heroImage} ogType="article">
@@ -62,14 +66,14 @@ const slug = postSlug(post);
       <PageHeader title={title} id="top">
         <div class="meta-row">
           <dl>
-            <dt class="sr-only">Published</dt>
+            <dt class="sr-only">{t.published}</dt>
             <dd>
               <DateFormatter date={pubDate} />
             </dd>
-            <dt class="sr-only">Reading time</dt>
-            <dd><data value={readingTime}>{readingTime} min read</data></dd>
-            <dt class="sr-only">Category</dt>
-            <dd>{category}</dd>
+            <dt class="sr-only">{t.readingTime}</dt>
+            <dd><data value={readingTime}>{t.minRead(readingTime)}</data></dd>
+            <dt class="sr-only">{t.category}</dt>
+            <dd>{categoryLabel}</dd>
           </dl>
           <div class="action-buttons">
             <LlmsTxtButton slug={slug} />

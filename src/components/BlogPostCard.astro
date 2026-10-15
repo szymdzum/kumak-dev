@@ -2,6 +2,7 @@
 import DateFormatter from "@components/DateFormatter.astro";
 import { postUrl } from "@utils/path";
 import { type BlogPost, postSlug } from "@utils/posts";
+import { i18n } from "@/i18n/ui";
 
 interface Props {
   post: BlogPost;
@@ -9,6 +10,7 @@ interface Props {
 
 const { post } = Astro.props
 const href = postUrl(postSlug(post));
+const { t } = i18n(Astro.currentLocale);
 ---
 
 <article>
@@ -21,7 +23,7 @@ const href = postUrl(postSlug(post));
   <div class="meta">
     <DateFormatter date={post.data.pubDate} />
     <span aria-hidden="true">·</span>
-    <a href={href} class="read-more" aria-hidden="true" tabindex="-1">Read</a>
+    <a href={href} class="read-more" aria-hidden="true" tabindex="-1">{t.read}</a>
   </div>
 </article>
 

@@ -1,12 +1,15 @@
 ---
 import { siteConfig } from "@/site-config";
+import { i18n } from "@/i18n/ui";
+
+const { t } = i18n(Astro.currentLocale);
 
 const { github, linkedin } = siteConfig.socials;
 ---
 
 <footer>
   <p>
-    Thoughts? Disagreements? Hit me up on <a href={github.url}>{github.name}</a> or <a href={linkedin.url}>{linkedin.name}</a>.
+    {t.articleFooterLead} <a href={github.url}>{github.name}</a> {t.or} <a href={linkedin.url}>{linkedin.name}</a>.
   </p>
 </footer>
 

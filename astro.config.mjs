@@ -9,6 +9,7 @@ import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { externalLinks } from "./src/utils/links.ts";
 import { POST_FILE } from "./src/utils/path.ts";
+import { DEFAULT_LOCALE, LOCALES } from "./src/i18n/ui.ts";
 import { scrollableTables } from "./src/utils/tables.ts";
 
 // Patches for @deno/astro-adapter 0.6.0 server.ts. Remove once fixed upstream
@@ -126,6 +127,13 @@ export default defineConfig({
   site: "https://kumak.dev",
   output: "server",
   adapter: deno(),
+
+  // English at the root, other languages under /<locale>/.
+  i18n: {
+    locales: [...LOCALES],
+    defaultLocale: DEFAULT_LOCALE,
+    routing: { prefixDefaultLocale: false },
+  },
 
   fonts: [
     {
