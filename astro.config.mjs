@@ -96,31 +96,6 @@ const LATIN_UNICODE_RANGE = [
   "U+FFFD",
 ];
 
-// Polish letters outside the latin subset (ą ć ę ł ń ś ź ż and capitals). Separate files cut from
-// Google Fonts' latin-ext builds of the same font versions, so they download only on pages that
-// use these letters.
-const POLISH_UNICODE_RANGE = [
-  "U+0104-0107",
-  "U+0118-0119",
-  "U+0141-0144",
-  "U+015A-015B",
-  "U+0179-017C",
-];
-
-// One variable file per subset, covering the weights the site uses (400-700). Latin comes first:
-// Head.astro preloads only the first variant.
-const subsetVariants = (font) =>
-  [
-    ["latin", LATIN_UNICODE_RANGE],
-    ["polish", POLISH_UNICODE_RANGE],
-  ].map(([subset, unicodeRange]) => ({
-    src: [`./src/assets/fonts/${font}-${subset}.woff2`],
-    weight: "400 700",
-    style: "normal",
-    display: "swap",
-    unicodeRange,
-  }));
-
 // https://astro.build/config
 export default defineConfig({
   site: "https://kumak.dev",
@@ -143,14 +118,36 @@ export default defineConfig({
         "Cantarell",
         "sans-serif",
       ],
-      options: { variants: subsetVariants("inter") },
+      options: {
+        // One variable file covering the weights the site uses (400, 500, 600, 700).
+        variants: [
+          {
+            src: ["./src/assets/fonts/inter-latin.woff2"],
+            weight: "400 700",
+            style: "normal",
+            display: "swap",
+            unicodeRange: LATIN_UNICODE_RANGE,
+          },
+        ],
+      },
     },
     {
       provider: fontProviders.local(),
       name: "JetBrains Mono",
       cssVariable: "--font-jetbrains-mono",
       fallbacks: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
-      options: { variants: subsetVariants("jetbrains-mono") }, // headings, logo and code
+      options: {
+        // Variable file for headings, logo and code (400-700).
+        variants: [
+          {
+            src: ["./src/assets/fonts/jetbrains-mono-latin.woff2"],
+            weight: "400 700",
+            style: "normal",
+            display: "swap",
+            unicodeRange: LATIN_UNICODE_RANGE,
+          },
+        ],
+      },
     },
   ],
 
