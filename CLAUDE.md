@@ -32,7 +32,7 @@ No test suite.
 - `src/components/` - Astro components (NavBar, Footer, Head, SchemaOrg, Hero, BlogPostCard, ArticleMeta, ArticleFooter, TableOfContents, TldrBox, CodeBlock, CopyPageButton, ShareButton, LlmsTxt*, Giscus, ScrollDepthTracker, ...)
 - `src/layouts/BaseLayout.astro` - Only layout
 - `src/pages/` - index, about, `[...slug]`, 404, `rss.xml.ts`, `llms.txt.ts`, `llms-full.txt.ts`, `llms/[slug].txt.ts`
-- `src/content/blog/` - one folder per post: `<slug>/en.mdx` (folder name = URL slug; `postSlug()` in `utils/posts`)
+- `src/content/blog/` - MDX posts (file name = slug)
 - `src/utils/` - analytics, links (external-link rehype plugin), llms, path, posts, toc
 - `src/styles/` - `global.css`, `prose.css`
 - `astro.config.mjs` - Vite plugin patching `@deno/astro-adapter` 0.6.0 (remove when fixed upstream); sitemap `lastmod` from post frontmatter
