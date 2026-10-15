@@ -8,7 +8,6 @@ import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { externalLinks } from "./src/utils/links.ts";
-import { POST_FILE } from "./src/utils/path.ts";
 import { scrollableTables } from "./src/utils/tables.ts";
 
 // Patches for @deno/astro-adapter 0.6.0 server.ts. Remove once fixed upstream
@@ -50,17 +49,16 @@ const patchDenoAdapter = () => ({
 });
 
 // Sitemap <lastmod> for posts. astro:content isn't available here, so parse each post's
-// frontmatter directly (same YAML parser Astro uses). Slug = post folder name.
+// frontmatter directly (same YAML parser Astro uses). Slug = file name.
 const BLOG_DIR = new URL("./src/content/blog/", import.meta.url);
 
-const readFrontmatter = (file) =>
-  parseFrontmatter(readFileSync(new URL(file, BLOG_DIR), "utf8")).frontmatter;
-
 const postLastmod = new Map(
-  readdirSync(BLOG_DIR, { recursive: true })
-    .map((file) => [file, POST_FILE.exec(file)])
-    .filter(([, match]) => match?.[2] === "en")
-    .map(([file, [, slug]]) => [slug, readFrontmatter(file)])
+  readdirSync(BLOG_DIR)
+    .filter((file) => /\.mdx?$/.test(file))
+    .map((file) => [
+      file.replace(/\.mdx?$/, ""),
+      parseFrontmatter(readFileSync(new URL(file, BLOG_DIR), "utf8")).frontmatter,
+    ])
     .filter(([, fm]) => !fm.draft)
     .map(([slug, fm]) => [slug, new Date(fm.updatedDate ?? fm.pubDate)])
     .filter(([, date]) => !Number.isNaN(date.getTime()))

@@ -1,14 +1,14 @@
 ---
 import DateFormatter from "@components/DateFormatter.astro";
 import { postUrl } from "@utils/path";
-import { type BlogPost, postSlug } from "@utils/posts";
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  post: BlogPost;
+  post: CollectionEntry<"blog">;
 }
 
 const { post } = Astro.props
-const href = postUrl(postSlug(post));
+const href = postUrl(post.id);
 ---
 
 <article>
