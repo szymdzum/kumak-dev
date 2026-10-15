@@ -1,5 +1,5 @@
 ---
-import { Font } from "astro:assets";
+import { Font, fontData } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 import { siteConfig } from "@/site-config";
 import "../styles/global.css";
@@ -19,6 +19,15 @@ const {
   ogType = "website",
 } = Astro.props;
 const imageURL = new URL(image, Astro.site).href;
+
+const FONT_VARIABLES = ["--font-inter", "--font-jetbrains-mono"] as const;
+
+// Preload only each font's latin file: the first variant (see subsetVariants in astro.config.mjs).
+// The Polish subset loads on demand through its unicode-range; `<Font preload>` can't tell the
+// two apart because the local provider sets no subset.
+const preloadFonts = FONT_VARIABLES.map((cssVariable) => fontData[cssVariable]?.[0]?.src[0])
+  .filter((src) => src !== undefined)
+  .map(({ url, format = "woff2" }) => ({ href: url, type: `font/${format}` }));
 ---
 
 <head>
@@ -44,8 +53,8 @@ const imageURL = new URL(image, Astro.site).href;
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-  <Font cssVariable="--font-inter" preload />
-  <Font cssVariable="--font-jetbrains-mono" preload />
+  {FONT_VARIABLES.map((cssVariable) => <Font cssVariable={cssVariable} />)}
+  {preloadFonts.map(({ href, type }) => <link rel="preload" href={href} as="font" type={type} crossorigin />)}
 
   <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={title} />
   <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
