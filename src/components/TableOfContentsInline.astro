@@ -1,0 +1,89 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+const tocHeadings = headings.filter((h) => h.depth === 2);
+---
+
+{/* Collapsed outline above the article for widths where the side TOC is hidden. */}
+{tocHeadings.length > 0 && (
+  <nav aria-label="Table of contents">
+    <details>
+      <summary>On this page</summary>
+      <ol>
+        {tocHeadings.map((heading) => (
+          <li>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ol>
+    </details>
+  </nav>
+)}
+
+<style>
+  /* Pulled up into PageHeader's bottom margin so the outline reads as part of the header. */
+  nav {
+    margin-top: calc(-1 * var(--space-md));
+    margin-bottom: var(--space-xl);
+    border-bottom: var(--border-width) solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+
+  summary {
+    padding: var(--space-xs) 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  summary:hover {
+    color: var(--color-text);
+  }
+
+  summary::marker {
+    color: var(--color-primary);
+  }
+
+  ol {
+    padding-left: var(--space-xl);
+    padding-bottom: var(--space-md);
+  }
+
+  li + li {
+    margin-top: var(--space-2xs);
+  }
+
+  li::marker {
+    color: var(--color-text-muted);
+  }
+
+  a {
+    display: block;
+    padding: var(--space-3xs) 0;
+    line-height: var(--line-height-snug);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-primary);
+  }
+
+  /* Same breakpoint as the side TOC in TableOfContents.astro: exactly one is visible. */
+  @media (min-width: 1200px) {
+    nav {
+      display: none;
+    }
+  }
+</style>

@@ -31,7 +31,8 @@ const { label, href, ...rest } = Astro.props;
     display: inline-flex;
     align-items: center;
     gap: var(--space-2xs);
-    padding: 0;
+    /* Tap target around the 16px icon; the row's negative margin keeps the visual edge. */
+    padding: var(--space-xs);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
     background: none;

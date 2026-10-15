@@ -11,19 +11,19 @@
 /* Headings (the page h1 lives in PageHeader, outside .prose) */
 .prose h2 {
   font-family: var(--font-family-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   word-spacing: var(--word-spacing-tight);
   text-wrap: balance;
-  margin-top: var(--rhythm-double); /* ~3.2em */
+  margin-top: var(--rhythm-double); /* 3.2em of h2, ~2.5 body lines */
   margin-bottom: var(--rhythm-half);
   letter-spacing: var(--letter-spacing-tight);
 }
 
 .prose h3 {
   font-family: var(--font-family-display);
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   word-spacing: var(--word-spacing-tight);
@@ -35,6 +35,7 @@
 .prose h4,
 .prose h5,
 .prose h6 {
+  font-family: var(--font-family-display);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   word-spacing: var(--word-spacing-tight);
@@ -46,12 +47,11 @@
 .prose p {
   line-height: var(--line-height-normal);
   margin-bottom: var(--rhythm-single);
-  max-width: 70ch; /* Optimal for reading (45-75ch range) */
 }
 
 /* Links */
 .prose a {
-  color: var(--color-primary);
+  color: var(--color-link);
   text-decoration: underline;
   text-decoration-color: rgb(var(--color-primary-rgb) / 0.4);
   text-underline-offset: 0.2em;
@@ -59,7 +59,7 @@
 }
 
 .prose a:hover {
-  text-decoration-color: var(--color-primary);
+  text-decoration-color: currentColor;
 }
 
 /* Lists */
@@ -67,7 +67,6 @@
 .prose ol {
   margin-bottom: var(--rhythm-single);
   padding-left: var(--space-xl);
-  max-width: 70ch;
 }
 
 .prose li {
@@ -87,6 +86,20 @@
   padding: 0.2em 0.4em;
   border-radius: var(--radius-sm);
   border: var(--border-width) solid var(--color-border);
+  /* Long flags and URLs must wrap on phones; clone keeps the box on each line fragment. */
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* In headings the mono face already marks code; a box there is heavy and breaks badly.
+   :is() (not :where()) so it outranks the mobile .prose code size below. */
+.prose :is(h1, h2, h3, h4, h5, h6) code {
+  font-size: inherit;
+  color: var(--color-highlight);
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .prose pre {
@@ -165,7 +178,6 @@
   color: var(--color-text-muted);
   font-style: italic;
   line-height: var(--line-height-relaxed);
-  max-width: 70ch;
 }
 
 /* Images */

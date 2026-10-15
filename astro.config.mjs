@@ -70,8 +70,8 @@ const withPostLastmod = (item) => {
   return lastmod ? { ...item, lastmod } : item;
 };
 
-// Inter latin subset (matches Google Fonts' "latin" unicode-range).
-const INTER_UNICODE_RANGE = [
+// Latin subset (matches Google Fonts' "latin" unicode-range), shared by Inter and JetBrains Mono.
+const LATIN_UNICODE_RANGE = [
   "U+0000-00FF",
   "U+0131",
   "U+0152-0153",
@@ -124,7 +124,25 @@ export default defineConfig({
             weight: "400 700",
             style: "normal",
             display: "swap",
-            unicodeRange: INTER_UNICODE_RANGE,
+            unicodeRange: LATIN_UNICODE_RANGE,
+          },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: "JetBrains Mono",
+      cssVariable: "--font-jetbrains-mono",
+      fallbacks: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
+      options: {
+        // Variable file for headings, logo and code (400-700).
+        variants: [
+          {
+            src: ["./src/assets/fonts/jetbrains-mono-latin.woff2"],
+            weight: "400 700",
+            style: "normal",
+            display: "swap",
+            unicodeRange: LATIN_UNICODE_RANGE,
           },
         ],
       },

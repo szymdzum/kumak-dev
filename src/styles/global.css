@@ -65,7 +65,8 @@
     --base-spacing: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
 
     /* Typography Scale */
-    --text-xs: calc(var(--scale-xs) * var(--base-font-size));
+    /* Floor at 12px: the 0.64 step alone drops meta text to ~10px on phones. */
+    --text-xs: max(0.75rem, calc(var(--scale-xs) * var(--base-font-size)));
     --text-sm: calc(var(--scale-sm) * var(--base-font-size));
     --text-base: var(--base-font-size);
     --text-lg: calc(var(--scale-lg) * var(--base-font-size));
@@ -85,7 +86,10 @@
     --space-3xl: calc(var(--scale-3xl) * var(--base-spacing));
 
     /* Content Width Constraints */
-    --content-width: min(65ch, 90vw);
+    /* Inter's "0" is wider than an average letter: 52ch is ~70 characters per line. */
+    --content-width: 52ch;
+    --gutter: var(--space-lg);
+    --page-width: calc(var(--content-width) + 2 * var(--gutter));
 
     /* Borders & Radii */
     --border-width: max(0.0625rem, 0.1vw);
@@ -103,6 +107,8 @@
     --color-primary-hover: #00cc33;
     --color-highlight: #eedb96;
     --color-highlight-hover: #f5e6b3;
+    /* Body-copy links: the full neon vibrates against dark text at reading length. */
+    --color-link: color-mix(in oklab, var(--color-primary) 75%, var(--color-text));
 
     /* RGB Values for Alpha Compositions */
     --color-text-rgb: 232, 232, 224;
@@ -112,8 +118,7 @@
     /* Typography Properties */
     --font-family-base: var(--font-inter); /* Fonts API (astro.config.mjs): Inter + fallbacks */
     --font-family-mono:
-      "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
-      Consolas, monospace;
+      var(--font-jetbrains-mono); /* Fonts API (astro.config.mjs): JetBrains Mono + fallbacks */
     --font-family-display: var(--font-family-mono);
     --font-weight-normal: 400;
     --font-weight-medium: 500;
@@ -164,13 +169,18 @@
    =========================== */
 
 @layer base {
+  /* Font size lives on body, not html: rem stays the user's default, so tokens resolve the same
+     everywhere (on html it rescaled rem and made --text-base 20px in components vs 18px body). */
   html {
     font-family: var(--font-family-base);
-    font-size: var(--text-base);
     line-height: var(--line-height-normal);
-    letter-spacing: 0.01em;
     color: var(--color-text);
     background-color: var(--color-bg);
+  }
+
+  body {
+    font-size: var(--text-base);
+    line-height: var(--line-height-normal);
   }
 
   /* Grain texture overlay */
@@ -184,7 +194,7 @@
     opacity: 0.03;
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' /%3E%3C/svg%3E");
-    z-index: 9999;
+    z-index: -1;
   }
 
   /* Focus Styles */

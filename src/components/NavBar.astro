@@ -40,9 +40,10 @@ const { rss, ...externalSocials } = siteConfig.socials;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: var(--content-width);
+    gap: var(--space-md);
+    max-width: var(--page-width);
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding: 0 var(--gutter);
   }
 
   header > div > a {
@@ -54,12 +55,16 @@ const { rss, ...externalSocials } = siteConfig.socials;
     letter-spacing: var(--letter-spacing-tight);
   }
 
+  /* Padding grows each icon's tap target; the negative margin keeps the last icon on the edge. */
   nav {
+    --icon-pad: calc(var(--space-xs) * 0.5);
     display: flex;
-    gap: calc(var(--space-xs) * 0.5);
+    margin-right: calc(-1 * var(--icon-pad));
   }
 
   nav a {
+    display: block;
+    padding: var(--icon-pad);
     color: var(--color-text);
     transition: color var(--transition-fast);
   }
@@ -70,7 +75,11 @@ const { rss, ...externalSocials } = siteConfig.socials;
 
   @media (max-width: 480px) {
     header > div > a {
-      font-size: calc(var(--text-base) * 1.1);
+      font-size: var(--text-base);
+    }
+
+    nav {
+      --icon-pad: var(--space-2xs);
     }
 
     nav svg {
