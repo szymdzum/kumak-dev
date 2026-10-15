@@ -6,6 +6,7 @@
 
 ## Tech Stack
 - **Astro 7** `output: "server"` + `@deno/astro-adapter`; pages prerendered, `rss.xml`/`llms*.txt`/404 on-demand (server-side Umami tracking)
+- **Bilingual**: English at `/`, Polish at `/pl/` (Astro `i18n`, no library). UI copy in `src/i18n/ui.ts`
 - **MDX** via `unified()` processor from `@astrojs/markdown-remark` (rehype plugins live in `markdown.processor`)
 - **Node 22.12+** for npm/Astro (`.nvmrc`), **Deno 2.x** for tasks, lint, fmt, runtime
 - **Deno Deploy** `szymdzum/kumak-dev` project, GitHub integration builds and deploys; build status via `gh api repos/szymdzum/kumak-dev/commits/<sha>/statuses`
@@ -25,17 +26,18 @@ No test suite.
 
 ## Infrastructure
 - **Domains**: kumak.dev, www.kumak.dev (Cloudflare proxy)
-- **Analytics**: Umami at analytics.kumak.dev (`siteConfig.umami`). Client script + `window.track` in `Head.astro`; server events in `src/utils/analytics.ts` (skip prefetch requests; internal links to tracked endpoints use `data-astro-prefetch="false"`). Optional `UMAMI_URL` env override.
+- **Analytics**: Umami at analytics.kumak.dev (`siteConfig.umami`). Client script + `window.track` in `Head.astro`; server events in `src/utils/analytics.ts` (skip prefetch requests; internal links to tracked endpoints use `data-astro-prefetch="false"`). Every event carries `lang` (page or path language). Optional `UMAMI_URL` env override.
 - **Comments**: Giscus (`siteConfig.giscus`)
 
 ## Architecture
 - `src/components/` - Astro components (NavBar, Footer, Head, SchemaOrg, Hero, BlogPostCard, ArticleMeta, ArticleFooter, TableOfContents, TldrBox, CodeBlock, CopyPageButton, ShareButton, LlmsTxt*, Giscus, ScrollDepthTracker, ...)
 - `src/layouts/BaseLayout.astro` - Only layout
-- `src/pages/` - index, about, `[...slug]`, 404, `rss.xml.ts`, `llms.txt.ts`, `llms-full.txt.ts`, `llms/[slug].txt.ts`
-- `src/content/blog/` - one folder per post: `<slug>/en.mdx` (folder name = URL slug; `postSlug()` in `utils/posts`)
-- `src/utils/` - analytics, links (external-link rehype plugin), llms, path, posts, toc
+- `src/pages/` - index, about, `[...slug]`, 404, `rss.xml.ts`, `llms.txt.ts`, `llms-full.txt.ts`, `llms/[slug].txt.ts`; `pl/` mirrors index, about, `[...slug]`, `rss.xml.ts`, `llms/[slug].txt.ts` as thin routes over `HomePage`/`PostPage`, `rssRoute`, `llmsPostRoute`
+- `src/content/blog/` - one folder per post: `<slug>/en.mdx` + optional `pl.mdx`. Folder = English URL slug and translation key; `pl.mdx` requires `slug` (Polish URL), `en.mdx` must not have one (checked in `content.config.ts`)
+- `src/i18n/ui.ts` - `LOCALES`, `i18n(Astro.currentLocale)` → `{ locale, t }`, typed UI copy (English is the type; a missing Polish key fails `astro check`), `localePath`, hreflang helpers
+- `src/utils/` - analytics, links (external-link rehype plugin), llms, path, posts (`getAllPosts(locale)`, `postPath`, `postTranslations`), rss, toc
 - `src/styles/` - `global.css`, `prose.css`
-- `astro.config.mjs` - Vite plugin patching `@deno/astro-adapter` 0.6.0 (remove when fixed upstream); sitemap `lastmod` from post frontmatter
+- `astro.config.mjs` - Vite plugin patching `@deno/astro-adapter` 0.6.0 (remove when fixed upstream); sitemap `lastmod` and hreflang alternates from post frontmatter
 
 **Configuration:**
 - `src/site-config.ts` - Site metadata, `author: { name, handle }`, socials, Umami, Giscus
@@ -66,5 +68,6 @@ Component <style>      → All component presentation
 - **Pre-commit** (Husky): `deno fmt --check`, `deno lint`, `deno task typecheck` (astro check; uses `.nvmrc` Node if nvm present)
 - **CI**: same checks + build
 - TypeScript strict, no `any` (`no-explicit-any` lint rule + astro check)
-- Use `src/utils/posts.ts` (`getAllPosts`) for content queries
+- Use `src/utils/posts.ts` (`getAllPosts(locale)`) for content queries; never use `post.id` as a URL (it is `<folder>/<lang>`), use `postPath`/`postSlug`
+- UI text goes through `i18n(Astro.currentLocale).t`; pages with a translation pass `translations` to `BaseLayout` (hreflang + language switcher)
 - Semantic HTML, WCAG AA accessibility
