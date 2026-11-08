@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace">
+  <title>OLX and Otomoto feed a pipeline on a Raspberry Pi: fetch, filter, dedupe, flag and price, SQLite, Home Assistant, then two phones and a dashboard card. Ratings go back to the watcher.</title>
+  <defs>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b8b8b"/>
+    </marker>
+    <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#eedb96"/>
+    </marker>
+  </defs>
+
+  <rect width="600" height="900" fill="#101113"/>
+
+  <!-- Sources -->
+  <rect x="30" y="20" width="250" height="72" rx="8" fill="#16151d" stroke="#8b8b8b" stroke-width="2"/>
+  <text x="155" y="51" fill="#e8e8e0" font-size="18" font-weight="700" text-anchor="middle">OLX</text>
+  <text x="155" y="76" fill="#8b8b8b" font-size="15" text-anchor="middle">JSON API · curl_cffi</text>
+
+  <rect x="310" y="20" width="250" height="72" rx="8" fill="#16151d" stroke="#8b8b8b" stroke-width="2"/>
+  <text x="435" y="51" fill="#e8e8e0" font-size="18" font-weight="700" text-anchor="middle">Otomoto</text>
+  <text x="435" y="76" fill="#8b8b8b" font-size="15" text-anchor="middle">__NEXT_DATA__</text>
+
+  <line x1="155" y1="92" x2="155" y2="164" stroke="#8b8b8b" stroke-width="2" marker-end="url(#arrow-gray)"/>
+  <line x1="435" y1="92" x2="435" y2="164" stroke="#8b8b8b" stroke-width="2" marker-end="url(#arrow-gray)"/>
+
+  <!-- Raspberry Pi container -->
+  <rect x="14" y="128" width="532" height="588" rx="12" fill="none" stroke="#8b8b8b" stroke-width="1.5" stroke-dasharray="6 6"/>
+  <rect x="190" y="117" width="210" height="22" fill="#101113"/>
+  <text x="295" y="133" fill="#8b8b8b" font-size="14" text-anchor="middle">raspberry pi 5 · docker</text>
+
+  <!-- Pipeline -->
+  <g fill="#16151d" stroke="#00ff41" stroke-width="2">
+    <rect x="110" y="168" width="340" height="60" rx="8"/>
+    <rect x="110" y="256" width="340" height="60" rx="8"/>
+    <rect x="110" y="344" width="340" height="60" rx="8"/>
+    <rect x="110" y="432" width="340" height="60" rx="8"/>
+    <rect x="110" y="520" width="340" height="60" rx="8"/>
+    <rect x="110" y="608" width="340" height="60" rx="8"/>
+  </g>
+  <g font-size="18" font-weight="700" fill="#00ff41" text-anchor="middle">
+    <text x="280" y="194">fetch + normalise</text>
+    <text x="280" y="282">filter</text>
+    <text x="280" y="370">dedupe</text>
+    <text x="280" y="458">flag + price</text>
+    <text x="280" y="546">SQLite</text>
+    <text x="280" y="634">Home Assistant</text>
+  </g>
+  <g font-size="15" fill="#8b8b8b" text-anchor="middle">
+    <text x="280" y="217">every 30 min, 07–22</text>
+    <text x="280" y="305">budget · colour · damage in text</text>
+    <text x="280" y="393">VIN · year, km and price</text>
+    <text x="280" y="481">scam risk · vs market median</text>
+    <text x="280" y="569">listings · ratings · history</text>
+    <text x="280" y="657">sensor + push</text>
+  </g>
+  <g stroke="#8b8b8b" stroke-width="2" marker-end="url(#arrow-gray)">
+    <line x1="280" y1="228" x2="280" y2="252"/>
+    <line x1="280" y1="316" x2="280" y2="340"/>
+    <line x1="280" y1="404" x2="280" y2="428"/>
+    <line x1="280" y1="492" x2="280" y2="516"/>
+    <line x1="280" y1="580" x2="280" y2="604"/>
+    <line x1="155" y1="668" x2="155" y2="752"/>
+    <line x1="435" y1="668" x2="435" y2="752"/>
+  </g>
+
+  <!-- Outputs -->
+  <rect x="30" y="756" width="250" height="72" rx="8" fill="#16151d" stroke="#eedb96" stroke-width="2"/>
+  <text x="155" y="787" fill="#eedb96" font-size="18" font-weight="700" text-anchor="middle">2 phones</text>
+  <text x="155" y="812" fill="#8b8b8b" font-size="15" text-anchor="middle">push + rating buttons</text>
+
+  <rect x="310" y="756" width="250" height="72" rx="8" fill="#16151d" stroke="#eedb96" stroke-width="2"/>
+  <text x="435" y="787" fill="#eedb96" font-size="18" font-weight="700" text-anchor="middle">dashboard card</text>
+  <text x="435" y="812" fill="#8b8b8b" font-size="15" text-anchor="middle">shortlist · price drops</text>
+
+  <!-- Ratings feedback -->
+  <g fill="none" stroke="#eedb96" stroke-width="2" stroke-dasharray="6 5">
+    <path d="M155 828 V852 H580 V550 H454" marker-end="url(#arrow-yellow)"/>
+    <path d="M435 828 V852"/>
+  </g>
+  <text x="300" y="880" fill="#eedb96" font-size="13" text-anchor="middle">ratings go back over local HTTP, synced to both phones</text>
+</svg>

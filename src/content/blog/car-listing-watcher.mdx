@@ -1,0 +1,110 @@
+---
+title: "Five Minutes Ahead: A Car Listing Watcher on a Raspberry Pi"
+description: "The good used cars sell in a day. A watcher on a Raspberry Pi pushed the listing to my phone five minutes after it went up, and the agent that built it had weeks of the market in its context to vet it."
+pubDate: 2026-11-08
+category: "project"
+tags: ["raspberry-pi", "home-assistant", "python", "scraping", "claude-code"]
+keywords:
+  [
+    "Raspberry Pi",
+    "Home Assistant",
+    "push notifications",
+    "OLX API",
+    "Otomoto",
+    "curl_cffi",
+    "classifieds watcher",
+    "used car search",
+    "Claude Code",
+  ]
+draft: false
+externalLinks:
+  - title: "Blueprint for a coding agent"
+    url: "/files/car-listing-watcher/blueprint.md"
+  - title: "curl_cffi"
+    url: "https://github.com/lexiforest/curl_cffi"
+---
+
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+Good used cars under budget sell in a day or two, and the ones worth calling about hide among damaged imports and duplicate listings. A small Python watcher on a Raspberry Pi filters OLX and Otomoto every 30 minutes and pushes what's left to our phones. The agent that built it had three weeks of the market in its context, so when the right car showed up, we called within five minutes and arrived prepared.
+</TldrBox>
+
+Friday, 16:30. My phone buzzes: a 2019 Suzuki Vitara, 55,000 km, 4×4, in the colour my fiancée liked, listed by a Warsaw dealer a few minutes earlier. No red flags, a fair price for the spec.
+
+At 16:35 I'm on the phone with the seller. We book a viewing for 10:00 the next morning and sign the paperwork right after it. The listing is gone 21 hours after the push.
+
+None of that was luck. It took a watcher that sends the push, and an agent that knew the market well enough to tell us what we were buying.
+
+## The problem
+
+My fiancée and I were looking for a Suzuki Vitara: 2019 or newer, under 100,000 km, 4×4, up to 65k PLN. In Poland that means two sites, OLX and Otomoto, and a lot of noise.
+
+The noise is worse than I expected. Over three weeks the watcher saw 251 listings that matched the search on paper. 67 of them were damaged cars: "starts and drives around the yard", "damage shown in photos", German auction imports with a crumpled front. Most of them don't say so in the structured fields. It's in the description, sometimes three paragraphs down.
+
+The decent ones go fast. When I looked at how long well-priced cars stayed up, it was three to six days on average, and the best ones went in one.
+
+## What it does
+
+Every 30 minutes, from 7:00 to 22:00:
+
+1. **Fetch** every listing for each saved search from OLX and Otomoto.
+2. **Filter** out what we'd never buy: wrong colour, over budget, suspiciously cheap, and damaged. Damage is detected from the structured field *and* from the description text, with negation handling, so "nie był po szkodzie" (never damaged) doesn't count as "po szkodzie" (damaged).
+3. **Deduplicate.** Dealers post the same car several times, and Otomoto exports to OLX, so one car shows up as three listings. Copies get merged by VIN and by a fingerprint of year, mileage and price.
+4. **Flag** risk: no VIN plus a seller account created this week is the classic scam pattern. A "private seller" who issues a VAT margin invoice is a dealer pretending.
+5. **Compare** the price to the median of similar cars currently listed, so the notification says "+3k over market" or "−5k under".
+6. **Push** to both phones with action buttons: ⭐ interesting, 👎 not for us. One 👎 from either of us hides it for both.
+
+![The push for the car we ended up buying: title, specs, location, and the pluses found in the listing](/images/car-listing-watcher/push-notification.webp)
+
+There's also a dashboard card in Home Assistant with the shortlist, price drops, and cars that disappeared (usually meaning sold), plus a weekly digest.
+
+![Dashboard card: a price drop banner on top, listings to review on the left, and on the right the shortlist, cars that disappeared in the last 14 days, and rejected ones that can be restored](/images/car-listing-watcher/dashboard-desktop.webp)
+
+## How it's built
+
+![OLX and Otomoto feed a pipeline on the Pi: filter, dedupe, flag and price, SQLite, Home Assistant, then phones and the dashboard](/images/car-listing-watcher/flow.svg)
+
+Nothing exotic, and that's the point. The Raspberry Pi 5 already runs Home Assistant in Docker, and the watcher is one more container: Python 3.13 with `curl_cffi` as the only dependency, and SQLite for listings, ratings and check history. Home Assistant already knows both phones, handles push actions and has a UI, so I didn't have to build any of that.
+
+The watcher publishes a single sensor with the whole shortlist as attributes. A small Lit card renders it, and ratings come back through a tiny local HTTP endpoint.
+
+The parts that took the most iterations:
+
+- **Getting the data.** OLX sits behind CloudFront WAF, and anything without a browser TLS fingerprint gets a 403. `curl_cffi` with `impersonate="chrome"` gets through, and the public `/api/v1/offers/` search returns JSON with descriptions included. Filter on the exact model label: the query is full-text, and "Vitara" also matches Grand Vitara. Otomoto is a Next.js app, so the search result sits in `__NEXT_DATA__` → `urqlState` → `advertSearch`. It lacks colour, damage and seller details, so each *new* listing gets one detail-page fetch.
+- **Damage hides in the description.** The filter is a set of narrow regexes with negation handling: a match preceded by "nie / bez / żaden" in the same sentence doesn't count. Every listing that slipped through became a new test case. `\bcesj` needs the word boundary, or "koncesjonowany" counts as a lease transfer.
+- **One car, three listings.** Copies are matched by year, city and mileage within 2,000 km (sellers round the odometer differently on each site). They get merged before pushing, because the OLX copy of an Otomoto export shows only a shared export account. The seller's two-week-old account is visible only on Otomoto.
+- **Scam signal = no VIN *and* a fresh account.** Either alone is common: 40 of 41 OLX Vitaras had no VIN. The combination is the classic pattern.
+- **Quiet by default.** The first run stores everything currently listed without pushing, so day one isn't 40 notifications. And "gone" needs a complete fetch: an empty or truncated result is a hiccup, not every car selling at once.
+
+## Built with an agent
+
+I built it with Claude Code, over a handful of sessions spread across three weeks. The agent ran on the Pi itself, so it could fetch real listings, read the database, and render the dashboard card in a headless browser to check its own work.
+
+**Real data beat specs.** The damage filter got good because we kept looking at actual listings that slipped through ("cesja" isn't damage, "pali i jeździ po placu" is) and fixing the rules, not because I wrote a perfect spec up front.
+
+**Diagnostics before features.** When nothing came in for days, the first instinct was "it's broken". We fetched both sites independently and compared: zero missed listings. The market was just thin in our budget. That was worth knowing before raising the budget.
+
+**The agent ended up knowing the market.** Three weeks of sessions meant it had seen every Vitara listed in our budget: what they cost, how long they stayed up, which "private sellers" were dealers. I didn't plan for that, and it turned out to matter as much as the code.
+
+## How it paid off
+
+Back to that Friday. The push did the first job. Because the junk was already filtered out, every notification was worth opening, and I didn't hesitate when the right one came. The price against the market and the missing flags told me in ten seconds that this one deserved a call.
+
+The agent did the second job. It compared the car with everything it had seen, including the ones that had already sold, and ranked it as the strongest candidate in our budget. Then it read the vehicle history report from CEPiK, the government registry: mileage readings over the years, inspections, registration history. It pointed out what to double-check and wrote the checklist we took to the pre-purchase inspection.
+
+So we arrived at 10:00 with the listing already vetted, knowing what to look at and what to ask. By then the seller had three more calls from people wanting to see the car. While we were signing, someone else called: "that nice Vitara, how is it gone already?"
+
+The listing disappeared from Otomoto at 13:30. On the dashboard it went straight to the top of the gone list.
+
+![The dashboard's list of cars that disappeared in the last 14 days. At the top: Warszawa, 64 900 zł, 2019, 55 thousand km, gone after 0 days](/images/car-listing-watcher/gone-list.webp)
+
+## Build your own
+
+I'm not publishing the code: it's wired into my home setup and tuned to one search. Instead, there's a **[blueprint](/files/car-listing-watcher/blueprint.md)**, a spec written to be handed to a coding agent. It covers the endpoints and fields, the data model, filters, deduplication, push and rating flow, the Home Assistant wiring, and acceptance checks the agent has to pass. Fill in the "Your setup" table and say "implement this".
+
+## Would I do it again?
+
+Yes. Any time you're competing with other people for something scarce on a classifieds site, whether that's a car, a flat or a used bike, being first and being sure are the same advantage. A cron job, a filter and an agent that has watched the market with you deliver both.
+
+The Vitara is parked outside. Next up: the same trick for flats.
