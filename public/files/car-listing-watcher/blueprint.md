@@ -245,7 +245,7 @@ Rules:
 - Push actions: `⭐ Interesting` and `👎 Not for us`. Encode the action id as `APP|<decision>|<source:id>|<person>`, so the handler knows who pressed it without separate users.
 - **One 👎 from anyone hides the car for everyone** and stops its price-drop and gone pushes.
 - ⭐ sorts the car to the top and puts ⭐ on its later pushes.
-- Decision endpoint: `POST /decide {"key": "otomoto:123", "decision": "star"|"no"|"none", "by": "Gosia"}`, where `"none"` takes it back. Bind to `127.0.0.1`, return 204, and return 400 on an unknown key. After saving: republish the dashboard and clear the push from all phones. Log failures after the save instead of returning them, because the decision is already done.
+- Decision endpoint: `POST /decide {"key": "otomoto:123", "decision": "star"|"no"|"none", "by": "Alex"}`, where `"none"` takes it back. Bind to `127.0.0.1`, return 204, and return 400 on an unknown key. After saving: republish the dashboard and clear the push from all phones. Log failures after the save instead of returning them, because the decision is already done.
 
 ---
 
@@ -296,8 +296,8 @@ active_hours = ["07:00", "22:00"]
 max_pushes_per_run = 5
 
 [notify]               # person → push target; first one also gets ⚠️ alerts
-Szymon = "notify.mobile_app_iphone_szymon"
-Gosia  = "notify.mobile_app_gosia"
+Alex = "notify.mobile_app_alex_phone"
+Sam  = "notify.mobile_app_sam_phone"
 
 [[searches]]
 name = "vitara"
