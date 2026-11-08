@@ -114,7 +114,7 @@ Keep **every** listing ever seen, including filtered ones with their reason. Tha
 
 ### Fetching (all sites)
 
-- Use `curl_cffi` with `impersonate="chrome"` and `Accept-Language: pl-PL`. OLX sits behind CloudFront WAF, which returns 403 to anything without a browser TLS fingerprint. Plain `requests`/`curl` will not work.
+- Use `curl_cffi` with browser-like defaults and `Accept-Language: pl-PL`. OLX expects requests that look like they come from a browser.
 - Sleep 1.5 s between requests. With a 30-minute interval that's a few dozen requests per hour, which is human scale. Don't go lower.
 - Sort by newest first, and stop paginating at a cap (OLX offset 200, Otomoto 5 pages). Mark the result `complete=False` if the cap was hit before the end: such a result can't be used to decide something was sold.
 
@@ -136,7 +136,7 @@ GET https://www.olx.pl/api/v1/offers/
 - `query` is full-text, so **filter on `params.model.label` exactly**. Otherwise "Vitara" also returns Grand Vitara.
 - **Deduplicate ids within one fetch.** A new ad posted mid-pagination shifts pages and you see the same ad twice.
 - `user.created` gives the seller account age. Ads exported from Otomoto to OLX all share one old account named "Otomoto", so skip the account check for those.
-- The single-offer endpoint (`/api/v1/offers/<id>`) often returns 403 even with impersonation. Everything you need is already in the search results, including the description.
+- The single-offer endpoint (`/api/v1/offers/<id>`) is unreliable. Everything you need is already in the search results, including the description.
 
 ### Otomoto: Next.js page state
 
