@@ -322,3 +322,13 @@ Times local (CEST). Secrets left out. Sources: main camera session + its researc
 
 ## 2026-10-13 — the cheapest fix was in the Tapo app
 After the AI cap ran out on a busy day, Szymon lowered the camera's own detection zone (the rectangle in the Tapo app) so it stops catching street traffic. Filtering at the source beats filtering in HA: fewer ONVIF events → fewer Gemini calls. Risk to watch: arrivals at the gate must still fall inside the zone.
+
+## 2026-10-15 — "is the Volvo in the frame" ≠ "is the Volvo moving"
+Cham parks his Volvo, then takes a tractor (kept behind the house) to fetch firewood. The model correctly reported "znane_auto = wrog_nr_1" on every frame — the Volvo WAS visible, parked in the background. So the tractor leaving ended Cham's visit, and a white car arriving got the "🚨 Cham" label. Fix: a separate structured field `cham_jedzie` ("is the Volvo itself the vehicle arriving/leaving?"). Presence and motion are different questions — ask them separately. Bonus: measuring the visit by "how long the car stood there" (12:47–16:34) beat any event-based logic.
+
+## 2026-10-17 — retro after 10 days
+- The timeline kept 12 events — under a day. Doing a retro from it was impossible; bumped to 40. Lesson: keep enough history to debug yourself.
+- Camera clock: manual time + DST off (zone Sarajevo). Overlay looked right, but the internal epoch ran +1 h, so every SD recording was listed an hour off. One `setTimezone` call (NTP + Warsaw + DST) fixed a week of "trust the overlay, not the listing".
+- Cost trims before Gemini's rumoured January price hike: person-only runs send 2 frames instead of 3; "same scene again" → 30 min silence (the host scraping moss between pavers for hours).
+- Feature from curiosity: tractor trips are now logged with the return photo of the loaded trailer — the firewood economics question became a dashboard card.
+- Generic motion detection off: a lit veranda at night produced ~35 clips/h of nothing.
