@@ -1,5 +1,5 @@
 ---
-import { siteConfig } from "@/site-config";
+import { i18n } from "@/i18n/ui";
 import { centerY, loopCount, torusLoop, tubeRadius } from "@utils/torus";
 
 const loops = Array.from({ length: loopCount }, (_, index) => torusLoop(index));
@@ -23,7 +23,7 @@ const middle = (loopCount - 1) / 2;
       ))}
     </g>
   </svg>
-  <h1>{siteConfig.description}</h1>
+  <h1>{i18n(Astro.currentLocale).t.tagline}</h1>
 </section>
 
 <script>

@@ -1,5 +1,6 @@
 ---
 import { siteConfig } from "@/site-config";
+import { i18n } from "@/i18n/ui";
 
 interface Props {
   type: "BlogPosting" | "WebSite";
@@ -22,6 +23,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const { locale, t } = i18n(Astro.currentLocale);
 const imageURL = new URL(image ?? siteConfig.image, Astro.site).href;
 
 const author = {
@@ -60,6 +62,7 @@ if (type === "BlogPosting") {
       "@id": canonicalURL.href,
     },
     "url": canonicalURL.href,
+    "inLanguage": locale,
     ...(keywords?.length ? { "keywords": keywords } : {}),
   };
 } else if (type === "WebSite") {
@@ -67,8 +70,9 @@ if (type === "BlogPosting") {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": siteConfig.name,
-    "description": siteConfig.description,
+    "description": t.tagline,
     "url": siteConfig.url,
+    "inLanguage": locale,
     author,
     publisher,
   };

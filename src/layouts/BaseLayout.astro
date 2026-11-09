@@ -4,18 +4,21 @@ import NavBar from "@components/NavBar.astro";
 import Footer from "@components/Footer.astro";
 import "@styles/prose.css";
 import type { ComponentProps } from "astro/types";
+import { i18n } from "@/i18n/ui";
 
 type Props = ComponentProps<typeof Head>;
+
+const { locale, t } = i18n(Astro.currentLocale);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <Head {...Astro.props}>
     <slot name="head" slot="head" />
   </Head>
   <body>
-    <a href="#main" data-skip-link>Skip to content</a>
-    <NavBar />
+    <a href="#main" data-skip-link>{t.skipToContent}</a>
+    <NavBar translations={Astro.props.translations} />
 
     <main id="main" tabindex="-1">
       <slot />

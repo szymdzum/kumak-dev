@@ -1,5 +1,8 @@
 ---
 import { siteConfig } from "@/site-config";
+import { i18n } from "@/i18n/ui";
+
+const { locale, t } = i18n(Astro.currentLocale);
 
 const themeUrl = import.meta.env.DEV
   ? `${Astro.url.origin}/giscus-theme.css`
@@ -15,10 +18,10 @@ const discussionsUrl = `https://github.com/${siteConfig.giscus.repo}/discussions
   data-category={siteConfig.giscus.category}
   data-category-id={siteConfig.giscus.categoryId}
   data-theme={themeUrl}
+  data-lang={locale}
 >
   <p data-giscus-fallback>
-    Comments are powered by GitHub Discussions and load when you scroll here. You can also
-    read or join the discussion on{" "}
+    {t.commentsFallback}{" "}
     <a href={discussionsUrl} target="_blank" rel="noopener noreferrer">GitHub</a>.
   </p>
 </div>
@@ -27,7 +30,7 @@ const discussionsUrl = `https://github.com/${siteConfig.giscus.repo}/discussions
   // The Giscus client script (and its connection to giscus.app) is only fetched
   // once the comments section is about to scroll into view.
   function loadGiscus(container: HTMLElement): void {
-    const { repo, repoId, category, categoryId, theme } = container.dataset;
+    const { repo, repoId, category, categoryId, theme, lang } = container.dataset;
     const script = document.createElement("script");
     script.src = "https://giscus.app/client.js";
     script.async = true;
@@ -43,7 +46,7 @@ const discussionsUrl = `https://github.com/${siteConfig.giscus.repo}/discussions
       reactionsEnabled: "1",
       emitMetadata: "0",
       inputPosition: "bottom",
-      lang: "en",
+      lang,
     });
     container.querySelector("[data-giscus-fallback]")?.remove();
     container.append(script);

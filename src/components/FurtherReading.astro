@@ -1,4 +1,6 @@
 ---
+import { i18n } from "@/i18n/ui";
+
 interface ExternalLink {
   title: string;
   url: string;
@@ -9,11 +11,12 @@ interface Props {
 }
 
 const { links = [] } = Astro.props;
+const { t } = i18n(Astro.currentLocale);
 ---
 
 {links.length > 0 && (
   <aside>
-    <h2>Further Reading</h2>
+    <h2>{t.furtherReading}</h2>
     <ul role="list">
       {links.map((link) => (
         <li>

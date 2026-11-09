@@ -1,4 +1,6 @@
 ---
+import { i18n } from "@/i18n/ui";
+
 interface Heading {
   depth: number;
   slug: string;
@@ -10,15 +12,16 @@ interface Props {
 }
 
 const { headings } = Astro.props;
+const { t } = i18n(Astro.currentLocale);
 
 const tocHeadings = headings.filter((h) => h.depth === 2);
 ---
 
 {/* Collapsed outline above the article for widths where the side TOC is hidden. */}
 {tocHeadings.length > 0 && (
-  <nav aria-label="Table of contents">
+  <nav aria-label={t.tableOfContents}>
     <details>
-      <summary>On this page</summary>
+      <summary>{t.onThisPage}</summary>
       <ol>
         {tocHeadings.map((heading) => (
           <li>

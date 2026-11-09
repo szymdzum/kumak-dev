@@ -1,4 +1,5 @@
 import { siteConfig } from "@/site-config";
+import { toLocale } from "@/i18n/ui";
 
 const SITE_HOSTNAME = new URL(siteConfig.url).hostname;
 
@@ -51,6 +52,8 @@ async function trackRequest(
       referrer: "",
       name: eventName,
       data: {
+        // Language of the requested path (/pl/... is Polish), as in client events.
+        lang: toLocale(url.split("/")[1]),
         agent: request.headers.get("user-agent") ?? "unknown",
         source: request.headers.get("referer") ?? "direct",
       },
@@ -79,8 +82,8 @@ export function trackLlmsRequest(request: Request, url: string): Promise<void> {
   return trackRequest(request, "llms-request", "LLMs.txt", url);
 }
 
-export function trackRssRequest(request: Request): Promise<void> {
-  return trackRequest(request, "rss-fetch", "RSS Feed", "/rss.xml");
+export function trackRssRequest(request: Request, path: string): Promise<void> {
+  return trackRequest(request, "rss-fetch", "RSS Feed", path);
 }
 
 const MAX_404_PATH_LENGTH = 200;

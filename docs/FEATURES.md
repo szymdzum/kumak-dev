@@ -7,6 +7,7 @@ Analysis of potential blog features, prioritized by impact and effort.
 | Feature | Status |
 |---------|--------|
 | SEO (Schema.org, OG, RSS, Sitemap) | Excellent |
+| Bilingual EN/PL (Polish slugs, hreflang, per-language RSS) | Good |
 | Accessibility (WCAG AA) | Excellent |
 | Performance (static, prefetch, lazy) | Excellent |
 | Comments (Giscus) | Good |

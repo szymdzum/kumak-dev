@@ -1,19 +1,21 @@
 ---
 import ActionButton from "./ActionButton.astro";
 import LlmsTxtIcon from "./LlmsTxtIcon.astro";
-import { llmsUrl } from "@utils/path";
+import { i18n } from "@/i18n/ui";
 
 interface Props {
-  slug: string;
+  /** The post's plain-text (llms.txt) path. */
+  href: string;
 }
 
-const { slug } = Astro.props;
+const { href } = Astro.props;
+const { t } = i18n(Astro.currentLocale);
 ---
 
 <ActionButton
-  href={llmsUrl(slug)}
+  href={href}
   label="LLM"
-  aria-label="View LLM-friendly version"
+  aria-label={t.llmsVersion}
   data-astro-prefetch="false"
 >
   <LlmsTxtIcon size={16} />

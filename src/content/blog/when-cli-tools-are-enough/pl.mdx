@@ -1,0 +1,78 @@
+---
+title: "Kiedy narzędzia CLI wystarczą"
+slug: kiedy-cli-wystarcza
+description: "Rok po premierze MCP Anthropic opublikował sposób na narzut kontekstu: odkrywanie narzędzi przez system plików. Ten wzorzec wyglądał znajomo."
+pubDate: 2025-11-15
+category: "opinion"
+tags: ["mcp", "cli", "developer-tools", "efficiency"]
+keywords:
+  [
+    "Model Context Protocol",
+    "MCP",
+    "narzędzia CLI",
+    "wiersz poleceń",
+    "efektywność programisty",
+    "Anthropic",
+  ]
+---
+
+import TldrBox from '@components/TldrBox.astro';
+
+<TldrBox>
+Serwery MCP często opakowują narzędzia CLI, które już zwracają ustrukturyzowane dane. Zanim dodasz kolejną warstwę protokołu, sprawdź, czy CLI nie robi już tego, czego potrzebujesz. Stopniowe ujawnianie, odkrywanie narzędzi przez system plików, wyjście w JSON: te wzorce nie są nowe. Tak działa Unix od dekad.
+</TldrBox>
+
+Rok temu Anthropic wypuścił Model Context Protocol. Społeczność zbudowała tysiące serwerów MCP. Dwa tygodnie temu Anthropic opublikował [przemyślenia o tym, jak zwiększyć wydajność MCP](https://www.anthropic.com/engineering/code-execution-with-mcp): konkretnie, jak ograniczyć narzut tokenów, gdy agent łączy się z wieloma narzędziami.
+
+Ich rozwiązanie polega na wygenerowaniu struktury plików, w której każde narzędzie MCP staje się plikiem TypeScript. Agent przegląda ten system plików, żeby odkryć narzędzia, czyta tylko potrzebne definicje i pisze kod, który je ze sobą łączy. W ich przykładzie zużycie spadło ze 150 000 do 2000 tokenów.
+
+Moją uwagę zwróciło jedno: budują system, w którym agenci odkrywają wykonywalne narzędzia, przeglądając strukturę systemu plików. Tym właśnie jest `/usr/bin` od początków Uniksa.
+
+## Wzorzec wrappera
+
+Wiele popularnych serwerów MCP opakowuje narzędzia CLI, które już zwracają ustrukturyzowane dane. Schemat jest zawsze ten sam: odbierz żądanie MCP, sparsuj je, zbuduj polecenie CLI, wykonaj je, sparsuj wynik, zserializuj go z powrotem do formatu MCP.
+
+Narzędzie wiersza poleceń SQLite obsługuje wyjście w JSON od wersji 3.33.0 z 2020 roku:
+
+```bash
+sqlite3 mydb.db 'SELECT * FROM users WHERE active = true' -json
+```
+
+GitHub CLI ma natywne wyjście w JSON od 2021 roku:
+
+```bash
+gh pr list --json number,title,author,state
+gh issue create --title "Bug report" --body "Description"
+```
+
+Kilka serwerów MCP wprost przedstawia się jako wrappery na narzędzie glab CLI albo coś podobnego. Dokładają warstwę serializacji do czegoś, co już zwraca ustrukturyzowane dane.
+
+To nie jest teoretyczny narzut. [Testy wydajności](https://www.twilio.com/en-us/blog/developers/twilio-alpha-mcp-server-real-world-performance) serwera MCP Twilio dały konkretne wyniki: liczba wywołań API spadła o 21,6%, ale odczyty z cache wzrosły o 28,5%, a zapisy do cache o 53,7%. **Całkowity koszt jednego zadania wzrósł o 23,5%.** Opakowali API, do którego i tak mieli dostęp, dodali warstwę MCP, żeby je zoptymalizować, i w efekcie zapłacili więcej za tokeny.
+
+Zespół Gemini CLI [opisał](https://github.com/google-gemini/gemini-cli/issues/4544) znaczące opóźnienie, około 8 do 12 sekund, zanim narzędzie zacznie odpowiadać. Dzieje się to przy każdym uruchomieniu serwera MCP. To nie jest jednorazowy koszt konfiguracji. Tak jest w każdej sesji. Narzędzia CLI działają od razu.
+
+## Kiedy MCP naprawdę ma sens
+
+MCP nie jest zbędny. Ma uzasadnione zastosowania:
+
+**Wewnętrzne, zamknięte systemy** bez CLI, w których trudno dodać CLI. Firmowy system zgłoszeń ze złożonym zarządzaniem stanem i bez zewnętrznego API do programowego dostępu zyska na serwerze MCP.
+
+**Złożone przepływy OAuth**, które wymagają logowania w przeglądarce, wielu przekierowań i zarządzania tokenami. Niektóre usługi celowo utrudniają dostęp programowy.
+
+**Wymagania bezpieczeństwa w dużych firmach**: logi audytowe, szczegółowe uprawnienia i zarządzanie sesjami wykraczające poza standardowe uprawnienia Uniksa.
+
+**Zdalne usługi**, które wymagają SDK, połączeń utrzymujących stan albo przetwarzania po stronie klienta, którego nie da się zrobić prostymi żądaniami HTTP.
+
+To prawdziwe problemy i MCP rozwiązuje je dobrze. Ale to nie jest typowy przypadek. Dostęp do baz danych, operacje na systemie kontroli wersji i na plikach mają już zwykle świetne narzędzia CLI.
+
+> **Uwaga:** Zanim pozwolisz agentowi uruchamiać polecenia na bazie danych, upewnij się, że masz kopię zapasową. Historie o agentach, które wyczyściły produkcyjną bazę, to nie miejskie legendy. Gdzie się da, używaj połączeń tylko do odczytu, testuj na danych w piaskownicy i nigdy nie dawaj prawa zapisu do niczego, czego nie da się odtworzyć.
+
+## Najpierw sprawdź CLI
+
+Wniosek Anthropic mówi wiele. Piszą, że choć wiele z tych problemów wydaje się nowych (zarządzanie kontekstem, składanie narzędzi, utrwalanie stanu), mają one znane rozwiązania w inżynierii oprogramowania. Mają rację. Skrypty powłoki, potoki, przekierowania i system plików rozwiązują je od dekad.
+
+Twilio doszło do wniosku, że wielu twórców zaczyna od MCP dla wygody, a później przechodzi na własne integracje narzędzi, gdy już dokładnie wie, czego potrzebuje ich agent. To przejście często oznacza odkrycie, że CLI już robi to, czego potrzeba.
+
+Zanim dodasz serwer MCP, sprawdź, czy istnieje narzędzie CLI. Jeśli tak, wypróbuj je. Agenci tacy jak Claude dobrze radzą sobie z narzędziami wiersza poleceń. Rozumieją bash, budują potoki i parsują ustrukturyzowane wyjście. Te umiejętności działają niezawodnie od samego początku.
+
+Wybierz najprostsze narzędzie, które rozwiązuje twój problem. Czasem to MCP. Często to CLI, które już masz zainstalowane.

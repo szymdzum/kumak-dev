@@ -8,6 +8,14 @@ import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { externalLinks } from "./src/utils/links.ts";
+import { POST_FILE, postUrl } from "./src/utils/path.ts";
+import {
+  DEFAULT_LOCALE,
+  hreflangLinks,
+  LOCALES,
+  PAGES_IN_ALL_LOCALES,
+  pathInAllLocales,
+} from "./src/i18n/ui.ts";
 import { scrollableTables } from "./src/utils/tables.ts";
 
 // Patches for @deno/astro-adapter 0.6.0 server.ts. Remove once fixed upstream
@@ -48,26 +56,52 @@ const patchDenoAdapter = () => ({
   },
 });
 
-// Sitemap <lastmod> for posts. astro:content isn't available here, so parse each post's
-// frontmatter directly (same YAML parser Astro uses). Slug = file name.
+// Sitemap <lastmod> and hreflang alternates. astro:content isn't available here, so parse each
+// post's frontmatter directly (same YAML parser Astro uses) and build URLs with the same helpers.
+const SITE = "https://kumak.dev";
 const BLOG_DIR = new URL("./src/content/blog/", import.meta.url);
 
-const postLastmod = new Map(
-  readdirSync(BLOG_DIR)
-    .filter((file) => /\.mdx?$/.test(file))
-    .map((file) => [
-      file.replace(/\.mdx?$/, ""),
-      parseFrontmatter(readFileSync(new URL(file, BLOG_DIR), "utf8")).frontmatter,
-    ])
-    .filter(([, fm]) => !fm.draft)
-    .map(([slug, fm]) => [slug, new Date(fm.updatedDate ?? fm.pubDate)])
-    .filter(([, date]) => !Number.isNaN(date.getTime()))
-    .map(([slug, date]) => [slug, date.toISOString()]),
+const readFrontmatter = (file) =>
+  parseFrontmatter(readFileSync(new URL(file, BLOG_DIR), "utf8")).frontmatter;
+
+// Published posts: { folder, locale, path, lastmod }. Same URL rule as postSlug() in utils/posts.
+const posts = readdirSync(BLOG_DIR, { recursive: true }).flatMap((file) => {
+  const match = POST_FILE.exec(file);
+  if (!match) return [];
+  const [, folder, locale] = match;
+  const fm = readFrontmatter(file);
+  if (fm.draft) return [];
+  const date = new Date(fm.updatedDate ?? fm.pubDate);
+  const lastmod = Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+  return [{ folder, locale, path: postUrl(locale, fm.slug ?? folder), lastmod }];
+});
+
+const lastmodByPath = new Map(posts.map(({ path, lastmod }) => [path, lastmod]));
+
+// Language versions of each page: posts paired by folder, plus pages in every language.
+const versionGroups = [
+  ...Object.values(Object.groupBy(posts, ({ folder }) => folder)).map((group) =>
+    group.map(({ locale, path }) => [locale, path])
+  ),
+  ...PAGES_IN_ALL_LOCALES.map((path) => Object.entries(pathInAllLocales(path))),
+];
+
+// path -> sitemap hreflang links, same rule as the <head> tags (hreflangLinks).
+const alternatesByPath = new Map(
+  versionGroups.flatMap((group) => {
+    const links = hreflangLinks(group).map(([lang, path]) => ({
+      lang,
+      url: new URL(path, SITE).href,
+    }));
+    return links.length ? group.map(([, path]) => [path, links]) : [];
+  }),
 );
 
-const withPostLastmod = (item) => {
-  const lastmod = postLastmod.get(new URL(item.url).pathname.replace(/^\/|\/$/g, ""));
-  return lastmod ? { ...item, lastmod } : item;
+const serializeSitemapItem = (item) => {
+  const path = new URL(item.url).pathname;
+  const lastmod = lastmodByPath.get(path);
+  const links = alternatesByPath.get(path);
+  return { ...item, ...(lastmod && { lastmod }), ...(links && { links }) };
 };
 
 // Latin subset (matches Google Fonts' "latin" unicode-range), shared by Inter and JetBrains Mono.
@@ -94,11 +128,43 @@ const LATIN_UNICODE_RANGE = [
   "U+FFFD",
 ];
 
+// Polish letters outside the latin subset (ą ć ę ł ń ś ź ż and capitals). Separate files cut from
+// Google Fonts' latin-ext builds of the same font versions, so they download only on pages that
+// use these letters.
+const POLISH_UNICODE_RANGE = [
+  "U+0104-0107",
+  "U+0118-0119",
+  "U+0141-0144",
+  "U+015A-015B",
+  "U+0179-017C",
+];
+
+// One variable file per subset, covering the weights the site uses (400-700). Latin comes first:
+// Head.astro preloads only the first variant.
+const subsetVariants = (font) =>
+  [
+    ["latin", LATIN_UNICODE_RANGE],
+    ["polish", POLISH_UNICODE_RANGE],
+  ].map(([subset, unicodeRange]) => ({
+    src: [`./src/assets/fonts/${font}-${subset}.woff2`],
+    weight: "400 700",
+    style: "normal",
+    display: "swap",
+    unicodeRange,
+  }));
+
 // https://astro.build/config
 export default defineConfig({
-  site: "https://kumak.dev",
+  site: SITE,
   output: "server",
   adapter: deno(),
+
+  // English at the root, other languages under /<locale>/.
+  i18n: {
+    locales: [...LOCALES],
+    defaultLocale: DEFAULT_LOCALE,
+    routing: { prefixDefaultLocale: false },
+  },
 
   fonts: [
     {
@@ -116,40 +182,18 @@ export default defineConfig({
         "Cantarell",
         "sans-serif",
       ],
-      options: {
-        // One variable file covering the weights the site uses (400, 500, 600, 700).
-        variants: [
-          {
-            src: ["./src/assets/fonts/inter-latin.woff2"],
-            weight: "400 700",
-            style: "normal",
-            display: "swap",
-            unicodeRange: LATIN_UNICODE_RANGE,
-          },
-        ],
-      },
+      options: { variants: subsetVariants("inter") },
     },
     {
       provider: fontProviders.local(),
       name: "JetBrains Mono",
       cssVariable: "--font-jetbrains-mono",
       fallbacks: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
-      options: {
-        // Variable file for headings, logo and code (400-700).
-        variants: [
-          {
-            src: ["./src/assets/fonts/jetbrains-mono-latin.woff2"],
-            weight: "400 700",
-            style: "normal",
-            display: "swap",
-            unicodeRange: LATIN_UNICODE_RANGE,
-          },
-        ],
-      },
+      options: { variants: subsetVariants("jetbrains-mono") }, // headings, logo and code
     },
   ],
 
-  integrations: [mdx(), sitemap({ serialize: withPostLastmod }), icon()],
+  integrations: [mdx(), sitemap({ serialize: serializeSitemapItem }), icon()],
 
   markdown: {
     shikiConfig: {
